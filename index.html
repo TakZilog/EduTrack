@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #15181d;
+    --plate: #1b1e25;
+    --paper: #f6f4ee;
+    --paper-dim: rgba(246,244,238,0.58);
+    --signal: #e8552a;
+    --muted: #9aa0ab;
+    --line: rgba(246,244,238,0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; min-height: 100%; width: 100%; max-width: 100%; overflow-x: hidden;
+    background: var(--ink); color: var(--paper);
+    font-family: 'Barlow', system-ui, sans-serif;
+  }
+
+  body {
+    min-height: 100vh; padding: 32px 20px;
+    display: flex; flex-direction: column; justify-content: center;
+    background-image: linear-gradient(rgba(21,24,29,0.62), rgba(21,24,29,0.62)), url('assets/img/campus-bg.webp');
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+  }
+
+  .plate {
+    position: relative;
+    width: 100%; max-width: 600px; margin: 0 auto;
+    background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 44px 40px 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+
+  .rivet {
+    position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--line);
+  }
+  .rivet.tl { top: 16px; left: 16px; }
+  .rivet.tr { top: 16px; right: 16px; }
+  .rivet.bl { bottom: 16px; left: 16px; }
+  .rivet.br { bottom: 16px; right: 16px; }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--signal);
+    margin: 0 0 10px; text-align: center;
+  }
+
+  .wordmark {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: clamp(2.4rem, 8vw, 3.2rem); letter-spacing: 0.01em;
+    text-transform: uppercase; text-align: center; margin: 0; line-height: 1;
+  }
+
+  .tagline {
+    text-align: center; color: var(--paper-dim); font-size: 0.92rem;
+    margin: 10px 0 32px; font-weight: 400;
+  }
+
+  .directory { border-top: 1px solid var(--line); }
+
+  .entry {
+    display: flex; align-items: center; gap: 18px;
+    padding: 20px 4px; text-decoration: none; color: var(--paper);
+    border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(6px);
+    animation: rise 0.5s ease forwards;
+  }
+  .entry:nth-child(1) { animation-delay: 0.05s; }
+  .entry:nth-child(2) { animation-delay: 0.14s; }
+  .entry:nth-child(3) { animation-delay: 0.23s; }
+
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  .entry .code {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500;
+    color: var(--muted); border: 1px solid var(--line); border-radius: 3px;
+    padding: 4px 7px; flex-shrink: 0; transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .entry .body { flex: 1; min-width: 0; }
+
+  .entry .title {
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.2rem;
+    text-transform: uppercase; letter-spacing: 0.01em; line-height: 1.2;
+  }
+
+  .entry .desc {
+    display: block;
+    color: var(--paper-dim); font-size: 0.84rem; margin-top: 3px; line-height: 1.4;
+  }
+
+  .entry .arrow {
+    font-size: 1.1rem; color: var(--muted); flex-shrink: 0;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .entry:hover, .entry:focus-visible {
+    background: rgba(246,244,238,0.03);
+  }
+  .entry:hover .code, .entry:focus-visible .code {
+    color: var(--signal); border-color: var(--signal);
+  }
+  .entry:hover .arrow, .entry:focus-visible .arrow {
+    color: var(--signal); transform: translateX(3px);
+  }
+  .entry:focus-visible {
+    outline: 2px solid var(--signal); outline-offset: -2px;
+  }
+
+  .footnote {
+    text-align: center; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem; color: var(--muted); letter-spacing: 0.02em;
+    margin-top: 26px;
+  }
+
+  @media (max-width: 480px) {
+    .plate { padding: 36px 22px 24px; }
+    .entry { gap: 12px; padding: 16px 2px; }
+    .entry .code { font-size: 0.7rem; padding: 3px 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .entry { animation: none; opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="plate">
+    <span class="rivet tl"></span><span class="rivet tr"></span>
+    <span class="rivet bl"></span><span class="rivet br"></span>
+
+    <p class="eyebrow">ACLC College &mdash; Mandaue Campus</p>
+    <h1 class="wordmark">EduTrack</h1>
+    <p class="tagline">Campus map &amp; room-to-room walkthrough</p>
+
+    <nav class="directory">
+      <a class="entry" href="guest-map.html">
+        <span class="code">GST</span>
+        <span class="body">
+          <span class="title">Continue as Guest</span>
+          <span class="desc">Browse the campus map — no account needed</span>
+        </span>
+        <span class="arrow">&rarr;</span>
+      </a>
+      <a class="entry" href="auth/login.html">
+        <span class="code">LOG</span>
+        <span class="body">
+          <span class="title">Student Login</span>
+          <span class="desc">Log in with your account for full access</span>
+        </span>
+        <span class="arrow">&rarr;</span>
+      </a>
+      <a class="entry" href="auth/register.html">
+        <span class="code">REG</span>
+        <span class="body">
+          <span class="title">Create Student Account</span>
+          <span class="desc">Requires a one-time code from the guard</span>
+        </span>
+        <span class="arrow">&rarr;</span>
+      </a>
+    </nav>
+
+    <p class="footnote">Ground floor, Admin Building — guard desk issues registration codes</p>
+  </div>
+
+</body>
+</html>

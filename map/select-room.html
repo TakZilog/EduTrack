@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTrack — Where do you want to go?</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    :root {
+      --ink: #15181d;
+      --plate: #1b1e25;
+      --paper: #f6f4ee;
+      --signal: #b3431f;
+      --signal-deep: #9e3a1a;
+      --muted: #9aa0ab;
+      --line: rgba(246, 244, 238, 0.14);
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Barlow', sans-serif;
+      background-image: linear-gradient(rgba(21, 24, 29, 0.62), rgba(21, 24, 29, 0.62)), url('../assets/img/campus-bg.webp');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .picker {
+      background: rgba(27, 30, 37, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 32px;
+      width: min(440px, 90vw);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .picker h1 {
+      color: var(--paper);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.7rem;
+      letter-spacing: 0.01em;
+      margin: 0 0 6px;
+    }
+
+    .picker p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0 0 20px;
+      line-height: 1.4;
+    }
+
+    #roomSearch {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    #roomSearch::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    #roomSearch:focus {
+      outline: none;
+      border-color: var(--signal);
+      box-shadow: 0 0 0 3px rgba(179, 67, 31, 0.2);
+    }
+
+    #roomList {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 280px;
+      overflow-y: auto;
+      border-top: 1px solid var(--line);
+    }
+
+    #roomList li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 10px;
+      min-height: 44px;
+      box-sizing: border-box;
+      color: var(--paper);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-bottom: 1px solid var(--line);
+      transition: background 0.12s ease;
+    }
+
+    #roomList li:hover,
+    #roomList li:focus-visible {
+      background: rgba(246, 244, 238, 0.04);
+    }
+
+    #roomList li .floor-tag {
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      text-align: right;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="picker">
+    <h1>Where do you want to go?</h1>
+    <p>Search or pick a room to start the walkthrough from the gate.</p>
+    <input id="roomSearch" type="text" placeholder="Search room, e.g. 101 or Clinic">
+    <ul id="roomList"></ul>
+  </div>
+
+  <script>
+    let allRooms = [];
+
+    fetch('../assets/nodes/nodes-edges.json')
+      .then(r => r.json())
+      .then(data => {
+        allRooms = data.rooms.sort((a, b) => a.room_name.localeCompare(b.room_name, undefined, { numeric: true }));
+        renderList(allRooms);
+      })
+      .catch(err => {
+        document.getElementById('roomList').innerHTML = '<li>Could not load room list. Check assets/nodes/nodes-edges.json exists.</li>';
+        console.error(err);
+      });
+
+    function renderList(rooms) {
+      const list = document.getElementById('roomList');
+      list.innerHTML = '';
+      rooms.forEach(r => {
+        const li = document.createElement('li');
+        li.innerHTML = `${r.room_name} <span class="floor-tag">${r.floor || ''}</span>`;
+        li.onclick = () => {
+          window.location.href = `walkthrough.html?room=${encodeURIComponent(r.room_name)}`;
+        };
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('roomSearch').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      renderList(allRooms.filter(r => r.room_name.toLowerCase().includes(q)));
+    });
+  </script>
+</body>
+
+</html>
+
+</html>

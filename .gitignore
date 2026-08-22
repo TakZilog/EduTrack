@@ -1,0 +1,11 @@
+node_modules
+vendor
+api/config.php
+
+# Claude Code / ruflo MCP tooling artifacts, not part of the app
+ruvector.db
+ruvector.db.lock
+agentdb.rvf
+agentdb.rvf.lock
+.claude-flow/
+.agents/

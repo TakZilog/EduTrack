@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack — Log In</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  body {
+    background-image: linear-gradient(rgba(21,24,29,0.62), rgba(21,24,29,0.62)), url('../assets/img/campus-bg.webp');
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+  }
+  .card {
+    background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+</style>
+</head>
+<body>
+  <div class="page-center">
+    <div class="card">
+      <h1>Log in</h1>
+      <p class="subtitle">Enter your student account details.</p>
+
+      <div id="alertBox" class="alert"></div>
+
+      <form id="loginForm" novalidate>
+        <label for="username">Username</label>
+        <input type="text" id="username" autocomplete="off" name="new-username-field">
+        <div class="field-error" id="err-username">Enter your username.</div>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password">
+        <div class="field-error" id="err-password">Enter your password.</div>
+
+        <button type="submit" class="btn" id="submitBtn">Log In</button>
+      </form>
+
+      <div class="form-footer">
+        No account yet? <a href="register.html">Register</a>
+      </div>
+    </div>
+  </div>
+
+<script src="auth.js"></script>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearErrors();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    let valid = true;
+    if (!username) { showError('username'); valid = false; }
+    if (!password) { showError('password'); valid = false; }
+    if (!valid) return;
+
+    setSubmitting(true);
+    fetch('../api/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    })
+      .then(res => res.json())
+      .then(data => {
+        setSubmitting(false);
+        if (!data.ok) {
+          showAlert(data.error || 'Login failed.', 'error');
+          return;
+        }
+        window.location.href = '../map/select-room.html';
+      })
+      .catch(() => {
+        setSubmitting(false);
+        showAlert('Could not reach server. Try again.', 'error');
+      });
+  });
+
+  function setSubmitting(state) {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = state;
+    btn.textContent = state ? 'Logging in…' : 'Log In';
+  }
+</script>
+</body>
+</html>

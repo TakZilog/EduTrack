@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack — Guard Login</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <div class="page-center">
+    <div class="card">
+      <h1>Guard Login</h1>
+      <p class="subtitle">Enter the guard passphrase to issue registration codes.</p>
+
+      <div id="alertBox" class="alert"></div>
+
+      <form id="guardLoginForm" novalidate>
+        <label for="passphrase">Passphrase</label>
+        <input type="password" id="passphrase" autocomplete="off">
+        <div class="field-error" id="err-passphrase">Enter the guard passphrase.</div>
+
+        <button type="submit" class="btn" id="submitBtn">Log In</button>
+      </form>
+    </div>
+  </div>
+
+<script src="../auth/auth.js"></script>
+<script>
+  document.getElementById('guardLoginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearErrors();
+
+    const passphrase = document.getElementById('passphrase').value;
+    if (!passphrase) {
+      showFieldErrorById('err-passphrase');
+      return;
+    }
+
+    setSubmitting(true);
+    fetch('../api/guard-login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passphrase })
+    })
+      .then(res => res.json())
+      .then(data => {
+        setSubmitting(false);
+        if (!data.ok) {
+          showAlert(data.error || 'Login failed.', 'error');
+          return;
+        }
+        window.location.href = 'issue-code.html';
+      })
+      .catch(() => {
+        setSubmitting(false);
+        showAlert('Could not reach server. Try again.', 'error');
+      });
+  });
+
+  function setSubmitting(state) {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = state;
+    btn.textContent = state ? 'Logging in…' : 'Log In';
+  }
+</script>
+</body>
+</html>

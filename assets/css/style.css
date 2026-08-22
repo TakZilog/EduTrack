@@ -1,0 +1,193 @@
+/* EduTrack — shared base styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root {
+  --bg: #15181d;
+  --panel: #1b1e25;
+  --border: rgba(246,244,238,0.14);
+  --text: #f6f4ee;
+  --text-dim: #9aa0ab;
+  --accent: #b3431f;
+  --accent-hover: #9e3a1a;
+  --danger: #e35d5d;
+  --success: #4caf7d;
+  --radius: 6px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', system-ui, sans-serif;
+}
+
+a { color: var(--text); }
+a:hover { color: var(--accent); }
+
+.page-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 34px 32px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.card h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.7rem;
+  letter-spacing: 0.01em;
+  margin: 0 0 6px;
+}
+
+.card .subtitle {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin: 0 0 24px;
+  line-height: 1.4;
+}
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
+  margin: 16px 0 6px;
+}
+
+label:first-of-type { margin-top: 0; }
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"] {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input::placeholder { color: var(--text-dim); opacity: 0.7; }
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(179,67,31,0.2);
+}
+
+.btn {
+  width: 100%;
+  padding: 13px;
+  min-height: 44px;
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  margin-top: 22px;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-secondary:hover { background: rgba(246,244,238,0.04); border-color: var(--text-dim); }
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin-top: 6px;
+  display: none;
+}
+
+.field-error.visible { display: block; }
+
+.form-footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-top: 20px;
+}
+
+.alert {
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin-bottom: 18px;
+  display: none;
+}
+
+.alert.visible { display: block; }
+.alert.success { background: rgba(76,175,125,0.1); color: var(--success); border: 1px solid rgba(76,175,125,0.3); }
+.alert.error { background: rgba(227,93,93,0.1); color: var(--danger); border: 1px solid rgba(227,93,93,0.3); }
+
+.otp-inputs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.otp-inputs input {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.2rem;
+  padding: 0;
+}
+
+.code-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+  margin-top: 18px;
+}
+
+.code-display .code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.7rem;
+  font-weight: 500;
+  letter-spacing: 5px;
+  color: var(--accent);
+}
+
+.code-display .code-note {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+  line-height: 1.4;
+}

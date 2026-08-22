@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTrack — Walkthrough</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #15181d;
+      --paper: #f6f4ee;
+      --signal: #e8552a;
+      --signal-dim: #b3431f;
+      --signal-deep: #9e3a1a;
+      --muted: #9aa0ab;
+      --line: rgba(246, 244, 238, 0.16);
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #000;
+      font-family: 'Barlow', 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    #panorama {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ---- top directory strip ---- */
+    #topBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px 18px 0;
+      background: linear-gradient(to bottom, rgba(10, 11, 13, 0.85), transparent);
+      color: var(--paper);
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    #topBar * {
+      pointer-events: auto;
+    }
+
+    #backLink {
+      color: var(--paper);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #backLink:hover {
+      color: var(--signal);
+    }
+
+    #stepLabel {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.1;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    #stepCount {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--paper);
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ---- route progress strip: the signature element ---- */
+    #routeStrip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 11;
+      display: flex;
+      gap: 3px;
+      padding: 0 18px;
+      box-sizing: border-box;
+      height: 3px;
+      pointer-events: none;
+    }
+
+    #routeStrip .tick {
+      flex: 1;
+      height: 100%;
+      background: rgba(246, 244, 238, 0.18);
+      transition: background 0.2s ease;
+    }
+
+    #routeStrip .tick.done {
+      background: var(--muted);
+    }
+
+    #routeStrip .tick.current {
+      background: var(--signal);
+    }
+
+    /* Pannellum ships its own title box — we render location info in #topBar
+     instead, so suppress theirs to avoid showing the same thing twice. */
+    .pnlm-title-box {
+      display: none !important;
+    }
+
+    /* ---- controls ---- */
+    #controls {
+      position: fixed;
+      bottom: 22px;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .navBtn {
+      background: var(--ink);
+      border: 1px solid var(--line);
+      color: var(--paper);
+      padding: 13px 26px;
+      min-height: 44px;
+      border-radius: 6px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 600;
+      font-size: 0.92rem;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      box-sizing: border-box;
+      box-shadow: inset 0 1px 0 rgba(246, 244, 238, 0.06);
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.08s ease;
+    }
+
+    .navBtn:hover:not(:disabled) {
+      border-color: var(--muted);
+    }
+
+    .navBtn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .navBtn:focus-visible {
+      outline: 2px solid var(--signal);
+      outline-offset: 2px;
+    }
+
+    .navBtn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .navBtn.primary {
+      background: var(--signal-dim);
+      border-color: var(--signal-dim);
+      color: #fff;
+    }
+
+    .navBtn.primary:hover:not(:disabled) {
+      background: var(--signal-deep);
+      border-color: var(--signal-deep);
+    }
+
+    /* ---- arrived plate ---- */
+    #arrivedBanner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.96);
+      background: rgba(21, 24, 29, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 36px 38px 30px;
+      color: var(--paper);
+      text-align: center;
+      z-index: 20;
+      display: none;
+      width: 280px;
+      opacity: 0;
+      animation: arrive 0.28s ease-out forwards;
+    }
+
+    @keyframes arrive {
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    #arrivedBanner.hiding {
+      animation: arrive-out 0.25s ease-in forwards;
+    }
+
+    @keyframes arrive-out {
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.96);
+      }
+    }
+
+    #arrivedBanner .check {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: var(--signal-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #arrivedBanner .eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin: 0 0 8px;
+    }
+
+    #arrivedBanner h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      margin: 0 0 22px;
+      line-height: 1;
+    }
+
+    #arrivedBanner a {
+      display: block;
+      background: var(--signal-dim);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 12px 20px;
+      border-radius: 6px;
+      min-height: 44px;
+      box-sizing: border-box;
+      line-height: 20px;
+      transition: background 0.15s ease, transform 0.08s ease;
+    }
+
+    #arrivedBanner a:hover {
+      background: var(--signal-deep);
+    }
+
+    #arrivedBanner a:active {
+      transform: scale(0.97);
+    }
+
+    #arrivedBanner a:focus-visible {
+      outline: 2px solid var(--signal);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #arrivedBanner {
+        animation: none;
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* ---- in-scene directional marker: minimal pulsing waypoint ---- */
+    .hotspot-arrow {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      box-sizing: border-box;
+      background: var(--signal-dim);
+      color: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.08s ease;
+    }
+
+    .hotspot-arrow::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--signal-dim);
+      opacity: 0;
+      animation: waypoint-pulse 2.2s ease-out infinite;
+    }
+
+    @keyframes waypoint-pulse {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.7;
+      }
+
+      100% {
+        transform: scale(1.35);
+        opacity: 0;
+      }
+    }
+
+    .hotspot-arrow svg {
+      width: 18px;
+      height: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hotspot-arrow:hover {
+      background: var(--signal-deep);
+    }
+
+    .hotspot-arrow:active {
+      transform: scale(0.94);
+    }
+
+    .hotspot-arrow:focus-visible {
+      outline: 2px solid var(--paper);
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hotspot-arrow::before {
+        animation: none;
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="routeStrip"></div>
+
+  <div id="topBar">
+    <a id="backLink" href="select-room.html">&larr; Choose different room</a>
+    <div style="text-align:right">
+      <div id="stepLabel">Loading…</div>
+      <div id="stepCount"></div>
+    </div>
+  </div>
+
+  <div id="panorama"></div>
+
+  <div id="controls">
+    <button class="navBtn" id="prevBtn">&larr; Back</button>
+    <button class="navBtn primary" id="nextBtn">Next &rarr;</button>
+  </div>
+
+  <div id="arrivedBanner">
+    <div class="check" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M4 10.5L8 14.5L16 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <p class="eyebrow">Destination reached</p>
+    <h2 id="arrivedRoomName"></h2>
+    <a href="select-room.html">Choose another room</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script src="walkthrough.js?v=2"></script>
+</body>
+
+</html>
