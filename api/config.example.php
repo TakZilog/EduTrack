@@ -15,6 +15,10 @@ return [
     'db_name' => 'edutrack',
     'db_user' => 'root',
     'db_pass' => '',
-
+    // Guard login. Put the plain passphrase here (what the guard types):
     'guard_passphrase' => 'change-me',
+
+    // Optional, stronger: leave guard_passphrase empty and put a bcrypt hash here.
+    // Generate with: php -r "echo password_hash('your-pass', PASSWORD_DEFAULT);"
+    'guard_passphrase_hash' => '',
 ];
