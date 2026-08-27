@@ -64,13 +64,8 @@
     }
 
     setSubmitting(true);
-    fetch('../api/verify-otp.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
-    })
-      .then(res => res.json())
-      .then(data => {
+    apiPost('verify-otp.php', { code })
+      .then(({ data }) => {
         setSubmitting(false);
         if (!data.ok) {
           showFieldErrorById('err-otp');
@@ -92,12 +87,8 @@
       showAlert('No pending email found. Please register again.', 'error');
       return;
     }
-    fetch('../api/resend-otp.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(res => res.json())
-      .then(data => {
+    apiPost('resend-otp.php')
+      .then(({ data }) => {
         showAlert(data.ok ? 'A new code has been sent.' : (data.error || 'Failed to resend code.'), data.ok ? 'success' : 'error');
       })
       .catch(() => showAlert('Could not reach server. Try again.', 'error'));

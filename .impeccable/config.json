@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "1.5rem",
+        "createdAt": "2026-08-26T12:29:26.320Z",
+        "reason": "adapt map/walkthrough.html: short-viewport (landscape/max-height:480px) down-step of the existing 2rem arrived-banner Display headline, same family/weight, just smaller for cramped viewports"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "Auth/register.html"
+        ],
+        "createdAt": "2026-08-26T13:23:52.681Z",
+        "reason": "Claude, verified against the rendered components: the rule compares 12.5px (the info-btn '?' glyph inside an 18px circular toggle) against 12.8px (help-popover body copy) and 15.2px (the fixed page-chrome back button). Those three are unrelated components, not steps in one hierarchy, so no ratio between them is meaningful. Widening the gap would mean an unreadable glyph or an oversized popover."
+      }
+    ]
+  }
+}

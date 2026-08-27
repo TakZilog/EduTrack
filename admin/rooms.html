@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Rooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+<style>
+  /* The walk, as pictures, in the order a visitor sees them. */
+  .strip { display: flex; flex-direction: column; gap: 14px; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    align-items: center;
+    padding: 14px;
+    background: var(--plate-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+  }
+  .step[data-last="true"] { border-color: var(--signal); background: var(--signal-wash); }
+
+  .step img {
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    object-fit: cover;
+    border-radius: var(--r-sm);
+    background: var(--ink);
+    display: block;
+  }
+
+  .step .n {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: var(--fs-label);
+    color: var(--paper-2);
+  }
+  /* Body size at 600, against a 15px muted line below. Weight and colour carry
+     the hierarchy, so a size between body and section is not needed. */
+  .step .t { font-weight: 600; margin: 4px 0 6px; }
+  .step .d { color: var(--paper-2); font-size: var(--fs-label); margin: 0; }
+
+  @media (max-width: 620px) {
+    .step { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="wordmark">EduTrack</div>
+      <div class="sub">Staff panel</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>Rooms</h1>
+          <p class="lede">Every room a visitor can walk to from the gate, and any problems with the map.</p>
+        </div>
+      </div>
+
+      <div class="cards" id="summary"></div>
+
+      <section class="panel">
+        <h2>Problems with the map</h2>
+        <div id="problems"></div>
+        <p class="field-hint" style="margin-top:16px">
+          The map is built from photographs and is edited outside this panel. This screen tells you
+          what is wrong so it can be fixed at the source.
+        </p>
+      </section>
+
+      <section class="panel" id="unlistedPanel" hidden>
+        <h2>Not shown to visitors</h2>
+        <p class="field-hint" style="margin-top:0">
+          These room photos are on the map but are not offered in the visitor's list.
+          Their walks still work, so any of them can be put back.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Rooms not shown to visitors</caption>
+            <thead>
+              <tr>
+                <th scope="col">Photo</th>
+                <th scope="col">Can visitors reach it</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="unlistedRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="toolbar">
+        <div class="search">
+          <label class="sr-only" for="q">Search rooms</label>
+          <input type="search" id="q" placeholder="Search rooms, for example 101 or Clinic">
+        </div>
+        <div>
+          <label class="sr-only" for="floor">Floor</label>
+          <select id="floor"><option value="">Every floor</option></select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">Rooms on the campus map</caption>
+          <thead>
+            <tr>
+              <th scope="col">Room</th>
+              <th scope="col" class="hide-sm">Floor</th>
+              <th scope="col">Can visitors reach it</th>
+              <th scope="col" class="hide-sm">Steps from gate</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/admin/admin.js"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+
+  const rows = document.getElementById('rows');
+  let all = [];
+  let floors = [];
+  const state = { q: '', floor: '' };
+
+  // load() runs at the very bottom of this block, after every const it depends
+  // on exists. Calling it here instead threw a ReferenceError on floorSelect,
+  // which is declared further down, and the table sat on skeletons forever.
+
+  async function load() {
+    showSkeleton(rows, 8, 5);
+
+    const { data } = await apiGet('rooms.php');
+    if (!data.ok) {
+      toast(data.error || 'Could not load the rooms.', 'bad');
+      return;
+    }
+
+    all = data.rooms;
+    floors = data.floors.filter(Boolean);
+    drawSummary(data);
+    drawProblems(data);
+    drawUnlisted(data.unlisted || []);
+    fillFloorFilter();
+    paint();
+  }
+
+  function drawUnlisted(list) {
+    const panel = document.getElementById('unlistedPanel');
+    const rows = document.getElementById('unlistedRows');
+    panel.hidden = list.length === 0;
+    if (list.length === 0) return;
+
+    rows.replaceChildren();
+    list.forEach(item => {
+      const tr = document.createElement('tr');
+
+      const who = document.createElement('td');
+      const strong = document.createElement('div');
+      strong.className = 'strong';
+      strong.textContent = item.label || item.nodeId;
+      const sub = document.createElement('div');
+      sub.className = 'sub mono';
+      sub.textContent = item.nodeId;
+      who.append(strong, sub);
+      tr.appendChild(who);
+
+      const reach = document.createElement('td');
+      reach.appendChild(item.reachable ? pill('Yes', 'verified') : pill('No route', 'revoked'));
+      tr.appendChild(reach);
+
+      const actions = document.createElement('td');
+      const box = document.createElement('div');
+      box.className = 'row-actions';
+
+      if (allowed('room.edit')) {
+        const put = document.createElement('button');
+        put.className = 'btn btn-small btn-quiet';
+        put.type = 'button';
+        put.textContent = 'Put back on the list';
+        put.addEventListener('click', () => relist(item));
+        box.appendChild(put);
+      }
+
+      actions.appendChild(box);
+      tr.appendChild(actions);
+      rows.appendChild(tr);
+    });
+  }
+
+  function relist(item) {
+    const dialog = document.createElement('dialog');
+    const body = document.createElement('div');
+    body.className = 'dialog-body';
+
+    const h = document.createElement('h2');
+    h.textContent = 'Put this room back on the list';
+    const p = document.createElement('p');
+    p.textContent = 'Visitors will be able to choose it again. Give it the name and floor they should see.';
+    body.append(h, p);
+
+    const nameField = document.createElement('div');
+    nameField.className = 'field';
+    const nameLabel = document.createElement('label');
+    nameLabel.setAttribute('for', 'relistName');
+    nameLabel.textContent = 'Room name';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.id = 'relistName';
+    nameInput.maxLength = 100;
+    nameInput.value = item.label || '';
+    nameField.append(nameLabel, nameInput);
+
+    const floorField = document.createElement('div');
+    floorField.className = 'field';
+    const floorLabel = document.createElement('label');
+    floorLabel.setAttribute('for', 'relistFloor');
+    floorLabel.textContent = 'Floor';
+    const floorInput = document.createElement('select');
+    floorInput.id = 'relistFloor';
+    floors.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f;
+      opt.textContent = f;
+      floorInput.appendChild(opt);
+    });
+    floorField.append(floorLabel, floorInput);
+
+    const error = document.createElement('p');
+    error.className = 'field-error';
+    body.append(nameField, floorField, error);
+
+    const foot = document.createElement('div');
+    foot.className = 'dialog-foot';
+    const cancel = document.createElement('button');
+    cancel.className = 'btn btn-quiet';
+    cancel.type = 'button';
+    cancel.textContent = 'Cancel';
+    const save = document.createElement('button');
+    save.className = 'btn';
+    save.type = 'button';
+    save.textContent = 'Put it back';
+    foot.append(cancel, save);
+
+    dialog.append(body, foot);
+    document.body.appendChild(dialog);
+
+    const shut = () => { dialog.close(); dialog.remove(); };
+    cancel.addEventListener('click', shut);
+    dialog.addEventListener('cancel', e => { e.preventDefault(); shut(); });
+
+    save.addEventListener('click', async () => {
+      error.classList.remove('on');
+      save.disabled = true;
+      save.textContent = 'Saving…';
+
+      const { data } = await apiPost('room-action.php', {
+        action: 'relist',
+        nodeId: item.nodeId,
+        newName: nameInput.value.trim(),
+        floor: floorInput.value
+      });
+
+      save.disabled = false;
+      save.textContent = 'Put it back';
+
+      if (!data.ok) {
+        error.textContent = data.error;
+        error.classList.add('on');
+        return;
+      }
+      shut();
+      toast(data.message);
+      load();
+    });
+
+    dialog.showModal();
+    nameInput.focus();
+    nameInput.select();
+  }
+
+  function drawSummary(data) {
+  const summary = document.getElementById('summary');
+  summary.replaceChildren();
+  const unreachable = all.filter(r => !r.reachable).length;
+  [
+    { n: data.summary.rooms,  l: 'Rooms on the map', tone: '' },
+    { n: data.summary.photos, l: 'Photos in the walkthrough', tone: '' },
+    { n: unreachable, l: 'Rooms visitors cannot reach', tone: unreachable > 0 ? 'bad' : 'good' },
+    { n: data.problems.length, l: 'Problems found', tone: data.problems.length > 0 ? 'warn' : 'good' }
+  ].forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.cursor = 'default';
+    const n = document.createElement('div');
+    n.className = 'n' + (c.tone ? ' ' + c.tone : '');
+    n.textContent = c.n;
+    const l = document.createElement('div');
+    l.className = 'l';
+    l.textContent = c.l;
+    div.append(n, l);
+    summary.appendChild(div);
+  });
+  }
+
+  function drawProblems(data) {
+  const problems = document.getElementById('problems');
+  problems.replaceChildren();
+  if (data.problems.length === 0) {
+    const ok = document.createElement('div');
+    ok.className = 'notice notice-good';
+    const box = document.createElement('div');
+    const t = document.createElement('p');
+    t.className = 't';
+    t.textContent = 'No problems found';
+    const d = document.createElement('p');
+    d.className = 'd';
+    d.textContent = 'Every room can be reached and every photo is in place.';
+    box.append(t, d);
+    ok.appendChild(box);
+    problems.appendChild(ok);
+  } else {
+    data.problems.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'notice notice-' + (p.severity === 'error' ? 'error' : 'warning');
+      const box = document.createElement('div');
+      const t = document.createElement('p');
+      t.className = 't';
+      t.textContent = p.title;
+      const d = document.createElement('p');
+      d.className = 'd';
+      d.textContent = p.detail;
+      box.append(t, d);
+      el.appendChild(box);
+      problems.appendChild(el);
+    });
+  }
+  }
+
+  const floorSelect = document.getElementById('floor');
+
+  function fillFloorFilter() {
+    const chosen = floorSelect.value;
+    floorSelect.replaceChildren();
+    const every = document.createElement('option');
+    every.value = '';
+    every.textContent = 'Every floor';
+    floorSelect.appendChild(every);
+    floors.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f;
+      opt.textContent = f;
+      floorSelect.appendChild(opt);
+    });
+    if (floors.includes(chosen)) floorSelect.value = chosen;
+  }
+
+  floorSelect.addEventListener('change', e => { state.floor = e.target.value; paint(); });
+
+  document.getElementById('q').addEventListener('input', debounce(e => {
+    state.q = e.target.value.trim().toLowerCase();
+    paint();
+  }, 250));
+
+  function paint() {
+    const list = all.filter(r =>
+      (state.q === '' || r.name.toLowerCase().includes(state.q)) &&
+      (state.floor === '' || r.floor === state.floor)
+    );
+
+    if (list.length === 0) {
+      showEmpty(rows, 5, 'No rooms match',
+        'Nothing here fits what you searched for.',
+        'Show every room',
+        () => {
+          state.q = ''; state.floor = '';
+          document.getElementById('q').value = '';
+          floorSelect.value = '';
+          paint();
+        });
+      return;
+    }
+
+    rows.replaceChildren();
+    list.forEach(room => {
+      const tr = document.createElement('tr');
+
+      const name = document.createElement('td');
+      const strong = document.createElement('div');
+      strong.className = 'strong';
+      strong.textContent = room.name;
+      const sub = document.createElement('div');
+      sub.className = 'sub';
+      sub.textContent = room.floor;
+      name.append(strong, sub);
+      tr.appendChild(name);
+
+      tr.appendChild(cell(room.floor, 'hide-sm sub'));
+
+      const reach = document.createElement('td');
+      reach.appendChild(room.reachable
+        ? pill('Yes', 'verified')
+        : pill('No route', 'revoked'));
+      tr.appendChild(reach);
+
+      tr.appendChild(cell(room.steps ? String(room.steps) : '—', 'hide-sm sub'));
+
+      const actions = document.createElement('td');
+      const box = document.createElement('div');
+      box.className = 'row-actions';
+      const see = document.createElement('button');
+      see.className = 'btn btn-small btn-quiet';
+      see.type = 'button';
+      see.textContent = 'See the walk';
+      see.addEventListener('click', () => showRoute(room));
+      box.appendChild(see);
+
+      if (room.reachable) {
+        const a = document.createElement('a');
+        a.className = 'btn btn-small btn-quiet';
+        a.href = '../map/walkthrough.html?room=' + encodeURIComponent(room.name);
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = 'Open in viewer';
+        box.appendChild(a);
+      }
+      if (allowed('room.edit')) {
+        const edit = document.createElement('button');
+        edit.className = 'btn btn-small btn-quiet';
+        edit.type = 'button';
+        edit.textContent = 'Edit details';
+        edit.addEventListener('click', () => editRoom(room));
+        box.appendChild(edit);
+      }
+      actions.appendChild(box);
+      tr.appendChild(actions);
+
+      rows.appendChild(tr);
+    });
+  }
+
+  /*
+    The walk, as pictures. This is the answer to "which photo is which part of
+    the building": nobody reads a node id, they look at the corridor and read
+    where it leads.
+  */
+  async function showRoute(room) {
+    const dialog = document.createElement('dialog');
+    dialog.style.width = 'min(860px, calc(100vw - 40px))';
+
+    const body = document.createElement('div');
+    body.className = 'dialog-body';
+
+    const h = document.createElement('h2');
+    h.textContent = 'The walk to ' + room.name;
+    const p = document.createElement('p');
+    p.textContent = 'Loading…';
+    body.append(h, p);
+
+    const foot = document.createElement('div');
+    foot.className = 'dialog-foot';
+    const close = document.createElement('button');
+    close.className = 'btn btn-quiet';
+    close.type = 'button';
+    close.textContent = 'Close';
+    foot.appendChild(close);
+
+    dialog.append(body, foot);
+    document.body.appendChild(dialog);
+
+    const shut = () => { dialog.close(); dialog.remove(); };
+    close.addEventListener('click', shut);
+    dialog.addEventListener('cancel', e => { e.preventDefault(); shut(); });
+    dialog.showModal();
+    close.focus();
+
+    const { data } = await apiGet('room-route.php', { name: room.name });
+    if (!data.ok) {
+      p.textContent = data.error || 'Could not load the walk.';
+      return;
+    }
+
+    if (!data.reachable) {
+      p.textContent = data.why;
+      p.style.color = 'var(--danger)';
+      return;
+    }
+
+    p.textContent = 'From the gate to the door, ' + data.total
+      + ' photos. This is exactly what a visitor sees, in order.';
+
+    const strip = document.createElement('div');
+    strip.className = 'strip';
+
+    data.steps.forEach(step => {
+      const row = document.createElement('div');
+      row.className = 'step';
+      row.dataset.last = String(step.isLast);
+
+      const img = document.createElement('img');
+      img.src = '../api/admin/thumb.php?node=' + encodeURIComponent(step.nodeId);
+      img.loading = 'lazy';
+      img.alt = 'Photo at step ' + step.position + ': ' + step.title;
+
+      const text = document.createElement('div');
+
+      const n = document.createElement('div');
+      n.className = 'n';
+      n.textContent = 'Step ' + step.position + ' of ' + data.total;
+
+      const t = document.createElement('div');
+      t.className = 't';
+      t.textContent = step.title;
+
+      const d = document.createElement('p');
+      d.className = 'd';
+      if (step.isLast) {
+        d.textContent = 'The door. This is where the walk ends.';
+      } else if (step.shared > 6) {
+        // Naming forty rooms helps nobody; the count is the useful fact.
+        d.textContent = 'A main corridor. ' + step.shared + ' rooms are reached through here.';
+      } else if (step.shared > 0) {
+        d.textContent = 'On the way to ' + step.leadsTo.join(', ') + '.';
+      } else {
+        d.textContent = 'Leads only to this room.';
+      }
+
+      text.append(n, t, d);
+
+      // Replacing is offered next to the picture itself. You choose the photo
+      // by looking at it, never by knowing what a node id is.
+      if (allowed('room.edit')) {
+        const swap = document.createElement('button');
+        swap.className = 'btn btn-small btn-quiet';
+        swap.type = 'button';
+        swap.textContent = 'Replace this photo';
+        swap.style.marginTop = '10px';
+        swap.addEventListener('click', () => replacePhoto(step, img, row));
+        text.appendChild(swap);
+      }
+
+      row.append(img, text);
+      strip.appendChild(row);
+    });
+
+    body.appendChild(strip);
+  }
+
+  /*
+    One photo, swapped in place. The route does not change, so this cannot
+    strand a room or break a link. The old picture is kept on the server.
+  */
+  function replacePhoto(step, imgEl, rowEl) {
+    const picker = document.createElement('input');
+    picker.type = 'file';
+    picker.accept = 'image/jpeg,image/png,image/webp';
+
+    picker.addEventListener('change', async () => {
+      const file = picker.files[0];
+      if (!file) return;
+
+      const yes = await confirmAction({
+        title: 'Replace the photo at step ' + step.position + '?',
+        message: 'Visitors will see this new picture at "' + step.title + '". '
+          + 'It must be a 360 photo, twice as wide as it is tall. '
+          + 'The old picture is kept on the server, so this can be undone.',
+        confirmLabel: 'Yes, replace it'
+      });
+      if (!yes) return;
+
+      const note = document.createElement('p');
+      note.className = 'd';
+      note.textContent = 'Uploading…';
+      rowEl.appendChild(note);
+
+      const form = new FormData();
+      form.append('node', step.nodeId);
+      form.append('photo', file);
+
+      let data;
+      try {
+        const res = await fetch('../api/admin/photo-replace.php', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'X-CSRF-Token': csrfToken },
+          body: form   // no Content-Type: the browser sets the multipart boundary
+        });
+        data = await res.json();
+      } catch {
+        data = { ok: false, error: 'Could not reach the server. Please try again.' };
+      }
+
+      note.remove();
+
+      if (!data.ok) {
+        toast(data.error, 'bad');
+        return;
+      }
+
+      toast(data.message + ' Now ' + data.width + ' by ' + data.height + ', ' + data.sizeKb + ' KB.');
+      // Cache-bust so the new picture shows immediately.
+      imgEl.src = '../api/admin/thumb.php?node=' + encodeURIComponent(step.nodeId) + '&v=' + Date.now();
+    });
+
+    picker.click();
+  }
+
+  /*
+    Only the name and the floor. The route and the photos are not editable
+    here on purpose: which photo leads to which is worked out by comparing the
+    images, so it is changed by walking the building again, not by typing.
+  */
+  function editRoom(room) {
+    const dialog = document.createElement('dialog');
+
+    const body = document.createElement('div');
+    body.className = 'dialog-body';
+
+    const h = document.createElement('h2');
+    h.textContent = 'Edit room details';
+    const p = document.createElement('p');
+    p.textContent = 'This changes what visitors see in the room list. The photos and the walking route are not affected.';
+    body.append(h, p);
+
+    const nameField = document.createElement('div');
+    nameField.className = 'field';
+    const nameLabel = document.createElement('label');
+    nameLabel.setAttribute('for', 'roomName');
+    nameLabel.textContent = 'Room name';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.id = 'roomName';
+    nameInput.maxLength = 100;
+    nameInput.value = room.name;
+    const nameHint = document.createElement('p');
+    nameHint.className = 'field-hint';
+    nameHint.textContent = 'Every room needs a different name. Two rooms with the same name means only one of them can be reached.';
+    nameField.append(nameLabel, nameInput, nameHint);
+
+    const floorField = document.createElement('div');
+    floorField.className = 'field';
+    const floorLabel = document.createElement('label');
+    floorLabel.setAttribute('for', 'roomFloor');
+    floorLabel.textContent = 'Floor';
+    const floorInput = document.createElement('select');
+    floorInput.id = 'roomFloor';
+    floors.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f;
+      opt.textContent = f;
+      if (f === room.floor) opt.selected = true;
+      floorInput.appendChild(opt);
+    });
+    floorField.append(floorLabel, floorInput);
+
+    const error = document.createElement('p');
+    error.className = 'field-error';
+
+    body.append(nameField, floorField, error);
+
+    const foot = document.createElement('div');
+    foot.className = 'dialog-foot';
+
+    const remove = document.createElement('button');
+    remove.className = 'btn btn-small btn-danger';
+    remove.type = 'button';
+    remove.textContent = 'Remove from list';
+    remove.style.marginRight = 'auto';
+
+    const cancel = document.createElement('button');
+    cancel.className = 'btn btn-quiet';
+    cancel.type = 'button';
+    cancel.textContent = 'Cancel';
+
+    const save = document.createElement('button');
+    save.className = 'btn';
+    save.type = 'button';
+    save.textContent = 'Save';
+
+    foot.append(remove, cancel, save);
+    dialog.append(body, foot);
+    document.body.appendChild(dialog);
+
+    const close = () => { dialog.close(); dialog.remove(); };
+    cancel.addEventListener('click', close);
+    dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
+
+    save.addEventListener('click', async () => {
+      error.classList.remove('on');
+      save.disabled = true;
+      save.textContent = 'Saving…';
+
+      const { data } = await apiPost('room-action.php', {
+        action: 'rename',
+        name: room.name,
+        newName: nameInput.value.trim(),
+        floor: floorInput.value
+      });
+
+      save.disabled = false;
+      save.textContent = 'Save';
+
+      if (!data.ok) {
+        error.textContent = data.error;
+        error.classList.add('on');
+        return;
+      }
+      close();
+      toast(data.message);
+      load();
+    });
+
+    remove.addEventListener('click', async () => {
+      close();
+      const yes = await confirmAction({
+        title: 'Remove this room from the list?',
+        message: '"' + room.name + '" will no longer be offered to visitors. The photos and the route are kept, so it can be put back later.',
+        confirmLabel: 'Yes, remove it',
+        danger: true
+      });
+      if (!yes) return;
+
+      const { data } = await apiPost('room-action.php', { action: 'remove', name: room.name });
+      if (!data.ok) { toast(data.error, 'bad'); return; }
+      toast(data.message);
+      load();
+    });
+
+    dialog.showModal();
+    nameInput.focus();
+    nameInput.select();
+  }
+
+  // Everything above is declared. Safe to fetch and render now.
+  await load();
+})();
+</script>
+</body>
+</html>

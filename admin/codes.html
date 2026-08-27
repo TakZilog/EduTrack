@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Codes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+<style>
+  /* The code itself is the point of this screen, so it is set large enough to
+     read across a desk and copy onto paper without leaning in. */
+  .issued {
+    text-align: center;
+    padding: 32px 24px;
+    border: 1px solid rgba(232,85,42,0.4);
+    background: var(--signal-wash);
+    border-radius: var(--r-md);
+    margin-bottom: 28px;
+  }
+  .issued .code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 3.25rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    color: var(--paper);
+    line-height: 1.1;
+  }
+  .issued .note { color: var(--paper-2); margin: 12px 0 0; }
+  .code-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="wordmark">EduTrack</div>
+      <div class="sub">Staff panel</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>Codes</h1>
+          <p class="lede">One-time codes students need before they can make an account.</p>
+        </div>
+        <div class="actions" id="headActions"></div>
+      </div>
+
+      <div id="issued"></div>
+
+      <div class="toolbar">
+        <div class="tabs" role="group" aria-label="Show which codes">
+          <button class="tab" type="button" data-status="all">All</button>
+          <button class="tab" type="button" data-status="active">Ready to use</button>
+          <button class="tab" type="button" data-status="redeemed">Used</button>
+          <button class="tab" type="button" data-status="expired">Ran out of time</button>
+          <button class="tab" type="button" data-status="revoked">Cancelled</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only" id="caption">Codes</caption>
+          <thead>
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Status</th>
+              <th scope="col">Used by</th>
+              <th scope="col" class="hide-sm">Given out</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <div class="pager" id="pager"></div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/admin/admin.js"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+
+  const rows = document.getElementById('rows');
+  const pager = document.getElementById('pager');
+  const caption = document.getElementById('caption');
+  const issued = document.getElementById('issued');
+
+  const params = new URLSearchParams(window.location.search);
+  const state = { status: params.get('status') || 'all', page: 1 };
+
+  const STATUS = {
+    active:   { label: 'Ready to use',     kind: 'active' },
+    redeemed: { label: 'Used',             kind: 'redeemed' },
+    expired:  { label: 'Ran out of time',  kind: 'expired' },
+    revoked:  { label: 'Cancelled',        kind: 'revoked' }
+  };
+
+  const TAB_TEXT = {
+    all: 'All codes',
+    active: 'Codes ready to use',
+    redeemed: 'Codes that have been used',
+    expired: 'Codes that ran out of time',
+    revoked: 'Codes that were cancelled'
+  };
+
+  /* Header actions depend on what this person may do. */
+  const head = document.getElementById('headActions');
+  if (allowed('code.issue')) {
+    const give = document.createElement('button');
+    give.className = 'btn';
+    give.type = 'button';
+    give.textContent = 'Give out a code';
+    give.addEventListener('click', () => issue(give));
+    head.appendChild(give);
+  }
+  if (allowed('code.revoke')) {
+    const cancelAll = document.createElement('button');
+    cancelAll.className = 'btn btn-quiet';
+    cancelAll.type = 'button';
+    cancelAll.textContent = 'Cancel all unused';
+    cancelAll.addEventListener('click', async () => {
+      const yes = await confirmAction({
+        title: 'Cancel every unused code?',
+        message: 'All codes that have been given out but not yet used will stop working. Anyone holding one will need a new code. Codes already used are not affected.',
+        confirmLabel: 'Yes, cancel them',
+        danger: true
+      });
+      if (!yes) return;
+      const { data } = await apiPost('code-action.php', { action: 'revoke-all' });
+      if (!data.ok) { toast(data.error, 'bad'); return; }
+      toast(data.message);
+      load();
+    });
+    head.appendChild(cancelAll);
+  }
+
+  async function issue(btn) {
+    btn.disabled = true;
+    btn.textContent = 'Making a code…';
+
+    const { data } = await apiPost('code-action.php', { action: 'issue' });
+
+    btn.disabled = false;
+    btn.textContent = 'Give out a code';
+
+    if (!data.ok) { toast(data.error || 'Could not make a code.', 'bad'); return; }
+
+    issued.replaceChildren();
+    const box = document.createElement('div');
+    box.className = 'issued';
+    box.setAttribute('role', 'status');
+
+    const code = document.createElement('div');
+    code.className = 'code';
+    code.textContent = data.code;
+
+    const note = document.createElement('p');
+    note.className = 'note';
+    note.textContent = 'Give this code to the student now. It works once, and only for the next '
+      + data.minutes + ' minutes.';
+
+    box.append(code, note);
+    issued.appendChild(box);
+    load();
+  }
+
+  function paintTabs() {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.setAttribute('aria-pressed', String(t.dataset.status === state.status));
+    });
+    caption.textContent = TAB_TEXT[state.status];
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.status = tab.dataset.status;
+      state.page = 1;
+      const url = new URL(window.location);
+      url.searchParams.set('status', state.status);
+      history.replaceState(null, '', url);
+      paintTabs();
+      load();
+    });
+  });
+
+  async function load() {
+    showSkeleton(rows, 6, 5);
+    const { data } = await apiGet('codes.php', { status: state.status, page: state.page });
+
+    if (!data.ok) { toast(data.error || 'Could not load codes.', 'bad'); return; }
+
+    if (data.data.length === 0) {
+      const filtered = state.status !== 'all';
+      showEmpty(rows, 5,
+        filtered ? 'Nothing in this list' : 'No codes yet',
+        filtered
+          ? 'There are no codes with this status right now.'
+          : 'Codes appear here as the guard desk gives them out, or when you make one above.',
+        filtered ? 'Show all codes' : null,
+        filtered ? () => { state.status = 'all'; state.page = 1; paintTabs(); load(); } : null
+      );
+      pager.replaceChildren();
+      return;
+    }
+
+    rows.replaceChildren();
+    data.data.forEach(code => rows.appendChild(drawRow(code, data.redacted)));
+    drawPager(pager, data, page => { state.page = page; load(); });
+  }
+
+  function drawRow(item, redacted) {
+    const tr = document.createElement('tr');
+
+    const code = document.createElement('td');
+    code.className = 'code-cell';
+    code.textContent = item.code;
+    if (redacted) {
+      code.title = 'Your access level does not show the code itself.';
+    }
+    tr.appendChild(code);
+
+    const status = document.createElement('td');
+    const meta = STATUS[item.status];
+    const p = pill(meta.label, meta.kind);
+    status.appendChild(p);
+    if (item.status === 'active') {
+      const when = document.createElement('div');
+      when.className = 'sub';
+      when.style.marginTop = '6px';
+      when.textContent = 'Runs out ' + relativeTime(item.expiresAt);
+      status.appendChild(when);
+    }
+    tr.appendChild(status);
+
+    const by = document.createElement('td');
+    if (item.student) {
+      const name = document.createElement('div');
+      name.className = 'strong';
+      name.textContent = item.student.fullName;
+      const sub = document.createElement('div');
+      sub.className = 'sub';
+      sub.textContent = item.student.verified ? 'Verified' : 'Has not verified yet';
+      by.append(name, sub);
+    } else {
+      by.textContent = '—';
+      by.className = 'sub';
+    }
+    tr.appendChild(by);
+
+    tr.appendChild(cell(formatDateTime(item.createdAt), 'hide-sm sub'));
+
+    const actions = document.createElement('td');
+    const box = document.createElement('div');
+    box.className = 'row-actions';
+
+    if (item.status === 'active' && allowed('code.revoke')) {
+      const b = document.createElement('button');
+      b.className = 'btn btn-small btn-quiet';
+      b.type = 'button';
+      b.textContent = 'Cancel';
+      b.addEventListener('click', async () => {
+        const yes = await confirmAction({
+          title: 'Cancel this code?',
+          message: 'It will stop working straight away. If a student is holding it, they will need a new one.',
+          confirmLabel: 'Yes, cancel it',
+          danger: true
+        });
+        if (!yes) return;
+        const { data } = await apiPost('code-action.php', { action: 'revoke', id: item.id });
+        if (!data.ok) { toast(data.error, 'bad'); return; }
+        toast(data.message);
+        load();
+      });
+      box.appendChild(b);
+    }
+
+    actions.appendChild(box);
+    tr.appendChild(actions);
+    return tr;
+  }
+
+  paintTabs();
+  load();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Activity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="wordmark">EduTrack</div>
+      <div class="sub">Staff panel</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>Activity</h1>
+          <p class="lede">A permanent record of everything staff have done in this panel. Nothing here can be edited or removed.</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div>
+          <label class="sr-only" for="who">Person</label>
+          <select id="who"><option value="">Everyone</option></select>
+        </div>
+        <div>
+          <label class="sr-only" for="what">Action</label>
+          <select id="what"><option value="">Every action</option></select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">Staff activity log</caption>
+          <thead>
+            <tr>
+              <th scope="col">When</th>
+              <th scope="col">Who</th>
+              <th scope="col">What happened</th>
+              <th scope="col" class="hide-sm">From</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <div class="pager" id="pager"></div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/admin/admin.js"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+
+  const rows = document.getElementById('rows');
+  const pager = document.getElementById('pager');
+  const whoSelect = document.getElementById('who');
+  const whatSelect = document.getElementById('what');
+
+  const state = { who: '', action: '', page: 1 };
+  let filtersBuilt = false;
+
+  /* The stored action name is a dotted key; these are the words for it. */
+  const WORDS = {
+    'admin.login': 'Signed in',
+    'admin.logout': 'Signed out',
+    'admin.create': 'Added a staff account',
+    'admin.enable': 'Turned a staff account on',
+    'admin.disable': 'Turned a staff account off',
+    'student.verify': 'Marked a student verified',
+    'student.deactivate': 'Turned a student account off',
+    'student.reactivate': 'Turned a student account on',
+    'student.delete': 'Deleted a student',
+    'code.issue': 'Gave out a code',
+    'code.revoke': 'Cancelled a code',
+    'code.revoke_all': 'Cancelled all unused codes',
+    'settings.save': 'Changed settings',
+    'access.denied': 'Was refused access'
+  };
+
+  whoSelect.addEventListener('change', e => { state.who = e.target.value; state.page = 1; load(); });
+  whatSelect.addEventListener('change', e => { state.action = e.target.value; state.page = 1; load(); });
+
+  async function load() {
+    showSkeleton(rows, 8, 4);
+    const { data } = await apiGet('activity.php', {
+      who: state.who, action: state.action, page: state.page
+    });
+
+    if (!data.ok) { toast(data.error || 'Could not load the activity log.', 'bad'); return; }
+
+    if (!filtersBuilt) {
+      data.people.forEach(p => {
+        const o = document.createElement('option');
+        o.value = p; o.textContent = p;
+        whoSelect.appendChild(o);
+      });
+      data.actions.forEach(a => {
+        const o = document.createElement('option');
+        o.value = a; o.textContent = WORDS[a] || a;
+        whatSelect.appendChild(o);
+      });
+      filtersBuilt = true;
+    }
+
+    if (data.data.length === 0) {
+      const filtered = state.who !== '' || state.action !== '';
+      showEmpty(rows, 4,
+        filtered ? 'Nothing matches' : 'Nothing has happened yet',
+        filtered
+          ? 'No activity fits the filters you chose.'
+          : 'Actions taken in this panel will be listed here as they happen.',
+        filtered ? 'Clear the filters' : null,
+        filtered ? () => {
+          state.who = ''; state.action = ''; state.page = 1;
+          whoSelect.value = ''; whatSelect.value = '';
+          load();
+        } : null);
+      pager.replaceChildren();
+      return;
+    }
+
+    rows.replaceChildren();
+    data.data.forEach(entry => {
+      const tr = document.createElement('tr');
+      if (entry.action === 'access.denied') {
+        tr.style.background = 'var(--danger-wash)';
+      }
+
+      const when = document.createElement('td');
+      const rel = document.createElement('div');
+      rel.textContent = relativeTime(entry.created_at);
+      const exact = document.createElement('div');
+      exact.className = 'sub';
+      exact.textContent = formatDateTime(entry.created_at);
+      when.append(rel, exact);
+      when.style.whiteSpace = 'nowrap';
+      tr.appendChild(when);
+
+      const who = document.createElement('td');
+      const name = document.createElement('div');
+      name.className = 'strong';
+      name.textContent = entry.admin_name;
+      const role = document.createElement('div');
+      role.className = 'sub';
+      role.textContent = entry.role;
+      who.append(name, role);
+      tr.appendChild(who);
+
+      const what = document.createElement('td');
+      const head = document.createElement('div');
+      head.className = 'strong';
+      head.textContent = WORDS[entry.action] || entry.action;
+      what.appendChild(head);
+      if (entry.detail) {
+        const d = document.createElement('div');
+        d.className = 'sub';
+        d.textContent = entry.detail;
+        what.appendChild(d);
+      }
+      tr.appendChild(what);
+
+      tr.appendChild(cell(entry.ip || '—', 'hide-sm sub mono'));
+
+      rows.appendChild(tr);
+    });
+
+    drawPager(pager, data, page => { state.page = page; load(); });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

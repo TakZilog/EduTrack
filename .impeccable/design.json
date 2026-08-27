@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-26T12:23:43Z",
+  "title": "Design System: EduTrack",
+  "extensions": {
+    "colorMeta": {
+      "signal": { "role": "primary", "displayName": "Signal", "canonical": "#b3431f", "tonalRamp": ["#2a0f07", "#4a1c0f", "#6b2a16", "#8c371d", "#b3431f", "#cf6a45", "#e39a7c", "#f5cdbc"] },
+      "signal-deep": { "role": "primary-hover", "displayName": "Signal Deep", "canonical": "#9e3a1a", "tonalRamp": ["#26100a", "#421c11", "#602918", "#7d3620", "#9e3a1a", "#c05a3a", "#dd8869", "#f1bda6"] },
+      "signal-bright": { "role": "primary-emphasis", "displayName": "Signal Bright", "canonical": "#e8552a", "tonalRamp": ["#331209", "#571f10", "#7d2c18", "#a53a20", "#e8552a", "#f17c53", "#f7ab8c", "#fcd7c5"] },
+      "ink": { "role": "neutral-bg", "displayName": "Ink", "canonical": "#15181d", "tonalRamp": ["#0a0b0d", "#15181d", "#21252c", "#2e333c", "#3c424d", "#565d6b", "#848b96", "#c3c7cd"] },
+      "plate": { "role": "neutral-surface", "displayName": "Plate", "canonical": "#1b1e25", "tonalRamp": ["#0d0e11", "#1b1e25", "#282c34", "#363b45", "#454b57", "#5f6673", "#8d94a0", "#c9ced5"] },
+      "paper": { "role": "neutral-text", "displayName": "Paper", "canonical": "#f6f4ee", "tonalRamp": ["#2b2a27", "#4d4b45", "#726f66", "#9a968a", "#c2beb0", "#ddd9cc", "#ede9de", "#f6f4ee"] },
+      "paper-dim": { "role": "neutral-text-secondary", "displayName": "Paper Dim", "canonical": "rgba(246,244,238,0.58)", "tonalRamp": ["#2b2a27", "#4d4b45", "#726f66", "#9a968a", "#c2beb0", "#ddd9cc", "#ede9de", "#f6f4ee"] },
+      "muted": { "role": "neutral-text-tertiary", "displayName": "Muted", "canonical": "#9aa0ab", "tonalRamp": ["#22252a", "#383c43", "#4f545c", "#676c75", "#80868f", "#9aa0ab", "#bcc0c7", "#dee0e3"] },
+      "line": { "role": "neutral-border", "displayName": "Line", "canonical": "rgba(246,244,238,0.14)", "tonalRamp": ["#2b2a27", "#4d4b45", "#726f66", "#9a968a", "#c2beb0", "#ddd9cc", "#ede9de", "#f6f4ee"] },
+      "danger": { "role": "semantic-danger", "displayName": "Danger", "canonical": "#e35d5d", "tonalRamp": ["#3a1414", "#5c2020", "#832d2d", "#ab3a3a", "#cf4a4a", "#e35d5d", "#ee8b8b", "#f7c2c2"] },
+      "success": { "role": "semantic-success", "displayName": "Success", "canonical": "#4caf7d", "tonalRamp": ["#12241a", "#1e3d2c", "#2c5940", "#3a7a58", "#479870", "#4caf7d", "#7ecaa2", "#b7e3cc"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Wordmark, page/card headlines, arrival banner title, picker title. Always uppercase." },
+      "body": { "displayName": "Body", "purpose": "Form copy, subtitles, alerts, directory descriptions." },
+      "label": { "displayName": "Label / Mono", "purpose": "Eyebrow tags, directory codes, floor tags, step counters, generated codes, OTP digits. Never used for prose." }
+    },
+    "shadows": [
+      { "name": "glass-card-ambient", "value": "0 20px 50px rgba(0,0,0,0.35)", "purpose": "The frosted hero card, floating over campus photography." },
+      { "name": "pill-chrome-ambient", "value": "0 4px 14px rgba(0,0,0,0.3)", "purpose": "The floating back-button and similar fixed chrome." },
+      { "name": "inner-rim", "value": "inset 0 1px 0 rgba(246,244,238,0.06)", "purpose": "Faint top highlight on walkthrough nav buttons, suggesting physical relief." },
+      { "name": "focus-glow", "value": "0 0 0 3px rgba(179,67,31,0.2)", "purpose": "Soft Signal glow on focused inputs, no layout shift." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "0.15s ease", "purpose": "Default hover/border/background transitions across buttons, inputs, links." },
+      { "name": "ease-press", "value": "0.08s ease", "purpose": "Button/pill active-state scale-down (0.97-0.98)." },
+      { "name": "rise-in", "value": "0.5s ease forwards, staggered ~0.09s per row", "purpose": "Directory row entrance on index.html; respects prefers-reduced-motion." },
+      { "name": "waypoint-pulse", "value": "2.2s ease-out infinite", "purpose": "Expanding-ring pulse on in-scene walkthrough hotspot markers." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "480px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Full-width primary CTA. Signal fill, white text, one per screen.",
+      "html": "<button class=\"ds-btn-primary\">Create Account</button>",
+      "css": ".ds-btn-primary { width: 100%; min-height: 44px; padding: 13px; border-radius: 6px; border: 1px solid #b3431f; background: #b3431f; color: #fff; font-family: 'Barlow', sans-serif; font-size: 0.92rem; font-weight: 600; letter-spacing: 0.01em; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease; } .ds-btn-primary:hover { background: #9e3a1a; border-color: #9e3a1a; } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 2px solid #b3431f; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Transparent, bordered fallback action (e.g. Generate Another).",
+      "html": "<button class=\"ds-btn-secondary\">Generate Another</button>",
+      "css": ".ds-btn-secondary { width: 100%; min-height: 44px; padding: 13px; border-radius: 6px; border: 1px solid rgba(246,244,238,0.14); background: transparent; color: #f6f4ee; font-family: 'Barlow', sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease; } .ds-btn-secondary:hover { background: rgba(246,244,238,0.04); border-color: #9aa0ab; } .ds-btn-secondary:focus-visible { outline: 2px solid #b3431f; outline-offset: 2px; }"
+    },
+    {
+      "name": "Glass Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Frosted hero/credential surface over campus photography (login, register, select-room, walkthrough entry).",
+      "html": "<div class=\"ds-card-glass\"><h1 class=\"ds-card-title\">Log in</h1><p class=\"ds-card-subtitle\">Enter your student account details.</p></div>",
+      "css": ".ds-card-glass { background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(246,244,238,0.14); border-radius: 10px; padding: 34px 32px 30px; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); } .ds-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.7rem; letter-spacing: 0.01em; color: #f6f4ee; margin: 0 0 6px; } .ds-card-subtitle { color: #9aa0ab; font-size: 0.9rem; line-height: 1.4; margin: 0; }"
+    },
+    {
+      "name": "Flat Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Opaque utility surface, no photography behind it (guest-map, guard desk, verify-otp).",
+      "html": "<div class=\"ds-card-flat\"><h1 class=\"ds-card-title\">Guard Login</h1><p class=\"ds-card-subtitle\">Enter the guard passphrase to issue registration codes.</p></div>",
+      "css": ".ds-card-flat { background: #1b1e25; border: 1px solid rgba(246,244,238,0.14); border-radius: 10px; padding: 34px 32px; width: 100%; max-width: 420px; } .ds-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.7rem; letter-spacing: 0.01em; color: #f6f4ee; margin: 0 0 6px; } .ds-card-subtitle { color: #9aa0ab; font-size: 0.9rem; line-height: 1.4; margin: 0; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Standard field: recessed ink fill, Signal focus glow.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search room, e.g. 101 or Clinic\">",
+      "css": ".ds-input { width: 100%; padding: 11px 12px; min-height: 44px; box-sizing: border-box; border-radius: 6px; border: 1px solid rgba(246,244,238,0.14); background: #15181d; color: #f6f4ee; font-family: 'Barlow', sans-serif; font-size: 0.95rem; transition: border-color 0.15s ease, box-shadow 0.15s ease; } .ds-input::placeholder { color: #9aa0ab; opacity: 0.7; } .ds-input:focus { outline: none; border-color: #b3431f; box-shadow: 0 0 0 3px rgba(179,67,31,0.2); }"
+    },
+    {
+      "name": "Code Chip",
+      "kind": "custom",
+      "refersTo": "code-chip",
+      "description": "Signature 'issued credential' display for guard-generated codes and OTP context; Signal left-accent border, mono code in Signal.",
+      "html": "<div class=\"ds-code-chip\"><div class=\"ds-code-chip-value\">7K2Q9X</div><div class=\"ds-code-chip-note\">Give this code to the student now. It can only be used once and expires in 1 hour.</div></div>",
+      "css": ".ds-code-chip { background: #15181d; border: 1px solid rgba(246,244,238,0.14); border-left: 3px solid #b3431f; border-radius: 6px; padding: 18px; text-align: center; } .ds-code-chip-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.7rem; font-weight: 500; letter-spacing: 5px; color: #b3431f; } .ds-code-chip-note { font-size: 0.78rem; color: #9aa0ab; margin-top: 8px; line-height: 1.4; }"
+    },
+    {
+      "name": "Directory Row",
+      "kind": "nav",
+      "refersTo": "directory-row",
+      "description": "Index page's manifest-style nav entry: mono code, condensed title, description, arrow. Signature navigation pattern.",
+      "html": "<a class=\"ds-directory-entry\" href=\"#\"><span class=\"ds-directory-code\">REG</span><span class=\"ds-directory-body\"><span class=\"ds-directory-title\">Create Student Account</span><span class=\"ds-directory-desc\">Requires a one-time code from the guard</span></span><span class=\"ds-directory-arrow\">&rarr;</span></a>",
+      "css": ".ds-directory-entry { display: flex; align-items: center; gap: 18px; padding: 20px 4px; text-decoration: none; color: #f6f4ee; border-bottom: 1px solid rgba(246,244,238,0.14); } .ds-directory-code { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: #9aa0ab; border: 1px solid rgba(246,244,238,0.14); border-radius: 3px; padding: 4px 7px; flex-shrink: 0; transition: color 0.15s ease, border-color 0.15s ease; } .ds-directory-body { flex: 1; min-width: 0; } .ds-directory-title { display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.01em; line-height: 1.2; } .ds-directory-desc { display: block; color: rgba(246,244,238,0.58); font-size: 0.84rem; margin-top: 3px; line-height: 1.4; } .ds-directory-arrow { font-size: 1.1rem; color: #9aa0ab; flex-shrink: 0; transition: transform 0.15s ease, color 0.15s ease; } .ds-directory-entry:hover .ds-directory-code, .ds-directory-entry:hover .ds-directory-arrow { color: #e8552a; } .ds-directory-entry:hover .ds-directory-code { border-color: #e8552a; } .ds-directory-entry:hover .ds-directory-arrow { transform: translateX(3px); }"
+    },
+    {
+      "name": "Floating Back Button",
+      "kind": "custom",
+      "refersTo": "back-btn",
+      "description": "Pill-shaped glass chip, fixed top-left on hero/credential pages; the system's only persistent escape-hatch chrome.",
+      "html": "<a class=\"ds-back-btn\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" width=\"18\" height=\"18\"><path d=\"M19 12H5M12 19l-7-7 7-7\"/></svg>Back</a>",
+      "css": ".ds-back-btn { position: fixed; top: 16px; left: 16px; z-index: 10; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; background: rgba(27,30,37,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(246,244,238,0.14); border-radius: 999px; color: #f6f4ee; text-decoration: none; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,0.3); transition: background 0.15s ease, border-color 0.15s ease; } .ds-back-btn:hover { background: rgba(27,30,37,0.98); border-color: #b3431f; } .ds-back-btn svg { width: 18px; height: 18px; flex-shrink: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Gate Pass",
+    "overview": "EduTrack looks like the clearance badge it functionally is. The product's entire mechanic runs through a physical checkpoint — a guard at the Admin Building desk hands out a one-time code before anyone can register — and the visual system carries that same institutional, issued-credential feel: riveted plate corners, a mono-spaced institutional eyebrow (\"ACLC College — Mandaue Campus\"), directory entries tagged with three-letter codes (GST / LOG / REG) like manifest line items, and codes and OTP digits rendered in the same monospace as the labels around them. Nothing about it reads as a consumer app; it reads as signage and paperwork you'd trust at a checkpoint.\n\nThe palette is dark-first and photographic: near-black ink with a single warm rust-orange signal color, used sparingly against the campus's own 360° photography rather than illustration. Where the product shows its hero surfaces — the front door, the credential steps, and the walkthrough itself — that photography shows through frosted glass panels. Where it's a quick utility step, the interface goes flat and gets out of the way. Typography is condensed-uppercase for anything that announces itself (headlines, arrival banners, directory titles) and a plain grotesque for anything you read line by line. The system rejects rounded/playful UI cliché and generic SaaS blue/purple; it is utilitarian and editorial rather than friendly.",
+    "keyCharacteristics": [
+      "Dark ink base with one warm accent, used at three deliberate intensities (default / hover / peak emphasis) rather than a broad palette.",
+      "Condensed uppercase display type for anything institutional or declarative; plain body type for instructions and copy.",
+      "Monospace (IBM Plex Mono) reserved for codes, tags, and short machine-readable-feeling labels — never for prose.",
+      "Frosted glass over real campus photography on hero/credential surfaces; flat opaque panels on quick utility steps.",
+      "Riveted-plate and directory-row motifs signal \"issued credential,\" not \"web app.\"",
+      "44px minimum touch targets everywhere — this is a phone-in-hand, gate-side product first."
+    ],
+    "rules": [
+      { "name": "The Three-Step Signal Rule", "body": "The accent color only ever appears at one of three fixed intensities — Signal (default), Signal Deep (hover), Signal Bright (peak emphasis). Never introduce a fourth shade or a different hue for interactive/emphasis meaning.", "section": "colors" },
+      { "name": "The One Hue Rule", "body": "All warmth in the system comes from the Signal family. Everything else is neutral ink/paper/muted plus the two semantic colors (danger/success), which are the only non-accent hues allowed.", "section": "colors" },
+      { "name": "The Mono-Means-Code Rule", "body": "IBM Plex Mono never appears in prose. If it's monospaced, it's a code, a tag, or a machine-adjacent label — that association is load-bearing and shouldn't be diluted with decorative mono use.", "section": "typography" },
+      { "name": "The Photo-Earns-Glass Rule", "body": "Frosted glass only appears where there's real photography behind it to justify the blur. A flat utility screen never gets a glass card without also getting a photographic background — glass is a response to imagery, not a default card style.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the accent to exactly the three defined Signal intensities; never introduce a fourth orange or a second hue for interactive meaning.",
+      "Do pair glass cards with real photography only; a flat page stays flat.",
+      "Do use IBM Plex Mono exclusively for codes, tags, and short labels — never for prose or long text.",
+      "Do keep every interactive target ≥44px, at every breakpoint — this is a phone-in-hand product.",
+      "Do use the riveted-plate / directory-row motif language for anything that represents an issued credential or a menu of destinations (it's the product's signature, not a one-off)."
+    ],
+    "donts": [
+      "Don't add rounded-full \"friendly\" buttons, pastel colors, or illustration — the system is deliberately institutional/editorial, not a consumer SaaS aesthetic.",
+      "Don't add a second accent hue (blue, green-as-accent, purple) for anything other than the two fixed semantic colors (danger/success).",
+      "Don't add a persistent top nav bar or hamburger menu; the floating pill back-button is the system's only wayfinding chrome outside the walkthrough itself.",
+      "Don't apply frosted glass to a flat utility page just for visual consistency — see The Photo-Earns-Glass Rule."
+    ]
+  }
+}

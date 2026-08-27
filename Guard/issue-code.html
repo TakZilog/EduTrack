@@ -16,6 +16,17 @@
   .btn { touch-action:manipulation; }
 
   #codeDisplay .btn-secondary { margin-top:16px; }
+
+  /* Separated from the issuing controls so it is never hit by reflex. */
+  .desk-footer {
+    margin-top:32px; padding-top:20px;
+    border-top:1px solid var(--border);
+  }
+  .desk-footer .btn { margin-top:0; }
+  .desk-note {
+    font-size:0.78rem; color:var(--text-dim);
+    line-height:1.4; margin:10px 0 0;
+  }
 </style>
 </head>
 <body>
@@ -40,10 +51,15 @@
         <div class="code-note">Give this code to the student now. It can only be used once and expires in 1 hour.</div>
         <button type="button" class="btn btn-secondary" id="generateAnotherBtn">Generate Another</button>
       </div>
+
+      <div class="desk-footer">
+        <button type="button" class="btn btn-secondary" id="signOutBtn">Sign out</button>
+        <p class="desk-note">Sign out when you leave the desk. Anyone at this machine can issue codes while you stay signed in.</p>
+      </div>
     </div>
   </div>
 
-<script src="../auth/auth.js"></script>
+<script src="../Auth/auth.js"></script>
 <script>
   const generateBtn = document.getElementById('generateBtn');
   const generateAnotherBtn = document.getElementById('generateAnotherBtn');
@@ -73,19 +89,12 @@
     const originalText = btn.textContent;
     btn.textContent = 'Generating…';
 
-    fetch('../api/issue-code.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(res => {
-        if (res.status === 401) {
+    apiPost('issue-code.php')
+      .then(({ status, data }) => {
+        if (status === 401) {
           window.location.href = 'login.html';
-          return null;
+          return;
         }
-        return res.json();
-      })
-      .then(data => {
-        if (!data) return;
         if (!data.ok) {
           btn.disabled = false;
           btn.textContent = originalText;
@@ -107,6 +116,18 @@
 
   generateBtn.addEventListener('click', () => generateCode(generateBtn));
   generateAnotherBtn.addEventListener('click', () => generateCode(generateAnotherBtn));
+
+  document.getElementById('signOutBtn').addEventListener('click', function () {
+    this.disabled = true;
+    this.textContent = 'Signing out…';
+    apiPost('logout.php')
+      .then(() => { window.location.href = 'login.html'; })
+      .catch(() => {
+        this.disabled = false;
+        this.textContent = 'Sign out';
+        showAlert('Could not reach server. Try again.', 'error');
+      });
+  });
 </script>
 </body>
 </html>

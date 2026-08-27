@@ -9,3 +9,7 @@ agentdb.rvf
 agentdb.rvf.lock
 .claude-flow/
 .agents/
+
+# Map snapshots written by the admin panel before each change
+storage/
+assets/nodes/nodes-edges.json.lock

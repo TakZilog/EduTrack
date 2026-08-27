@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="wordmark">EduTrack</div>
+      <div class="sub">Staff panel</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>Overview</h1>
+          <p class="lede" id="greeting">Everything at a glance.</p>
+        </div>
+      </div>
+
+      <h2 class="sr-only">Students and codes</h2>
+      <div class="cards" id="cards"></div>
+
+      <section class="panel">
+        <h2>Campus map</h2>
+        <div id="problems"></div>
+      </section>
+
+      <section class="panel" id="activityPanel" hidden>
+        <h2>Recent activity</h2>
+        <div id="recent"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/admin/admin.js"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+
+  document.getElementById('greeting').textContent =
+    'Signed in as ' + s.admin.fullName + '. ' + s.admin.roleLabel + '.';
+
+  const { data } = await apiGet('overview.php');
+  if (!data.ok) {
+    toast(data.error || 'Could not load the overview.', 'bad');
+    return;
+  }
+
+  /* Each figure links to the list it summarises, with the filter already
+     applied, so a number is something you can act on rather than just read. */
+  const cards = [
+    { n: data.students.verified,  l: 'Students who can sign in', href: 'students.html?status=verified', tone: 'good' },
+    { n: data.students.pending,   l: 'Waiting to verify email',  href: 'students.html?status=pending',  tone: data.students.pending > 0 ? 'warn' : '' },
+    { n: data.codes.active,       l: 'Codes ready to use',       href: 'codes.html?status=active',      tone: '' },
+    { n: data.codes.redeemedWeek, l: 'Codes used this week',     href: 'codes.html?status=redeemed',    tone: '' },
+    { n: data.rooms.total,        l: 'Rooms on the map',         href: 'rooms.html',                    tone: '' },
+    { n: data.rooms.problems,     l: 'Map problems found',       href: 'rooms.html',                    tone: data.rooms.problems > 0 ? 'bad' : 'good' }
+  ];
+
+  const host = document.getElementById('cards');
+  cards.forEach(c => {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = c.href;
+
+    const n = document.createElement('div');
+    n.className = 'n' + (c.tone ? ' ' + c.tone : '');
+    n.textContent = c.n;
+
+    const l = document.createElement('div');
+    l.className = 'l';
+    l.textContent = c.l;
+
+    a.append(n, l);
+    host.appendChild(a);
+  });
+
+  /* Map problems */
+  const problems = document.getElementById('problems');
+  if (data.problems.length === 0) {
+    const ok = document.createElement('div');
+    ok.className = 'notice notice-good';
+    const box = document.createElement('div');
+    const t = document.createElement('p');
+    t.className = 't';
+    t.textContent = 'The map is healthy';
+    const d = document.createElement('p');
+    d.className = 'd';
+    d.textContent = 'Every room can be reached from the gate.';
+    box.append(t, d);
+    ok.appendChild(box);
+    problems.appendChild(ok);
+  } else {
+    data.problems.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'notice notice-' + (p.severity === 'error' ? 'error' : 'warning');
+      const box = document.createElement('div');
+      const t = document.createElement('p');
+      t.className = 't';
+      t.textContent = p.title;
+      const d = document.createElement('p');
+      d.className = 'd';
+      d.textContent = p.detail;
+      box.append(t, d);
+      el.appendChild(box);
+      problems.appendChild(el);
+    });
+  }
+
+  /* Recent activity, only for roles that may read the log */
+  if (data.recent && data.recent.length) {
+    document.getElementById('activityPanel').hidden = false;
+    const list = document.getElementById('recent');
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
+
+    data.recent.forEach(r => {
+      const tr = document.createElement('tr');
+      const when = cell(relativeTime(r.created_at));
+      when.className = 'sub';
+      when.style.whiteSpace = 'nowrap';
+      tr.append(cell(r.admin_name), when, cell(r.detail || r.action));
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    list.appendChild(wrap);
+  }
+})();
+</script>
+</body>
+</html>

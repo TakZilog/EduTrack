@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="wordmark">EduTrack</div>
+      <div class="sub">Staff panel</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>Settings</h1>
+          <p class="lede">How long codes last, and who is allowed into this panel.</p>
+        </div>
+      </div>
+
+      <section class="panel">
+        <h2>Timings</h2>
+        <form id="settingsForm">
+          <div class="form-grid" id="settingsFields"></div>
+          <button type="submit" class="btn" id="saveBtn">Save timings</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Which computers can open this panel</h2>
+        <div id="accessState"></div>
+        <form id="accessForm">
+          <div class="field">
+            <label for="allowlist">Allowed addresses</label>
+            <textarea id="allowlist" rows="4" spellcheck="false"
+              placeholder="Leave empty to allow every computer on the network"></textarea>
+            <p class="field-hint">
+              One per line. Use a single address like <span class="mono">192.168.0.50</span> for one computer,
+              or <span class="mono">192.168.0.0/24</span> for a whole network. Leave it empty to turn the
+              restriction off. The server itself can always get in, so you cannot lock yourself out for good.
+            </p>
+          </div>
+          <p class="field-error" id="accessError"></p>
+          <div class="row-actions" style="justify-content:flex-start">
+            <button type="submit" class="btn" id="accessSave">Save</button>
+            <button type="button" class="btn btn-quiet" id="addMine">Add this computer</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Staff accounts</h2>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">People who can sign in to this panel</caption>
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Access level</th>
+                <th scope="col" class="hide-sm">Last signed in</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="adminRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Add a staff account</h2>
+        <form id="addForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="newName">Full name</label>
+              <input type="text" id="newName" autocomplete="off" maxlength="100">
+            </div>
+            <div class="field">
+              <label for="newUsername">Username for signing in</label>
+              <input type="text" id="newUsername" autocomplete="off" autocapitalize="none" spellcheck="false">
+              <p class="field-hint">Letters, numbers, dots, dashes and underscores.</p>
+            </div>
+            <div class="field">
+              <label for="newRole">Access level</label>
+              <select id="newRole">
+                <option value="faculty">View only, cannot change anything</option>
+                <option value="admin">Staff, day-to-day work</option>
+                <option value="super_admin">Full access, including settings</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="newPassword">Password</label>
+              <input type="password" id="newPassword" autocomplete="new-password">
+              <p class="field-hint">At least 12 characters.</p>
+            </div>
+          </div>
+          <p class="field-error" id="addError"></p>
+          <button type="submit" class="btn" id="addBtn">Add this person</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Things kept outside this panel</h2>
+        <div class="notice notice-info">
+          <div>
+            <p class="t">Passwords for email and the database are not shown here</p>
+            <p class="d">
+              They live in a file on the server that is never sent to a browser. To change them, edit
+              <span class="mono">api/config.php</span> on the machine itself. The guard desk passphrase
+              is in the same file.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/admin/admin.js"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+
+  const settingsFields = document.getElementById('settingsFields');
+  const adminRows = document.getElementById('adminRows');
+
+  async function load() {
+    const { data } = await apiGet('settings.php');
+    if (!data.ok) { toast(data.error || 'Could not load settings.', 'bad'); return; }
+
+    settingsFields.replaceChildren();
+    data.settings.forEach(setting => {
+      const field = document.createElement('div');
+      field.className = 'field';
+
+      const label = document.createElement('label');
+      label.setAttribute('for', 'set-' + setting.key);
+      label.textContent = setting.label;
+
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.id = 'set-' + setting.key;
+      input.dataset.key = setting.key;
+      input.value = setting.value;
+      input.min = setting.min;
+      input.max = setting.max;
+
+      const hint = document.createElement('p');
+      hint.className = 'field-hint';
+      hint.textContent = `Between ${setting.min} and ${setting.max} ${setting.unit}.`;
+
+      field.append(label, input, hint);
+      settingsFields.appendChild(field);
+    });
+
+    adminRows.replaceChildren();
+    data.admins.forEach(admin => adminRows.appendChild(drawAdmin(admin)));
+
+    drawAccess(data.access);
+  }
+
+  let yourIp = '';
+
+  function drawAccess(access) {
+    yourIp = access.yourIp;
+    document.getElementById('allowlist').value = access.allowlist.join('\n');
+
+    const host = document.getElementById('accessState');
+    host.replaceChildren();
+
+    const notice = document.createElement('div');
+    notice.className = 'notice ' + (access.enabled ? 'notice-good' : 'notice-warning');
+
+    const box = document.createElement('div');
+    const t = document.createElement('p');
+    t.className = 't';
+    t.textContent = access.enabled
+      ? 'Limited to ' + access.allowlist.length + ' address(es)'
+      : 'Any computer on the network can open this panel';
+
+    const d = document.createElement('p');
+    d.className = 'd';
+    d.textContent = access.enabled
+      ? 'You are on ' + access.yourIp + '.'
+      : 'This panel is served without encryption, so anyone on the same network can reach the sign-in page. '
+        + 'You are on ' + access.yourIp + '.';
+
+    box.append(t, d);
+    notice.appendChild(box);
+    host.appendChild(notice);
+  }
+
+  document.getElementById('addMine').addEventListener('click', () => {
+    const field = document.getElementById('allowlist');
+    const lines = field.value.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.includes(yourIp)) {
+      toast('This computer is already on the list.');
+      return;
+    }
+    lines.push(yourIp);
+    field.value = lines.join('\n');
+    field.focus();
+  });
+
+  document.getElementById('accessForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const error = document.getElementById('accessError');
+    error.classList.remove('on');
+
+    const value = document.getElementById('allowlist').value.trim();
+
+    // Turning the restriction on is worth a second look: get it wrong and the
+    // only way back is the server itself.
+    if (value !== '') {
+      const yes = await confirmAction({
+        title: 'Limit the panel to these computers?',
+        message: 'Anyone on a computer not in this list will not be able to open the staff panel, '
+          + 'including other staff. You are on ' + yourIp + '. The server itself can always get in.',
+        confirmLabel: 'Yes, limit it'
+      });
+      if (!yes) return;
+    }
+
+    const btn = document.getElementById('accessSave');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const { data } = await apiPost('settings.php', { action: 'save-ip-allowlist', allowlist: value });
+
+    btn.disabled = false;
+    btn.textContent = 'Save';
+
+    if (!data.ok) {
+      error.textContent = data.error;
+      error.classList.add('on');
+      return;
+    }
+    toast(data.message);
+    load();
+  });
+
+  function drawAdmin(admin) {
+    const tr = document.createElement('tr');
+
+    const name = document.createElement('td');
+    const strong = document.createElement('div');
+    strong.className = 'strong';
+    strong.textContent = admin.fullName + (admin.isYou ? ' (you)' : '');
+    const sub = document.createElement('div');
+    sub.className = 'sub';
+    sub.textContent = admin.username;
+    name.append(strong, sub);
+    tr.appendChild(name);
+
+    const role = document.createElement('td');
+    role.appendChild(pill(admin.roleLabel, admin.active ? 'verified' : 'off'));
+    if (!admin.active) {
+      const off = document.createElement('div');
+      off.className = 'sub';
+      off.style.marginTop = '6px';
+      off.textContent = 'Turned off';
+      role.appendChild(off);
+    }
+    tr.appendChild(role);
+
+    tr.appendChild(cell(admin.lastLogin ? relativeTime(admin.lastLogin) : 'Never', 'hide-sm sub'));
+
+    const actions = document.createElement('td');
+    const box = document.createElement('div');
+    box.className = 'row-actions';
+
+    if (!admin.isYou) {
+      const b = document.createElement('button');
+      b.className = 'btn btn-small ' + (admin.active ? 'btn-quiet' : 'btn-quiet');
+      b.type = 'button';
+      b.textContent = admin.active ? 'Turn off' : 'Turn back on';
+      b.addEventListener('click', async () => {
+        const yes = await confirmAction({
+          title: admin.active ? 'Turn this account off?' : 'Turn this account back on?',
+          message: admin.active
+            ? admin.fullName + ' will not be able to sign in to this panel.'
+            : admin.fullName + ' will be able to sign in again.',
+          confirmLabel: admin.active ? 'Yes, turn it off' : 'Yes, turn it on',
+          danger: admin.active
+        });
+        if (!yes) return;
+
+        const { data } = await apiPost('settings.php', {
+          action: 'set-admin-active', id: admin.id, active: !admin.active
+        });
+        if (!data.ok) { toast(data.error, 'bad'); return; }
+        toast(data.message);
+        load();
+      });
+      box.appendChild(b);
+    }
+
+    actions.appendChild(box);
+    tr.appendChild(actions);
+    return tr;
+  }
+
+  document.getElementById('settingsForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const payload = { action: 'save-settings' };
+    settingsFields.querySelectorAll('input[data-key]').forEach(input => {
+      payload[input.dataset.key] = Number(input.value);
+    });
+
+    const { data } = await apiPost('settings.php', payload);
+    btn.disabled = false;
+    btn.textContent = 'Save timings';
+
+    if (!data.ok) { toast(data.error, 'bad'); return; }
+    toast(data.message);
+  });
+
+  document.getElementById('addForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const error = document.getElementById('addError');
+    error.classList.remove('on');
+
+    const btn = document.getElementById('addBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+
+    const { data } = await apiPost('settings.php', {
+      action: 'add-admin',
+      fullName: document.getElementById('newName').value.trim(),
+      username: document.getElementById('newUsername').value.trim(),
+      role: document.getElementById('newRole').value,
+      password: document.getElementById('newPassword').value
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Add this person';
+
+    if (!data.ok) {
+      error.textContent = data.error;
+      error.classList.add('on');
+      return;
+    }
+
+    toast(data.message);
+    document.getElementById('addForm').reset();
+    load();
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

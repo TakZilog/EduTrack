@@ -148,7 +148,27 @@ def build_graph(root: Path, out_dir: Path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('Usage: python build_node_graph.py "<photos_root_folder>" "<output_folder>"')
+    if len(sys.argv) < 3:
+        print('Usage: python build_node_graph_v2.py "<photos_root_folder>" "<output_folder>" [--force]')
         sys.exit(1)
-    build_graph(Path(sys.argv[1]), Path(sys.argv[2]))
+
+    out = Path(sys.argv[2])
+    force = "--force" in sys.argv
+
+    # This script builds a map from nothing. It emits N0001-style ids and
+    # type="unassigned", while the live map uses GATE / HALL-01 / ROOM-105 with
+    # types that were assigned by hand. Running it over a real map throws all
+    # of that away, and walkthrough.js finds the starting point with
+    # type == "landmark", so the walkthrough stops working entirely.
+    existing = out / "nodes-edges.json"
+    if existing.exists() and not force:
+        print(f"\nRefusing to run: {existing} already exists.\n")
+        print("  This tool REPLACES a map, it does not add to one. It would discard")
+        print("  every node id and type in the current map and break the walkthrough.\n")
+        print("  To add a room, or to re-record one with more photos:")
+        print('      python map/add_walk.py "<walk folder>" --room "NAME" --floor "FLOOR" --dry-run\n')
+        print("  If you really do mean to rebuild from scratch, back up the map first")
+        print("  and pass --force.\n")
+        sys.exit(1)
+
+    build_graph(Path(sys.argv[1]), out)

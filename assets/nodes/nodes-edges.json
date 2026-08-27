@@ -1,1446 +1,1446 @@
 {
-  "nodes": [
-    {
-      "node_id": "GATE",
-      "label": "Main Gate",
-      "image_file": "GATE.webp",
-      "type": "landmark"
-    },
-    {
-      "node_id": "HALL-01",
-      "label": "101",
-      "image_file": "HALL-01.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-02",
-      "label": "101",
-      "image_file": "HALL-02.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-03",
-      "label": "101",
-      "image_file": "HALL-03.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-04",
-      "label": "101",
-      "image_file": "HALL-04.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-105",
-      "label": "101",
-      "image_file": "ROOM-105.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "JUNC-01",
-      "label": "101",
-      "image_file": "JUNC-01.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-02",
-      "label": "101",
-      "image_file": "JUNC-02.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-03",
-      "label": "101",
-      "image_file": "JUNC-03.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-04",
-      "label": "101",
-      "image_file": "JUNC-04.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-05",
-      "label": "101",
-      "image_file": "JUNC-05.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-06",
-      "label": "101",
-      "image_file": "JUNC-06.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-07",
-      "label": "101",
-      "image_file": "JUNC-07.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "ROOM-101",
-      "label": "101",
-      "image_file": "ROOM-101.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-102",
-      "label": "102",
-      "image_file": "ROOM-102.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-103",
-      "label": "103",
-      "image_file": "ROOM-103.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-104",
-      "label": "104",
-      "image_file": "ROOM-104.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "JUNC-08",
-      "label": "106",
-      "image_file": "JUNC-08.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "ROOM-106",
-      "label": "106",
-      "image_file": "ROOM-106.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-107",
-      "label": "107",
-      "image_file": "ROOM-107.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-108",
-      "label": "108",
-      "image_file": "ROOM-108.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-110",
-      "label": "110",
-      "image_file": "ROOM-110.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-CASHIER",
-      "label": "CASHIER",
-      "image_file": "ROOM-CASHIER.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-CLINIC",
-      "label": "CLINIC",
-      "image_file": "ROOM-CLINIC.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-05",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-05.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-06",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-06.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-COMFORT-ROOM",
-      "label": "COMFORT ROOM",
-      "image_file": "ROOM-COMFORT-ROOM.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-DEANS-OFFICE",
-      "label": "DEANS OFFICE",
-      "image_file": "ROOM-DEANS-OFFICE.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-FACULTY",
-      "label": "FACULTY",
-      "image_file": "ROOM-FACULTY.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-GUIDANCE-OFFICE",
-      "label": "GUIDANCE OFFICE",
-      "image_file": "ROOM-GUIDANCE-OFFICE.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-07",
-      "label": "PROPERTY CUSTODIAN",
-      "image_file": "HALL-07.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-PROPERTY-CUSTODIAN",
-      "label": "PROPERTY CUSTODIAN",
-      "image_file": "ROOM-PROPERTY-CUSTODIAN.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-SCHOLARSHIP-OFFICE",
-      "label": "SCHOLARSHIP OFFICE",
-      "image_file": "ROOM-SCHOLARSHIP-OFFICE.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-SLAB-1",
-      "label": "SLAB 1",
-      "image_file": "ROOM-SLAB-1.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-SLAB-3",
-      "label": "SLAB 3",
-      "image_file": "ROOM-SLAB-3.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-STUDENT-AFFAIRS-OFFICE",
-      "label": "STUDENT AFFAIRS OFFICE",
-      "image_file": "ROOM-STUDENT-AFFAIRS-OFFICE.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-08",
-      "label": "201",
-      "image_file": "HALL-08.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "JUNC-09",
-      "label": "201",
-      "image_file": "JUNC-09.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-10",
-      "label": "201",
-      "image_file": "JUNC-10.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-11",
-      "label": "201",
-      "image_file": "JUNC-11.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "HALL-09",
-      "label": "201",
-      "image_file": "HALL-09.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "JUNC-12",
-      "label": "201",
-      "image_file": "JUNC-12.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-13",
-      "label": "201",
-      "image_file": "JUNC-13.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-14",
-      "label": "201",
-      "image_file": "JUNC-14.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-15",
-      "label": "201",
-      "image_file": "JUNC-15.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-16",
-      "label": "201",
-      "image_file": "JUNC-16.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "JUNC-17",
-      "label": "201",
-      "image_file": "JUNC-17.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "HALL-10",
-      "label": "201",
-      "image_file": "HALL-10.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-201",
-      "label": "201",
-      "image_file": "ROOM-201.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-202",
-      "label": "202",
-      "image_file": "ROOM-202.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-203",
-      "label": "203",
-      "image_file": "ROOM-203.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-204",
-      "label": "204",
-      "image_file": "ROOM-204.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-205",
-      "label": "205",
-      "image_file": "ROOM-205.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-206",
-      "label": "206",
-      "image_file": "ROOM-206.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-207",
-      "label": "207",
-      "image_file": "ROOM-207.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-208",
-      "label": "208",
-      "image_file": "ROOM-208.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-209",
-      "label": "209",
-      "image_file": "ROOM-209.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-210",
-      "label": "210",
-      "image_file": "ROOM-210.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-11",
-      "label": "211",
-      "image_file": "HALL-11.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-12",
-      "label": "211",
-      "image_file": "HALL-12.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-13",
-      "label": "211",
-      "image_file": "HALL-13.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-211",
-      "label": "211",
-      "image_file": "ROOM-211.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-14",
-      "label": "214",
-      "image_file": "HALL-14.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "JUNC-18",
-      "label": "214",
-      "image_file": "JUNC-18.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "ROOM-214",
-      "label": "214",
-      "image_file": "ROOM-214.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-215",
-      "label": "215",
-      "image_file": "ROOM-215.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-15",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-15.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-16",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-16.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-17",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-17.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-18",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-18.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-19",
-      "label": "COMFORT ROOM",
-      "image_file": "HALL-19.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-COMFORT-ROOM-2",
-      "label": "COMFORT ROOM",
-      "image_file": "ROOM-COMFORT-ROOM-2.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-LIBRARY",
-      "label": "LIBRARY",
-      "image_file": "ROOM-LIBRARY.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "ROOM-TECHNICAL-OFFICE",
-      "label": "TECHNICAL OFFICE",
-      "image_file": "ROOM-TECHNICAL-OFFICE.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-20",
-      "label": "301",
-      "image_file": "HALL-20.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-21",
-      "label": "301",
-      "image_file": "HALL-21.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-22",
-      "label": "301",
-      "image_file": "HALL-22.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-23",
-      "label": "301",
-      "image_file": "HALL-23.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-24",
-      "label": "301",
-      "image_file": "HALL-24.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-25",
-      "label": "301",
-      "image_file": "HALL-25.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-26",
-      "label": "301",
-      "image_file": "HALL-26.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-27",
-      "label": "301",
-      "image_file": "HALL-27.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-28",
-      "label": "301",
-      "image_file": "HALL-28.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-29",
-      "label": "301",
-      "image_file": "HALL-29.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-30",
-      "label": "301",
-      "image_file": "HALL-30.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-301",
-      "label": "301",
-      "image_file": "ROOM-301.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "JUNC-19",
-      "label": "302",
-      "image_file": "JUNC-19.webp",
-      "type": "junction"
-    },
-    {
-      "node_id": "HALL-31",
-      "label": "302",
-      "image_file": "HALL-31.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-32",
-      "label": "302",
-      "image_file": "HALL-32.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-33",
-      "label": "302",
-      "image_file": "HALL-33.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-34",
-      "label": "302",
-      "image_file": "HALL-34.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-35",
-      "label": "302",
-      "image_file": "HALL-35.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-36",
-      "label": "302",
-      "image_file": "HALL-36.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-37",
-      "label": "302",
-      "image_file": "HALL-37.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-38",
-      "label": "302",
-      "image_file": "HALL-38.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-302",
-      "label": "302",
-      "image_file": "ROOM-302.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-39",
-      "label": "AUDITORIUM",
-      "image_file": "HALL-39.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-40",
-      "label": "AUDITORIUM",
-      "image_file": "HALL-40.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-AUDITORIUM",
-      "label": "AUDITORIUM",
-      "image_file": "ROOM-AUDITORIUM.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-41",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-41.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-42",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-42.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-43",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-43.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-44",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-44.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-45",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-45.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-46",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-46.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-47",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-47.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-48",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-48.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-49",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-49.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-50",
-      "label": "KITCHEN LAB",
-      "image_file": "HALL-50.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-KITCHEN-LAB",
-      "label": "KITCHEN LAB",
-      "image_file": "ROOM-KITCHEN-LAB.webp",
-      "type": "room"
-    },
-    {
-      "node_id": "HALL-51",
-      "label": "LINUX",
-      "image_file": "HALL-51.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "HALL-52",
-      "label": "LINUX",
-      "image_file": "HALL-52.webp",
-      "type": "hallway"
-    },
-    {
-      "node_id": "ROOM-LINUX",
-      "label": "LINUX",
-      "image_file": "ROOM-LINUX.webp",
-      "type": "room"
-    }
-  ],
-  "edges": [
-    {
-      "from_node": "GATE",
-      "to_node": "HALL-01",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-01",
-      "to_node": "HALL-02",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-02",
-      "to_node": "HALL-03",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-03",
-      "to_node": "HALL-04",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-04",
-      "to_node": "ROOM-105",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-105",
-      "to_node": "JUNC-01",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-01",
-      "to_node": "JUNC-02",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-02",
-      "to_node": "JUNC-03",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-03",
-      "to_node": "JUNC-04",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-04",
-      "to_node": "JUNC-05",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-05",
-      "to_node": "JUNC-06",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-06",
-      "to_node": "JUNC-07",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-07",
-      "to_node": "ROOM-101",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-07",
-      "to_node": "ROOM-102",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-06",
-      "to_node": "ROOM-103",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-105",
-      "to_node": "ROOM-104",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-04",
-      "to_node": "JUNC-08",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-08",
-      "to_node": "ROOM-106",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-08",
-      "to_node": "ROOM-107",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-08",
-      "to_node": "ROOM-108",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-08",
-      "to_node": "ROOM-110",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-02",
-      "to_node": "ROOM-CASHIER",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-05",
-      "to_node": "ROOM-CLINIC",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-106",
-      "to_node": "HALL-05",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-05",
-      "to_node": "HALL-06",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-06",
-      "to_node": "ROOM-COMFORT-ROOM",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-01",
-      "to_node": "ROOM-DEANS-OFFICE",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-01",
-      "to_node": "ROOM-FACULTY",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-02",
-      "to_node": "ROOM-GUIDANCE-OFFICE",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-101",
-      "to_node": "HALL-07",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-07",
-      "to_node": "ROOM-PROPERTY-CUSTODIAN",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-03",
-      "to_node": "ROOM-SCHOLARSHIP-OFFICE",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-106",
-      "to_node": "ROOM-SLAB-1",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-106",
-      "to_node": "ROOM-SLAB-3",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-04",
-      "to_node": "ROOM-STUDENT-AFFAIRS-OFFICE",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-105",
-      "to_node": "HALL-08",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-08",
-      "to_node": "JUNC-09",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-09",
-      "to_node": "JUNC-10",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-10",
-      "to_node": "JUNC-11",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-11",
-      "to_node": "HALL-09",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-09",
-      "to_node": "JUNC-12",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-12",
-      "to_node": "JUNC-13",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-13",
-      "to_node": "JUNC-14",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-14",
-      "to_node": "JUNC-15",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-15",
-      "to_node": "JUNC-16",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-16",
-      "to_node": "JUNC-17",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-17",
-      "to_node": "HALL-10",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-10",
-      "to_node": "ROOM-201",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-17",
-      "to_node": "ROOM-202",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-16",
-      "to_node": "ROOM-203",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-15",
-      "to_node": "ROOM-204",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-14",
-      "to_node": "ROOM-205",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-13",
-      "to_node": "ROOM-206",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-11",
-      "to_node": "ROOM-207",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-11",
-      "to_node": "ROOM-208",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-10",
-      "to_node": "ROOM-209",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-09",
-      "to_node": "ROOM-210",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-105",
-      "to_node": "HALL-11",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-11",
-      "to_node": "HALL-12",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-12",
-      "to_node": "HALL-13",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-13",
-      "to_node": "ROOM-211",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-08",
-      "to_node": "HALL-14",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-14",
-      "to_node": "JUNC-18",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-18",
-      "to_node": "ROOM-214",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-18",
-      "to_node": "ROOM-215",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-12",
-      "to_node": "HALL-15",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-15",
-      "to_node": "HALL-16",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-16",
-      "to_node": "HALL-17",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-17",
-      "to_node": "HALL-18",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-18",
-      "to_node": "HALL-19",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-19",
-      "to_node": "ROOM-COMFORT-ROOM-2",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-18",
-      "to_node": "ROOM-LIBRARY",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-12",
-      "to_node": "ROOM-TECHNICAL-OFFICE",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-105",
-      "to_node": "HALL-20",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-20",
-      "to_node": "HALL-21",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-21",
-      "to_node": "HALL-22",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-22",
-      "to_node": "HALL-23",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-23",
-      "to_node": "HALL-24",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-24",
-      "to_node": "HALL-25",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-25",
-      "to_node": "HALL-26",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-26",
-      "to_node": "HALL-27",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-27",
-      "to_node": "HALL-28",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-28",
-      "to_node": "HALL-29",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-29",
-      "to_node": "HALL-30",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-30",
-      "to_node": "ROOM-301",
-      "direction_label": ""
-    },
-    {
-      "from_node": "ROOM-105",
-      "to_node": "JUNC-19",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-19",
-      "to_node": "HALL-31",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-31",
-      "to_node": "HALL-32",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-32",
-      "to_node": "HALL-33",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-33",
-      "to_node": "HALL-34",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-34",
-      "to_node": "HALL-35",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-35",
-      "to_node": "HALL-36",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-36",
-      "to_node": "HALL-37",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-37",
-      "to_node": "HALL-38",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-38",
-      "to_node": "ROOM-302",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-18",
-      "to_node": "HALL-39",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-39",
-      "to_node": "HALL-40",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-40",
-      "to_node": "ROOM-AUDITORIUM",
-      "direction_label": ""
-    },
-    {
-      "from_node": "JUNC-19",
-      "to_node": "HALL-41",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-41",
-      "to_node": "HALL-42",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-42",
-      "to_node": "HALL-43",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-43",
-      "to_node": "HALL-44",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-44",
-      "to_node": "HALL-45",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-45",
-      "to_node": "HALL-46",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-46",
-      "to_node": "HALL-47",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-47",
-      "to_node": "HALL-48",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-48",
-      "to_node": "HALL-49",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-49",
-      "to_node": "HALL-50",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-50",
-      "to_node": "ROOM-KITCHEN-LAB",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-51",
-      "to_node": "HALL-52",
-      "direction_label": ""
-    },
-    {
-      "from_node": "HALL-52",
-      "to_node": "ROOM-LINUX",
-      "direction_label": ""
-    }
-  ],
-  "rooms": [
-    {
-      "room_name": "101",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-101"
-    },
-    {
-      "room_name": "102",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-102"
-    },
-    {
-      "room_name": "103",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-103"
-    },
-    {
-      "room_name": "104",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-104"
-    },
-    {
-      "room_name": "105",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-105"
-    },
-    {
-      "room_name": "106",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-106"
-    },
-    {
-      "room_name": "107",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-107"
-    },
-    {
-      "room_name": "108",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-108"
-    },
-    {
-      "room_name": "110",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-110"
-    },
-    {
-      "room_name": "CASHIER",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-CASHIER"
-    },
-    {
-      "room_name": "CLINIC",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-CLINIC"
-    },
-    {
-      "room_name": "COMFORT ROOM",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-COMFORT-ROOM"
-    },
-    {
-      "room_name": "DEANS OFFICE",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-DEANS-OFFICE"
-    },
-    {
-      "room_name": "FACULTY",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-FACULTY"
-    },
-    {
-      "room_name": "GUIDANCE OFFICE",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-GUIDANCE-OFFICE"
-    },
-    {
-      "room_name": "PROPERTY CUSTODIAN",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-PROPERTY-CUSTODIAN"
-    },
-    {
-      "room_name": "SCHOLARSHIP OFFICE",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-SCHOLARSHIP-OFFICE"
-    },
-    {
-      "room_name": "SLAB 1",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-SLAB-1"
-    },
-    {
-      "room_name": "SLAB 3",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-SLAB-3"
-    },
-    {
-      "room_name": "STUDENT AFFAIRS OFFICE",
-      "floor": "1ST FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-STUDENT-AFFAIRS-OFFICE"
-    },
-    {
-      "room_name": "201",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-201"
-    },
-    {
-      "room_name": "202",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-202"
-    },
-    {
-      "room_name": "203",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-203"
-    },
-    {
-      "room_name": "204",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-204"
-    },
-    {
-      "room_name": "205",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-205"
-    },
-    {
-      "room_name": "206",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-206"
-    },
-    {
-      "room_name": "207",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-207"
-    },
-    {
-      "room_name": "208",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-208"
-    },
-    {
-      "room_name": "209",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-209"
-    },
-    {
-      "room_name": "210",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-210"
-    },
-    {
-      "room_name": "211",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-211"
-    },
-    {
-      "room_name": "214",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-214"
-    },
-    {
-      "room_name": "215",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-215"
-    },
-    {
-      "room_name": "COMFORT ROOM",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-COMFORT-ROOM-2"
-    },
-    {
-      "room_name": "LIBRARY",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-LIBRARY"
-    },
-    {
-      "room_name": "TECHNICAL OFFICE",
-      "floor": "2ND FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-TECHNICAL-OFFICE"
-    },
-    {
-      "room_name": "301",
-      "floor": "3RD FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-301"
-    },
-    {
-      "room_name": "302",
-      "floor": "3RD FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-302"
-    },
-    {
-      "room_name": "AUDITORIUM",
-      "floor": "3RD FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-AUDITORIUM"
-    },
-    {
-      "room_name": "KITCHEN LAB",
-      "floor": "3RD FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-KITCHEN-LAB"
-    },
-    {
-      "room_name": "LINUX",
-      "floor": "3RD FLOOR ADMIN BUILDING",
-      "node_id": "ROOM-LINUX"
-    }
-  ]
+    "nodes": [
+        {
+            "node_id": "GATE",
+            "label": "Main Gate",
+            "image_file": "GATE.webp",
+            "type": "landmark"
+        },
+        {
+            "node_id": "HALL-01",
+            "label": "101",
+            "image_file": "HALL-01.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-02",
+            "label": "101",
+            "image_file": "HALL-02.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-03",
+            "label": "101",
+            "image_file": "HALL-03.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-04",
+            "label": "101",
+            "image_file": "HALL-04.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-105",
+            "label": "101",
+            "image_file": "ROOM-105.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "JUNC-01",
+            "label": "101",
+            "image_file": "JUNC-01.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-02",
+            "label": "101",
+            "image_file": "JUNC-02.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-03",
+            "label": "101",
+            "image_file": "JUNC-03.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-04",
+            "label": "101",
+            "image_file": "JUNC-04.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-05",
+            "label": "101",
+            "image_file": "JUNC-05.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-06",
+            "label": "101",
+            "image_file": "JUNC-06.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-07",
+            "label": "101",
+            "image_file": "JUNC-07.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "ROOM-101",
+            "label": "101",
+            "image_file": "ROOM-101.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-102",
+            "label": "102",
+            "image_file": "ROOM-102.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-103",
+            "label": "103",
+            "image_file": "ROOM-103.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-104",
+            "label": "104",
+            "image_file": "ROOM-104.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "JUNC-08",
+            "label": "106",
+            "image_file": "JUNC-08.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "ROOM-106",
+            "label": "106",
+            "image_file": "ROOM-106.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-107",
+            "label": "107",
+            "image_file": "ROOM-107.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-108",
+            "label": "108",
+            "image_file": "ROOM-108.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-110",
+            "label": "110",
+            "image_file": "ROOM-110.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-CASHIER",
+            "label": "CASHIER",
+            "image_file": "ROOM-CASHIER.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-CLINIC",
+            "label": "CLINIC",
+            "image_file": "ROOM-CLINIC.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-05",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-05.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-06",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-06.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-COMFORT-ROOM",
+            "label": "COMFORT ROOM",
+            "image_file": "ROOM-COMFORT-ROOM.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-DEANS-OFFICE",
+            "label": "DEANS OFFICE",
+            "image_file": "ROOM-DEANS-OFFICE.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-FACULTY",
+            "label": "FACULTY",
+            "image_file": "ROOM-FACULTY.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-GUIDANCE-OFFICE",
+            "label": "GUIDANCE OFFICE",
+            "image_file": "ROOM-GUIDANCE-OFFICE.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-07",
+            "label": "PROPERTY CUSTODIAN",
+            "image_file": "HALL-07.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-PROPERTY-CUSTODIAN",
+            "label": "PROPERTY CUSTODIAN",
+            "image_file": "ROOM-PROPERTY-CUSTODIAN.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-SCHOLARSHIP-OFFICE",
+            "label": "SCHOLARSHIP OFFICE",
+            "image_file": "ROOM-SCHOLARSHIP-OFFICE.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-SLAB-1",
+            "label": "SLAB 1",
+            "image_file": "ROOM-SLAB-1.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-SLAB-3",
+            "label": "SLAB 3",
+            "image_file": "ROOM-SLAB-3.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-STUDENT-AFFAIRS-OFFICE",
+            "label": "STUDENT AFFAIRS OFFICE",
+            "image_file": "ROOM-STUDENT-AFFAIRS-OFFICE.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-08",
+            "label": "201",
+            "image_file": "HALL-08.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "JUNC-09",
+            "label": "201",
+            "image_file": "JUNC-09.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-10",
+            "label": "201",
+            "image_file": "JUNC-10.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-11",
+            "label": "201",
+            "image_file": "JUNC-11.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "HALL-09",
+            "label": "201",
+            "image_file": "HALL-09.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "JUNC-12",
+            "label": "201",
+            "image_file": "JUNC-12.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-13",
+            "label": "201",
+            "image_file": "JUNC-13.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-14",
+            "label": "201",
+            "image_file": "JUNC-14.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-15",
+            "label": "201",
+            "image_file": "JUNC-15.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-16",
+            "label": "201",
+            "image_file": "JUNC-16.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "JUNC-17",
+            "label": "201",
+            "image_file": "JUNC-17.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "HALL-10",
+            "label": "201",
+            "image_file": "HALL-10.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-201",
+            "label": "201",
+            "image_file": "ROOM-201.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-202",
+            "label": "202",
+            "image_file": "ROOM-202.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-203",
+            "label": "203",
+            "image_file": "ROOM-203.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-204",
+            "label": "204",
+            "image_file": "ROOM-204.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-205",
+            "label": "205",
+            "image_file": "ROOM-205.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-206",
+            "label": "206",
+            "image_file": "ROOM-206.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-207",
+            "label": "207",
+            "image_file": "ROOM-207.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-208",
+            "label": "208",
+            "image_file": "ROOM-208.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-209",
+            "label": "209",
+            "image_file": "ROOM-209.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-210",
+            "label": "210",
+            "image_file": "ROOM-210.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-11",
+            "label": "211",
+            "image_file": "HALL-11.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-12",
+            "label": "211",
+            "image_file": "HALL-12.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-13",
+            "label": "211",
+            "image_file": "HALL-13.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-211",
+            "label": "211",
+            "image_file": "ROOM-211.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-14",
+            "label": "214",
+            "image_file": "HALL-14.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "JUNC-18",
+            "label": "214",
+            "image_file": "JUNC-18.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "ROOM-214",
+            "label": "214",
+            "image_file": "ROOM-214.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-215",
+            "label": "215",
+            "image_file": "ROOM-215.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-15",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-15.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-16",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-16.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-17",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-17.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-18",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-18.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-19",
+            "label": "COMFORT ROOM",
+            "image_file": "HALL-19.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-COMFORT-ROOM-2",
+            "label": "COMFORT ROOM",
+            "image_file": "ROOM-COMFORT-ROOM-2.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-LIBRARY",
+            "label": "LIBRARY",
+            "image_file": "ROOM-LIBRARY.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "ROOM-TECHNICAL-OFFICE",
+            "label": "TECHNICAL OFFICE",
+            "image_file": "ROOM-TECHNICAL-OFFICE.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-20",
+            "label": "301",
+            "image_file": "HALL-20.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-21",
+            "label": "301",
+            "image_file": "HALL-21.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-22",
+            "label": "301",
+            "image_file": "HALL-22.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-23",
+            "label": "301",
+            "image_file": "HALL-23.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-24",
+            "label": "301",
+            "image_file": "HALL-24.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-25",
+            "label": "301",
+            "image_file": "HALL-25.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-26",
+            "label": "301",
+            "image_file": "HALL-26.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-27",
+            "label": "301",
+            "image_file": "HALL-27.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-28",
+            "label": "301",
+            "image_file": "HALL-28.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-29",
+            "label": "301",
+            "image_file": "HALL-29.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-30",
+            "label": "301",
+            "image_file": "HALL-30.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-301",
+            "label": "301",
+            "image_file": "ROOM-301.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "JUNC-19",
+            "label": "302",
+            "image_file": "JUNC-19.webp",
+            "type": "junction"
+        },
+        {
+            "node_id": "HALL-31",
+            "label": "302",
+            "image_file": "HALL-31.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-32",
+            "label": "302",
+            "image_file": "HALL-32.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-33",
+            "label": "302",
+            "image_file": "HALL-33.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-34",
+            "label": "302",
+            "image_file": "HALL-34.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-35",
+            "label": "302",
+            "image_file": "HALL-35.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-36",
+            "label": "302",
+            "image_file": "HALL-36.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-37",
+            "label": "302",
+            "image_file": "HALL-37.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-38",
+            "label": "302",
+            "image_file": "HALL-38.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-302",
+            "label": "302",
+            "image_file": "ROOM-302.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-39",
+            "label": "AUDITORIUM",
+            "image_file": "HALL-39.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-40",
+            "label": "AUDITORIUM",
+            "image_file": "HALL-40.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-AUDITORIUM",
+            "label": "AUDITORIUM",
+            "image_file": "ROOM-AUDITORIUM.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-41",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-41.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-42",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-42.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-43",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-43.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-44",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-44.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-45",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-45.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-46",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-46.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-47",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-47.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-48",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-48.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-49",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-49.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-50",
+            "label": "KITCHEN LAB",
+            "image_file": "HALL-50.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-KITCHEN-LAB",
+            "label": "KITCHEN LAB",
+            "image_file": "ROOM-KITCHEN-LAB.webp",
+            "type": "room"
+        },
+        {
+            "node_id": "HALL-51",
+            "label": "LINUX",
+            "image_file": "HALL-51.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "HALL-52",
+            "label": "LINUX",
+            "image_file": "HALL-52.webp",
+            "type": "hallway"
+        },
+        {
+            "node_id": "ROOM-LINUX",
+            "label": "LINUX",
+            "image_file": "ROOM-LINUX.webp",
+            "type": "room"
+        }
+    ],
+    "edges": [
+        {
+            "from_node": "GATE",
+            "to_node": "HALL-01",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-01",
+            "to_node": "HALL-02",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-02",
+            "to_node": "HALL-03",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-03",
+            "to_node": "HALL-04",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-04",
+            "to_node": "ROOM-105",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-105",
+            "to_node": "JUNC-01",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-01",
+            "to_node": "JUNC-02",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-02",
+            "to_node": "JUNC-03",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-03",
+            "to_node": "JUNC-04",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-04",
+            "to_node": "JUNC-05",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-05",
+            "to_node": "JUNC-06",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-06",
+            "to_node": "JUNC-07",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-07",
+            "to_node": "ROOM-101",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-07",
+            "to_node": "ROOM-102",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-06",
+            "to_node": "ROOM-103",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-105",
+            "to_node": "ROOM-104",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-04",
+            "to_node": "JUNC-08",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-08",
+            "to_node": "ROOM-106",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-08",
+            "to_node": "ROOM-107",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-08",
+            "to_node": "ROOM-108",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-08",
+            "to_node": "ROOM-110",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-02",
+            "to_node": "ROOM-CASHIER",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-05",
+            "to_node": "ROOM-CLINIC",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-106",
+            "to_node": "HALL-05",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-05",
+            "to_node": "HALL-06",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-06",
+            "to_node": "ROOM-COMFORT-ROOM",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-01",
+            "to_node": "ROOM-DEANS-OFFICE",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-01",
+            "to_node": "ROOM-FACULTY",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-02",
+            "to_node": "ROOM-GUIDANCE-OFFICE",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-101",
+            "to_node": "HALL-07",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-07",
+            "to_node": "ROOM-PROPERTY-CUSTODIAN",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-03",
+            "to_node": "ROOM-SCHOLARSHIP-OFFICE",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-106",
+            "to_node": "ROOM-SLAB-1",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-106",
+            "to_node": "ROOM-SLAB-3",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-04",
+            "to_node": "ROOM-STUDENT-AFFAIRS-OFFICE",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-105",
+            "to_node": "HALL-08",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-08",
+            "to_node": "JUNC-09",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-09",
+            "to_node": "JUNC-10",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-10",
+            "to_node": "JUNC-11",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-11",
+            "to_node": "HALL-09",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-09",
+            "to_node": "JUNC-12",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-12",
+            "to_node": "JUNC-13",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-13",
+            "to_node": "JUNC-14",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-14",
+            "to_node": "JUNC-15",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-15",
+            "to_node": "JUNC-16",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-16",
+            "to_node": "JUNC-17",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-17",
+            "to_node": "HALL-10",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-10",
+            "to_node": "ROOM-201",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-17",
+            "to_node": "ROOM-202",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-16",
+            "to_node": "ROOM-203",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-15",
+            "to_node": "ROOM-204",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-14",
+            "to_node": "ROOM-205",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-13",
+            "to_node": "ROOM-206",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-11",
+            "to_node": "ROOM-207",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-11",
+            "to_node": "ROOM-208",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-10",
+            "to_node": "ROOM-209",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-09",
+            "to_node": "ROOM-210",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-105",
+            "to_node": "HALL-11",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-11",
+            "to_node": "HALL-12",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-12",
+            "to_node": "HALL-13",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-13",
+            "to_node": "ROOM-211",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-08",
+            "to_node": "HALL-14",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-14",
+            "to_node": "JUNC-18",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-18",
+            "to_node": "ROOM-214",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-18",
+            "to_node": "ROOM-215",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-12",
+            "to_node": "HALL-15",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-15",
+            "to_node": "HALL-16",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-16",
+            "to_node": "HALL-17",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-17",
+            "to_node": "HALL-18",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-18",
+            "to_node": "HALL-19",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-19",
+            "to_node": "ROOM-COMFORT-ROOM-2",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-18",
+            "to_node": "ROOM-LIBRARY",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-12",
+            "to_node": "ROOM-TECHNICAL-OFFICE",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-105",
+            "to_node": "HALL-20",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-20",
+            "to_node": "HALL-21",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-21",
+            "to_node": "HALL-22",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-22",
+            "to_node": "HALL-23",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-23",
+            "to_node": "HALL-24",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-24",
+            "to_node": "HALL-25",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-25",
+            "to_node": "HALL-26",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-26",
+            "to_node": "HALL-27",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-27",
+            "to_node": "HALL-28",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-28",
+            "to_node": "HALL-29",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-29",
+            "to_node": "HALL-30",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-30",
+            "to_node": "ROOM-301",
+            "direction_label": ""
+        },
+        {
+            "from_node": "ROOM-105",
+            "to_node": "JUNC-19",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-19",
+            "to_node": "HALL-31",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-31",
+            "to_node": "HALL-32",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-32",
+            "to_node": "HALL-33",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-33",
+            "to_node": "HALL-34",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-34",
+            "to_node": "HALL-35",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-35",
+            "to_node": "HALL-36",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-36",
+            "to_node": "HALL-37",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-37",
+            "to_node": "HALL-38",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-38",
+            "to_node": "ROOM-302",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-18",
+            "to_node": "HALL-39",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-39",
+            "to_node": "HALL-40",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-40",
+            "to_node": "ROOM-AUDITORIUM",
+            "direction_label": ""
+        },
+        {
+            "from_node": "JUNC-19",
+            "to_node": "HALL-41",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-41",
+            "to_node": "HALL-42",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-42",
+            "to_node": "HALL-43",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-43",
+            "to_node": "HALL-44",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-44",
+            "to_node": "HALL-45",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-45",
+            "to_node": "HALL-46",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-46",
+            "to_node": "HALL-47",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-47",
+            "to_node": "HALL-48",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-48",
+            "to_node": "HALL-49",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-49",
+            "to_node": "HALL-50",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-50",
+            "to_node": "ROOM-KITCHEN-LAB",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-51",
+            "to_node": "HALL-52",
+            "direction_label": ""
+        },
+        {
+            "from_node": "HALL-52",
+            "to_node": "ROOM-LINUX",
+            "direction_label": ""
+        }
+    ],
+    "rooms": [
+        {
+            "room_name": "101",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-101"
+        },
+        {
+            "room_name": "102",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-102"
+        },
+        {
+            "room_name": "103",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-103"
+        },
+        {
+            "room_name": "104",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-104"
+        },
+        {
+            "room_name": "105",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-105"
+        },
+        {
+            "room_name": "106",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-106"
+        },
+        {
+            "room_name": "107",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-107"
+        },
+        {
+            "room_name": "108",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-108"
+        },
+        {
+            "room_name": "110",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-110"
+        },
+        {
+            "room_name": "CASHIER",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-CASHIER"
+        },
+        {
+            "room_name": "CLINIC",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-CLINIC"
+        },
+        {
+            "room_name": "COMFORT ROOM (2nd floor)",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-COMFORT-ROOM"
+        },
+        {
+            "room_name": "DEANS OFFICE",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-DEANS-OFFICE"
+        },
+        {
+            "room_name": "FACULTY",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-FACULTY"
+        },
+        {
+            "room_name": "GUIDANCE OFFICE",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-GUIDANCE-OFFICE"
+        },
+        {
+            "room_name": "PROPERTY CUSTODIAN",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-PROPERTY-CUSTODIAN"
+        },
+        {
+            "room_name": "SCHOLARSHIP OFFICE",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-SCHOLARSHIP-OFFICE"
+        },
+        {
+            "room_name": "SLAB 1",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-SLAB-1"
+        },
+        {
+            "room_name": "STUDENT AFFAIRS OFFICE",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-STUDENT-AFFAIRS-OFFICE"
+        },
+        {
+            "room_name": "201",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-201"
+        },
+        {
+            "room_name": "202",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-202"
+        },
+        {
+            "room_name": "203",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-203"
+        },
+        {
+            "room_name": "204",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-204"
+        },
+        {
+            "room_name": "205",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-205"
+        },
+        {
+            "room_name": "206",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-206"
+        },
+        {
+            "room_name": "207",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-207"
+        },
+        {
+            "room_name": "208",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-208"
+        },
+        {
+            "room_name": "209",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-209"
+        },
+        {
+            "room_name": "210",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-210"
+        },
+        {
+            "room_name": "211",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-211"
+        },
+        {
+            "room_name": "214",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-214"
+        },
+        {
+            "room_name": "215",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-215"
+        },
+        {
+            "room_name": "COMFORT ROOM",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-COMFORT-ROOM-2"
+        },
+        {
+            "room_name": "LIBRARY",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-LIBRARY"
+        },
+        {
+            "room_name": "TECHNICAL OFFICE",
+            "floor": "2ND FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-TECHNICAL-OFFICE"
+        },
+        {
+            "room_name": "301",
+            "floor": "3RD FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-301"
+        },
+        {
+            "room_name": "302",
+            "floor": "3RD FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-302"
+        },
+        {
+            "room_name": "AUDITORIUM",
+            "floor": "3RD FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-AUDITORIUM"
+        },
+        {
+            "room_name": "KITCHEN LAB",
+            "floor": "3RD FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-KITCHEN-LAB"
+        },
+        {
+            "room_name": "LINUX",
+            "floor": "3RD FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-LINUX"
+        },
+        {
+            "room_name": "SLAB 3",
+            "floor": "1ST FLOOR ADMIN BUILDING",
+            "node_id": "ROOM-SLAB-3"
+        }
+    ]
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="signin-wrap">
+  <div class="signin">
+    <h1 class="wordmark">EduTrack</h1>
+    <p class="sub">Staff panel</p>
+
+    <div id="alert" class="notice notice-error" hidden>
+      <div><p class="t">Could not sign in</p><p class="d" id="alertText"></p></div>
+    </div>
+
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" autocomplete="username" autocapitalize="none" spellcheck="false">
+        <p class="field-error" id="err-username">Enter your username.</p>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password">
+        <p class="field-error" id="err-password">Enter your password.</p>
+      </div>
+
+      <button type="submit" class="btn" id="submit" style="width:100%">Sign in</button>
+    </form>
+
+    <p class="field-hint" style="margin-top:24px">
+      Staff accounts are created by a full-access admin. If you do not have one, ask them to add you.
+    </p>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('form');
+  const submit = document.getElementById('submit');
+  const alertBox = document.getElementById('alert');
+  const alertText = document.getElementById('alertText');
+
+  let token = null;
+
+  async function getToken() {
+    if (token) return token;
+    const res = await fetch('../api/csrf-token.php', { credentials: 'same-origin' });
+    const data = await res.json();
+    token = data.token;
+    return token;
+  }
+
+  function fail(message) {
+    alertText.textContent = message;
+    alertBox.hidden = false;
+  }
+
+  function busy(state) {
+    submit.disabled = state;
+    submit.textContent = state ? 'Signing in…' : 'Sign in';
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    alertBox.hidden = true;
+    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('on'));
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    let ok = true;
+    if (!username) { document.getElementById('err-username').classList.add('on'); ok = false; }
+    if (!password) { document.getElementById('err-password').classList.add('on'); ok = false; }
+    if (!ok) return;
+
+    busy(true);
+    try {
+      const res = await fetch('../api/admin/login.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': await getToken() },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (!data.ok) {
+        token = null;             // it may have been the token that was stale
+        busy(false);
+        fail(data.error || 'Sign in failed. Please try again.');
+        return;
+      }
+      window.location.href = 'index.html';
+    } catch {
+      busy(false);
+      fail('Could not reach the server. Check that Laragon is running, then try again.');
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel — Students</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="wordmark">EduTrack</div>
+      <div class="sub">Staff panel</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>Students</h1>
+          <p class="lede">Everyone who has made an account with a code from the guard.</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs" role="group" aria-label="Show which students">
+          <button class="tab" type="button" data-status="all">Everyone</button>
+          <button class="tab" type="button" data-status="verified">Can sign in</button>
+          <button class="tab" type="button" data-status="pending">Waiting to verify</button>
+          <button class="tab" type="button" data-status="off">Turned off</button>
+        </div>
+        <div class="search">
+          <label class="sr-only" for="q">Search by name or email</label>
+          <input type="search" id="q" placeholder="Search by name or email">
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only" id="caption">Students</caption>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col" class="hide-sm">Email</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="hide-sm">Joined</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <div class="pager" id="pager"></div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/admin/admin.js"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+
+  const rows = document.getElementById('rows');
+  const pager = document.getElementById('pager');
+  const caption = document.getElementById('caption');
+
+  const params = new URLSearchParams(window.location.search);
+  const state = {
+    status: params.get('status') || 'all',
+    q: '',
+    page: 1
+  };
+
+  const STATUS = {
+    verified: { label: 'Can sign in', kind: 'verified' },
+    pending:  { label: 'Waiting to verify', kind: 'pending' },
+    off:      { label: 'Turned off', kind: 'off' }
+  };
+
+  const TAB_TEXT = {
+    all: 'All students',
+    verified: 'Students who can sign in',
+    pending: 'Students waiting to verify their email',
+    off: 'Students whose accounts are turned off'
+  };
+
+  function paintTabs() {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.setAttribute('aria-pressed', String(t.dataset.status === state.status));
+    });
+    caption.textContent = TAB_TEXT[state.status];
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.status = tab.dataset.status;
+      state.page = 1;
+      // Kept in the address bar so the view can be refreshed or shared.
+      const url = new URL(window.location);
+      url.searchParams.set('status', state.status);
+      history.replaceState(null, '', url);
+      paintTabs();
+      load();
+    });
+  });
+
+  document.getElementById('q').addEventListener('input', debounce(e => {
+    state.q = e.target.value.trim();
+    state.page = 1;
+    load();
+  }, 300));
+
+  async function load() {
+    showSkeleton(rows, 6, 5);
+    const { data } = await apiGet('students.php', {
+      status: state.status, q: state.q, page: state.page
+    });
+
+    if (!data.ok) {
+      toast(data.error || 'Could not load students.', 'bad');
+      return;
+    }
+
+    if (data.data.length === 0) {
+      // Two different situations, two different messages.
+      const filtered = state.q !== '' || state.status !== 'all';
+      showEmpty(rows, 5,
+        filtered ? 'No students match' : 'No students yet',
+        filtered
+          ? 'Nothing here fits what you searched for.'
+          : 'Students appear here once they register with a code from the guard desk.',
+        filtered ? 'Show everyone' : null,
+        filtered ? () => {
+          state.q = ''; state.status = 'all'; state.page = 1;
+          document.getElementById('q').value = '';
+          paintTabs(); load();
+        } : null
+      );
+      pager.replaceChildren();
+      return;
+    }
+
+    rows.replaceChildren();
+    data.data.forEach(student => rows.appendChild(drawRow(student)));
+    drawPager(pager, data, page => { state.page = page; load(); });
+  }
+
+  function drawRow(student) {
+    const tr = document.createElement('tr');
+
+    const name = document.createElement('td');
+    const strong = document.createElement('div');
+    strong.className = 'strong';
+    strong.textContent = student.fullName;
+    name.appendChild(strong);
+    // On narrow screens the email column is hidden, so it rides along here.
+    const sub = document.createElement('div');
+    sub.className = 'sub';
+    sub.textContent = student.email;
+    name.appendChild(sub);
+    tr.appendChild(name);
+
+    const email = cell(student.email, 'hide-sm');
+    tr.appendChild(email);
+
+    const status = document.createElement('td');
+    const meta = STATUS[student.status];
+    status.appendChild(pill(meta.label, meta.kind));
+    tr.appendChild(status);
+
+    const joined = cell(formatDate(student.createdAt), 'hide-sm sub');
+    tr.appendChild(joined);
+
+    const actions = document.createElement('td');
+    const box = document.createElement('div');
+    box.className = 'row-actions';
+
+    if (student.status === 'pending' && allowed('student.verify')) {
+      box.appendChild(button('Mark verified', 'btn-quiet', async () => {
+        const yes = await confirmAction({
+          title: 'Mark as verified?',
+          message: student.fullName + ' will be able to sign in straight away, without clicking the link in their email.',
+          confirmLabel: 'Yes, mark verified'
+        });
+        if (yes) act({ action: 'verify', id: student.id });
+      }));
+    }
+
+    if (allowed('student.deactivate')) {
+      if (student.status === 'off') {
+        box.appendChild(button('Turn back on', 'btn-quiet', async () => {
+          const yes = await confirmAction({
+            title: 'Turn this account back on?',
+            message: student.fullName + ' will be able to sign in again.',
+            confirmLabel: 'Yes, turn it on'
+          });
+          if (yes) act({ action: 'reactivate', id: student.id });
+        }));
+      } else {
+        box.appendChild(button('Turn off', 'btn-quiet', async () => {
+          const yes = await confirmAction({
+            title: 'Turn this account off?',
+            message: student.fullName + ' will not be able to sign in. Nothing is deleted, and you can turn it back on at any time.',
+            confirmLabel: 'Yes, turn it off'
+          });
+          if (yes) act({ action: 'deactivate', id: student.id });
+        }));
+      }
+    }
+
+    if (allowed('student.delete')) {
+      box.appendChild(button('Delete', 'btn-danger', async () => {
+        const typed = await confirmAction({
+          title: 'Delete this student for good?',
+          message: 'This cannot be undone. ' + student.fullName + "'s account will be removed completely. If you only want to stop them signing in, turn the account off instead.",
+          confirmLabel: 'Delete permanently',
+          danger: true,
+          typeToConfirm: student.email
+        });
+        if (typed) act({ action: 'delete', id: student.id, confirmEmail: typed });
+      }));
+    }
+
+    actions.appendChild(box);
+    tr.appendChild(actions);
+    return tr;
+  }
+
+  function button(label, kind, onClick) {
+    const b = document.createElement('button');
+    b.className = 'btn btn-small ' + kind;
+    b.type = 'button';
+    b.textContent = label;
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  async function act(payload) {
+    const { data } = await apiPost('student-action.php', payload);
+    if (!data.ok) {
+      toast(data.error || 'That did not work.', 'bad');
+      return;
+    }
+    toast(data.message || 'Done.');
+    load();
+  }
+
+  paintTabs();
+  load();
+})();
+</script>
+</body>
+</html>
