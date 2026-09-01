@@ -117,7 +117,37 @@ function client_ip(): string
 /** True when the request came from the machine running the server. */
 function is_local_request(): bool
 {
-    return in_array(client_ip(), ['127.0.0.1', '::1'], true);
+    return is_server_machine(client_ip());
+}
+
+/**
+ * True when this address is the machine running the server.
+ *
+ * Loopback covers the usual http://localhost/ case. The second test covers the
+ * server being reached at its own LAN address instead, which is what happens
+ * as soon as it is shared on a network: the browser sitting at the server then
+ * reports 192.168.x.x rather than 127.0.0.1, and every loopback-only check
+ * quietly stops recognising the machine it is running on.
+ *
+ * It stays deliberately narrow. It matches the single address Apache answered
+ * on, never the rest of the subnet, so nothing beyond that one computer is
+ * trusted by this.
+ */
+function is_server_machine(string $ip): bool
+{
+    // Apache reports an IPv4 client as ::ffff:192.168.0.223 on a dual-stack
+    // listener, so both sides are flattened before they are compared.
+    $flatten = static fn (string $a): string => stripos($a, '::ffff:') === 0 ? substr($a, 7) : $a;
+
+    $ip = $flatten($ip);
+
+    if (in_array($ip, ['127.0.0.1', '::1'], true)) {
+        return true;
+    }
+
+    $server = $flatten((string) ($_SERVER['SERVER_ADDR'] ?? ''));
+
+    return $server !== '' && $ip === $server;
 }
 
 /*

@@ -103,8 +103,8 @@ switch ((string) ($input['action'] ?? '')) {
         /*
           The guard that makes this feature safe to offer. Saving a list that
           does not include the computer you are sitting at would lock you out
-          of the screen you would need to undo it. Localhost always passes, so
-          whoever is at the server can still recover.
+          of the screen you would need to undo it. The server's own machine
+          always passes, so whoever is at it can still recover.
         */
         if ($entries !== [] && !ip_allowed(client_ip(), $entries)) {
             json_fail(400, 'That list does not include this computer (' . client_ip()

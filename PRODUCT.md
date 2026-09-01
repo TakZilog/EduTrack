@@ -30,7 +30,7 @@ The mechanism a static campus map or directory can't copy: a real photographic w
 
 ## Capabilities and Constraints
 
-- Stack: plain HTML/CSS/JS frontend (no build tooling), PHP + MySQL backend (PDO — standardize all `api/*.php` on PDO per HANDOFF.md), running under XAMPP/Laragon locally.
+- Stack: plain HTML/CSS/JS frontend (no build tooling), PHP + MySQL backend (PDO — standardize all `api/*.php` on PDO per HANDOFF.md), running under Laragon locally (Apache 2.4, PHP 8.3, MySQL 8.4).
 - Campus map currently runs off a flat file (`assets/nodes/nodes-edges.json`, ~90 deduplicated 360° images), not the database; a DB-backed node graph is a known future phase, not yet started.
 - OTP codes are session-based (`$_SESSION['otp']`), not a DB table — accepted tradeoff, not a gap to silently fix.
 - Guard codes are stored in plain text (short-lived, single-use — accepted tradeoff per HANDOFF.md, not to be "fixed" without being asked).

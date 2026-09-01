@@ -13,7 +13,8 @@
  *
  * Safety rules, because a wrong entry here could lock everyone out for good:
  *   - an empty list means the restriction is off
- *   - localhost is always allowed, so whoever sits at the server can undo it
+ *   - the server's own machine is always allowed, whether it is reached as
+ *     localhost or at its LAN address, so whoever sits at it can undo this
  *   - a list that would lock out the person saving it is refused
  *   - tools/reset-ip-allowlist.php clears it from the command line
  */
@@ -74,8 +75,10 @@ function ip_allowed(string $ip, array $entries): bool
 
     $ip = normalise_ip($ip);
 
-    // Always. This is the way back in if the list is wrong.
-    if (in_array($ip, ['127.0.0.1', '::1'], true)) {
+    // Always. This is the way back in if the list is wrong, and it has to hold
+    // whether the server is reached as localhost or at its own LAN address,
+    // because on a shared server it is normally the latter.
+    if (is_server_machine($ip)) {
         return true;
     }
 

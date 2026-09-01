@@ -7,13 +7,29 @@ against the running system rather than carried forward.
 ## Where it runs
 
 - Project root: `C:\laragon\www\EduTrack` (Laragon, not XAMPP)
-- Apache serves it at `http://localhost/EduTrack/` and `http://edutrack.test/`
+- Apache serves it at `http://localhost/EduTrack/` and `http://edutrack.test/`.
+  Apache listens on every interface, so the same paths work from another
+  machine at `http://<server-lan-ip>/EduTrack/` once Windows Firewall allows
+  inbound TCP 80. Every page uses relative paths, so no URL is host-specific.
 - MySQL 8.4 on port 3306, database `edutrack`
 - PHP 8.3
 
-A stale XAMPP copy still exists at `C:\xampp\htdocs\EduTrack` with an old
-MariaDB `edutrack` database. Nothing uses it. XAMPP's MySQL cannot start while
-Laragon holds port 3306.
+This machine is Laragon-only. XAMPP is still installed at `C:\xampp` but every
+one of its services — Apache, MySQL, Tomcat, FileZilla — is stopped and set to
+Disabled, so none of them start at boot or contend for a port.
+
+That was not always true. XAMPP's Apache and MariaDB used to run as automatic
+services and won ports 80 and 3306 at every boot, which meant the site was
+being served from a stale copy at `C:\xampp\htdocs\EduTrack\EduTrack` while the
+database lived in `C:\xampp\mysql`. The `edutrack`, `campusvoice` and
+`squishy_db` databases were dumped out of MariaDB 10.4 and loaded into Laragon's
+MySQL 8.4 on 2026-09-01; `C:\xampp\mysql\data` is untouched and remains a
+fallback. The stale web copy is unserved but still on disk — delete it once you
+are confident nothing wants it.
+
+To bring XAMPP back for another project, re-enable only the service you need
+(`Set-Service mysql -StartupType Automatic`) and move Laragon off that port
+first, or the two will fight over it again.
 
 Run `php tools/setup-check.php` for a full environment report: PHP version and
 extensions, config, database, schema, and campus map integrity.

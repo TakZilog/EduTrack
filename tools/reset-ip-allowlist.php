@@ -8,7 +8,7 @@
  *
  *     php tools/reset-ip-allowlist.php
  *
- * Signing in from the server itself also works, because localhost is always
+ * Signing in from the server itself also works, because that machine is always
  * allowed. This exists for the case where that is not convenient either.
  */
 
