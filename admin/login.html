@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/admin.css">
+<link rel="stylesheet" href="../assets/css/admin.css?v=3">
 </head>
 <body>
 
@@ -16,8 +16,10 @@
     <h1 class="wordmark">EduTrack</h1>
     <p class="sub">Staff panel</p>
 
+    <!-- The heading is set from the server's answer rather than being fixed
+         text, so a lock-out reads as a lock-out instead of a wrong password. -->
     <div id="alert" class="notice notice-error" hidden>
-      <div><p class="t">Could not sign in</p><p class="d" id="alertText"></p></div>
+      <div><p class="t" id="alertTitle">Could not sign in</p><p class="d" id="alertText"></p></div>
     </div>
 
     <form id="form" novalidate>
@@ -58,7 +60,11 @@
     return token;
   }
 
-  function fail(message) {
+  function fail(message, status) {
+    // 429 is the throttle, not a bad password. Saying "could not sign in"
+    // there sends people back to retype a password that was already right.
+    document.getElementById('alertTitle').textContent =
+      status === 429 ? 'Too many tries' : 'Could not sign in';
     alertText.textContent = message;
     alertBox.hidden = false;
   }
@@ -94,13 +100,13 @@
       if (!data.ok) {
         token = null;             // it may have been the token that was stale
         busy(false);
-        fail(data.error || 'Sign in failed. Please try again.');
+        fail(data.error || 'Sign in failed. Please try again.', res.status);
         return;
       }
       window.location.href = 'index.html';
     } catch {
       busy(false);
-      fail('Could not reach the server. Check that Laragon is running, then try again.');
+      fail('Could not reach the server. Check that Laragon is running, then try again.', 0);
     }
   });
 </script>

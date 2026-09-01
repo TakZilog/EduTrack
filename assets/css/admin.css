@@ -60,6 +60,16 @@
 
 * { box-sizing: border-box; }
 
+/*
+  The hidden attribute has to win.
+
+  It works through the browser's own [hidden] { display: none }, which a class
+  selector outranks. Any component that sets its own display, such as .notice
+  with display: flex, would otherwise stay on screen while marked hidden. That
+  put "Could not sign in" on the sign-in page before anyone had typed anything.
+*/
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
