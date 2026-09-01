@@ -10,14 +10,19 @@
   <div class="page-center">
     <div class="card">
       <h1>Guard Login</h1>
-      <p class="subtitle">Enter the guard passphrase to issue registration codes.</p>
+      <p class="subtitle">Enter the guard password to issue registration codes.</p>
 
       <div id="alertBox" class="alert"></div>
 
       <form id="guardLoginForm" novalidate>
-        <label for="passphrase">Passphrase</label>
+        <!--
+          The element id and the JSON field sent to api/guard-login.php are
+          still called "passphrase". Only the wording on screen changed, so
+          the two sides stay wired together.
+        -->
+        <label for="passphrase">Password</label>
         <input type="password" id="passphrase" autocomplete="off">
-        <div class="field-error" id="err-passphrase">Enter the guard passphrase.</div>
+        <div class="field-error" id="err-passphrase">Enter the guard password.</div>
 
         <button type="submit" class="btn" id="submitBtn">Log In</button>
       </form>

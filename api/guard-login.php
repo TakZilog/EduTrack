@@ -21,7 +21,9 @@ if ($secret === '' || $secret === 'PASTE-BCRYPT-HASH-HERE') {
 
 $unset = ['', 'change-me', 'PASTE-BCRYPT-HASH-HERE'];
 if (in_array($secret, $unset, true)) {
-    json_fail(500, 'Guard passphrase is not configured');
+    // Worded as "password" to match the guard login screen. The config keys
+    // are still guard_passphrase / guard_passphrase_hash.
+    json_fail(500, 'Guard password is not configured');
 }
 
 // One shared credential guards this desk, so the address is the only
@@ -37,7 +39,7 @@ $ok = $passphrase !== ''
 
 if (!$ok) {
     rate_limit_record($ip, 'guard_login', false);
-    json_fail(401, 'Incorrect passphrase');
+    json_fail(401, 'Incorrect password');
 }
 
 rate_limit_record($ip, 'guard_login', true);

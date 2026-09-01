@@ -122,33 +122,116 @@
       flex-shrink: 0;
     }
 
-    .back-btn {
-      position: fixed; top: 16px; left: 16px; z-index: 10;
-      display: inline-flex; align-items: center; gap: 8px;
-      min-height: 44px; padding: 0 18px;
-      background: rgba(27,30,37,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--line); border-radius: 999px;
-      color: var(--paper); text-decoration: none; font-size: 0.95rem; font-weight: 600;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      transition: background 0.15s ease, border-color 0.15s ease;
+    /*
+      Session row. Sign-out lives in the card footer here rather than in a
+      floating pill, matching how the guard desk already ends a session
+      (Guard/issue-code.html). DESIGN.md calls the floating pill the product's
+      only wayfinding chrome, so a second floating control would have competed
+      with it; anchoring this to the card also keeps the action next to the
+      name it belongs to.
+
+      Hidden until api/whoami.php answers, because this page serves both
+      signed-in students and guests, and showing the wrong control first would
+      be worse than showing none.
+    */
+    .session {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
     }
-    .back-btn:hover { background: rgba(27,30,37,0.98); border-color: var(--signal); }
-    .back-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .session[hidden] { display: none; }
+
+    .session-who {
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.3;
+      min-width: 0;
+    }
+
+    .session-who strong {
+      display: block;
+      color: var(--paper);
+      font-weight: 600;
+      /* A long name wraps rather than pushing the control off the card. */
+      overflow-wrap: anywhere;
+    }
+
+    /* Shared shape for both states, so the footer keeps its rhythm either way. */
+    .session-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 16px;
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--paper);
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .session-action svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+    /*
+      Hover stays in the Signal family. DESIGN.md reserves Danger for field
+      errors and alerts, and the One Hue Rule allows no other interactive hue,
+      so signing out is not tinted red however tempting that is.
+    */
+    @media (hover: hover) and (pointer: fine) {
+      .session-action:hover {
+        background: rgba(246, 244, 238, 0.06);
+        border-color: var(--signal);
+      }
+    }
+
+    .session-action:active { transform: scale(0.98); }
+
+    .session-action:focus-visible {
+      outline: 2px solid var(--signal);
+      outline-offset: 2px;
+    }
+
+    .session-action[disabled] {
+      opacity: 0.4;
+      cursor: default;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .session-action { transition: background 0.15s ease, border-color 0.15s ease; }
+      .session-action:active { transform: none; }
+    }
+
+    /* Narrow phones: let the row stack instead of squeezing the 44px target. */
+    @media (max-width: 380px) {
+      .session { flex-direction: column; align-items: stretch; }
+      .session-action { justify-content: center; }
+    }
   </style>
 </head>
 
 <body>
-  <a href="../index.html" class="back-btn" aria-label="Back to home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-    Back
-  </a>
   <div class="picker">
     <h1>Where do you want to go?</h1>
     <p>Search or pick a room to start the walkthrough from the gate.</p>
     <input id="roomSearch" type="text" placeholder="Search room, e.g. 101 or Clinic">
     <ul id="roomList"></ul>
+    <div class="session" id="sessionFooter" hidden></div>
   </div>
 
+  <!-- apiPost() attaches the CSRF token api/logout.php requires. -->
+  <script src="../Auth/auth.js"></script>
   <script>
     let allRooms = [];
 
@@ -180,6 +263,72 @@
       const q = e.target.value.toLowerCase();
       renderList(allRooms.filter(r => r.room_name.toLowerCase().includes(q)));
     });
+
+    /* ------------------------------------------------------------- session */
+
+    /*
+      This page is opened two ways: by a student who has just signed in
+      (Auth/login.html) and by a guest who has not (guest-map.html). Ask the
+      server which one this is before drawing anything, so a guest is never
+      offered a way to log out of a session they do not have, and a signed-in
+      student is never left without one.
+
+      Either way the room picker above is already usable; the footer is the
+      only thing waiting on this.
+    */
+    const ICON_LOGOUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 17l5-5-5-5M20 12H9M12 3H6a1 1 0 00-1 1v16a1 1 0 001 1h6"/></svg>';
+    const ICON_BACK   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>';
+
+    const sessionFooter = document.getElementById('sessionFooter');
+
+    function escapeHtml(text) {
+      const p = document.createElement('p');
+      p.textContent = text;
+      return p.innerHTML;
+    }
+
+    function showGuestFooter() {
+      sessionFooter.innerHTML =
+        '<span class="session-who">Browsing as a guest</span>' +
+        '<a class="session-action" href="../index.html">' + ICON_BACK + 'Back to home</a>';
+      sessionFooter.hidden = false;
+    }
+
+    function showSignedInFooter(fullName) {
+      sessionFooter.innerHTML =
+        '<span class="session-who">Signed in as <strong>' + escapeHtml(fullName) + '</strong></span>' +
+        '<button type="button" class="session-action" id="logoutBtn">' + ICON_LOGOUT + 'Log out</button>';
+      sessionFooter.hidden = false;
+
+      document.getElementById('logoutBtn').addEventListener('click', function () {
+        this.disabled = true;
+        this.textContent = 'Logging out…';
+
+        apiPost('logout.php')
+          .then(() => { window.location.href = '../index.html'; })
+          .catch(() => {
+            // Still signed in, so put the control back rather than stranding
+            // them, and say what happened where they are already looking.
+            this.disabled = false;
+            this.innerHTML = ICON_LOGOUT + 'Log out';
+            const who = sessionFooter.querySelector('.session-who');
+            if (who) {
+              who.textContent = 'Could not reach the server. Try again.';
+              who.setAttribute('role', 'alert');
+            }
+          });
+      });
+    }
+
+    fetch('../api/whoami.php', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        data.signedIn ? showSignedInFooter(data.fullName) : showGuestFooter();
+      })
+      .catch(() => {
+        // Server unreachable: offer the way out that needs no server.
+        showGuestFooter();
+      });
   </script>
 </body>
 

@@ -5,6 +5,15 @@
       "PowerShell(npm cache *)",
       "PowerShell(npx -y --package @claude-flow/cli@latest -c \"echo RESOLVED_OK\" 2>&1 | Out-String)",
       "PowerShell(npm exec *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "PowerShell(Remove-Item -Recurse -Force *)",
+      "Bash(sudo *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard*)",
+      "Read(./api/config.php)"
     ]
   },
   "hooks": {
@@ -34,5 +43,16 @@
       }
     ]
   },
-  "description": "Impeccable design detector: immediate-tier checks after Edit/Write on UI files, full-rule deep pass on Stop."
+  "extraKnownMarketplaces": {
+    "ecc": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/affaan-m/ECC.git"
+      }
+    }
+  },
+  "description": "Impeccable design detector: immediate-tier checks after Edit/Write on UI files, full-rule deep pass on Stop.",
+  "enabledPlugins": {
+    "ecc@ecc": true
+  }
 }

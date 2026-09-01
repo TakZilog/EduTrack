@@ -7,10 +7,33 @@ against the running system rather than carried forward.
 ## Where it runs
 
 - Project root: `C:\laragon\www\EduTrack` (Laragon, not XAMPP)
-- Apache serves it at `http://localhost/EduTrack/` and `http://edutrack.test/`.
-  Apache listens on every interface, so the same paths work from another
-  machine at `http://<server-lan-ip>/EduTrack/` once Windows Firewall allows
-  inbound TCP 80. Every page uses relative paths, so no URL is host-specific.
+- **There are exactly two addresses, and no others.** Use these; do not
+  bookmark anything else.
+
+  | Who | Address |
+  | --- | --- |
+  | This machine | `http://localhost/EduTrack/` |
+  | The guard desk, or any other computer | `http://192.168.0.223/EduTrack/` |
+
+  Both reach the same Apache and the same files. Every page uses relative
+  paths, so no page is tied to a particular host.
+
+  The `edutrack.test` and `vendor.test` names were removed on 2026-09-02.
+  They were Laragon auto-vhosts nobody needed, and having four ways to open
+  one site made it impossible to tell a wrong address from a broken one.
+  `AutoVirtualHosts=0` in `C:\laragon\usr\laragon.ini` stops Laragon
+  recreating them; the vhost files themselves are gone from
+  `C:\laragon\etc\apache2\sites-enabled\`.
+
+  Apache still listens on every interface (`Listen 80`), which is what lets
+  the guard desk connect. The Windows Firewall rule "Apache HTTP Server" is
+  already enabled and allows the inbound connection.
+
+  `192.168.0.223` is a DHCP lease, so it moves. It was `192.168.0.127` in
+  early September. Give this machine a DHCP reservation on the router
+  (gateway `192.168.0.1`) for MAC `D8-43-AE-4B-6B-80` so the guard's
+  bookmark stops breaking. Until that is done, check the current address
+  with `ipconfig` whenever the guard desk cannot connect.
 - MySQL 8.4 on port 3306, database `edutrack`
 - PHP 8.3
 

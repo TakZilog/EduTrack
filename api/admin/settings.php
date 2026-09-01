@@ -79,10 +79,21 @@ switch ((string) ($input['action'] ?? '')) {
                 $changes[] = "{$meta['label']}: {$value} {$meta['unit']}";
             }
 
+            /*
+              The update half repeats the placeholders rather than using
+              VALUES(setting_value). That function is deprecated as of MySQL
+              8.0.20 and warns on this server, and its replacement — the row
+              alias form, `VALUES (?, ?, ?) AS new` — does not exist in
+              MariaDB. Binding the value twice is the one spelling that is both
+              current and portable across the two engines this may run on.
+            */
             $pdo->prepare(
                 'INSERT INTO app_settings (setting_key, setting_value, updated_by) VALUES (?, ?, ?)
-                 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_by = VALUES(updated_by)'
-            )->execute([$key, (string) $value, $_SESSION['admin_id']]);
+                 ON DUPLICATE KEY UPDATE setting_value = ?, updated_by = ?'
+            )->execute([
+                $key, (string) $value, $_SESSION['admin_id'],
+                (string) $value, $_SESSION['admin_id'],
+            ]);
         }
 
         if ($changes) {
@@ -112,10 +123,14 @@ switch ((string) ($input['action'] ?? '')) {
         }
 
         $stored = implode("\n", $entries);
+        // Placeholders repeated on the update half, for the reason given above.
         $pdo->prepare(
             'INSERT INTO app_settings (setting_key, setting_value, updated_by) VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_by = VALUES(updated_by)'
-        )->execute([IP_ALLOWLIST_KEY, $stored, $_SESSION['admin_id']]);
+             ON DUPLICATE KEY UPDATE setting_value = ?, updated_by = ?'
+        )->execute([
+            IP_ALLOWLIST_KEY, $stored, $_SESSION['admin_id'],
+            $stored, $_SESSION['admin_id'],
+        ]);
 
         audit_log('settings.access', 'settings', IP_ALLOWLIST_KEY, $entries === []
             ? 'Turned off the computer restriction. The staff panel is reachable from anywhere on the network again.'

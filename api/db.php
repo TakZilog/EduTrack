@@ -106,14 +106,58 @@ function db_failure_hint(PDOException $e, string $host, string $port, string $na
 }
 
 /**
+ * Every table the application reads or writes at runtime.
+ *
+ * The admin panel's three were missing from this list, so a fresh install made
+ * from the old sql/schema.sql — which did not create them — passed the setup
+ * check and then failed on the first staff screen anyone opened. If a table is
+ * named in a query anywhere under api/, it belongs here.
+ */
+const DB_REQUIRED_TABLES = [
+    'users',
+    'guard_codes',
+    'login_attempts',
+    'admins',
+    'admin_audit',
+    'app_settings',
+];
+
+/**
  * True when the schema is present. Used by tools/setup-check.php.
  *
  * @return string[] names of the tables that are missing
  */
 function db_missing_tables(PDO $pdo): array
 {
-    $required = ['users', 'guard_codes', 'login_attempts'];
-    $present  = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    $present = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
 
-    return array_values(array_diff($required, array_map('strval', $present)));
+    return array_values(array_diff(DB_REQUIRED_TABLES, array_map('strval', $present)));
+}
+
+/**
+ * Which sql/migrations files this database has recorded as applied.
+ *
+ * Returns null when schema_migrations does not exist, which means the database
+ * predates migration 004 and cannot say anything about itself. That is not a
+ * failure on its own; it just means the answer has to come from inspecting
+ * columns instead.
+ *
+ * @return string[]|null version prefixes, e.g. ['001', '002', '003', '004']
+ */
+function db_applied_migrations(PDO $pdo): ?array
+{
+    try {
+        return $pdo->query('SELECT version FROM schema_migrations ORDER BY version')
+            ->fetchAll(PDO::FETCH_COLUMN);
+    } catch (PDOException $e) {
+        // 1146 is "table doesn't exist", the one case this function is allowed
+        // to answer for. Anything else — a dropped connection, a permission
+        // problem, a damaged table — must not be reported to the operator as
+        // "your database predates migration 004", sending them to re-run a
+        // migration that already succeeded while the real fault stays hidden.
+        if ((int) ($e->errorInfo[1] ?? 0) !== 1146) {
+            throw $e;
+        }
+        return null;
+    }
 }

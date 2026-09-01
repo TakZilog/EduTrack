@@ -229,17 +229,17 @@ Restrained: one hue family (warm rust-orange) carries all interactive and emphas
 
 Every surface is a single centered column — one card (max-width 420–440px) vertically and horizontally centered in the viewport (`page-center`: flex, min-height 100vh, center/center). There is no multi-column or dashboard layout anywhere; this is a linear, one-decision-per-screen product by design, matching its one-task-at-a-time physical journey (arrive → find room / register → verify → walkthrough).
 
-Spacing is generous at the card level (32–44px outer padding, 22–24px between grouped elements) and tight within form fields (6px label-to-input, 16px between fields). Mobile is the base case, not a breakpoint: the card collapses to ~90vw with reduced padding under 480px, but touch targets (buttons, inputs, the floating back button) never shrink below 44px at any width — this is non-negotiable per the product's low-end-phone, gate-side usage context.
+Spacing is generous at the card level (32–44px outer padding, 22–24px between grouped elements) and tight within form fields (6px label-to-input, 16px between fields). Mobile is the base case, not a breakpoint: the card collapses to ~90vw with reduced padding under 480px, but touch targets (buttons, inputs, the back link) never shrink below 44px at any width — this is non-negotiable per the product's low-end-phone, gate-side usage context.
 
 The walkthrough surface (`map/walkthrough.html`) is the one exception to the centered-card rule: it's full-bleed (the 360° panorama fills the viewport) with fixed-position UI — a top directory strip, a bottom control bar, and a centered arrival banner — floating over the photography rather than containing it.
 
 ## Elevation & Depth
 
-Hybrid, and the split is intentional rather than inconsistent: hero and credential surfaces (`index.html`, `auth/login.html`, `auth/register.html`, `map/select-room.html`, `map/walkthrough.html`) sit a frosted glass panel (`background: rgba(27,30,37,0.72)`, `backdrop-filter: blur(14px)`, soft ambient shadow `0 20px 50px rgba(0,0,0,0.35)`) over real campus photography. Quick utility steps (`guest-map.html`, `auth/verify-otp.html`, `guard/login.html`, `guard/issue-code.html`) stay flat — an opaque plate panel with only a 1px hairline border, no blur, no shadow, no photo. The floating back-button pill gets its own smaller ambient shadow (`0 4px 14px rgba(0,0,0,0.3)`) wherever it appears.
+Hybrid, and the split is intentional rather than inconsistent: hero and credential surfaces (`index.html`, `auth/login.html`, `auth/register.html`, `map/select-room.html`, `map/walkthrough.html`) sit a frosted glass panel (`background: rgba(27,30,37,0.72)`, `backdrop-filter: blur(14px)`, soft ambient shadow `0 20px 50px rgba(0,0,0,0.35)`) over real campus photography. Quick utility steps (`guest-map.html`, `auth/verify-otp.html`, `guard/login.html`, `guard/issue-code.html`) stay flat — an opaque plate panel with only a 1px hairline border, no blur, no shadow, no photo. The back link carries no shadow of its own: it sits in the card's column rather than above the page, so it has nothing to lift off.
 
 ### Shadow Vocabulary
 - **Glass-card ambient** (`box-shadow: 0 20px 50px rgba(0,0,0,0.35)`): the frosted hero card, floating over photography.
-- **Pill-chrome ambient** (`box-shadow: 0 4px 14px rgba(0,0,0,0.3)`): the floating back-button and similar fixed chrome.
+- **Chrome ambient** (`box-shadow: 0 4px 14px rgba(0,0,0,0.3)`): reserved for chrome that genuinely floats above the page. Nothing currently uses it — the back link gave it up when it moved into the card's column.
 - **Inner rim** (`box-shadow: inset 0 1px 0 rgba(246,244,238,0.06)`): a faint top highlight on walkthrough nav buttons, suggesting physical button relief.
 
 ### Named Rules
@@ -247,7 +247,7 @@ Hybrid, and the split is intentional rather than inconsistent: hero and credenti
 
 ## Shapes
 
-Two form languages coexist deliberately: soft rectangles (4–10px radius) for containers, fields, and buttons — cards at 10px, buttons/inputs at 6px, small chips at 3–4px — and true circles/pills for anything that represents a physical badge or waypoint object: the floating back-button (999px pill), the guard badge-icon and walkthrough hotspot-arrow/arrived-check (50% circle). Nothing in the system uses a sharp 0px corner or a heavy rounded-full button; the radius scale stays modest and architectural, never toy-like.
+Two form languages coexist deliberately: soft rectangles (4–10px radius) for containers, fields, and buttons — cards at 10px, buttons/inputs at 6px, small chips at 3–4px — and true circles for anything that represents a physical badge or waypoint object: the guard badge-icon and the walkthrough hotspot-arrow/arrived-check (50% circle). The back link used to be a 999px pill and is now 6px, with the rest of the buttons — a rounded-full control never belonged in a system whose Don'ts reject them. Nothing in the system uses a sharp 0px corner or a heavy rounded-full button; the radius scale stays modest and architectural, never toy-like.
 
 ## Components
 
@@ -275,8 +275,12 @@ The generated-code / OTP-context display: Ink background, 1px Line border, a 3px
 ### Navigation (index directory)
 Row-based, not tab/menu-based: each entry is a full-width flex row with a mono 3-letter code chip on the left, a condensed-uppercase title + body description in the middle, and an arrow on the right. Hover/focus shifts the code and arrow to Signal Bright and nudges the arrow 3px right. Rows animate in with a staggered rise-and-fade on load (respects `prefers-reduced-motion`).
 
-### Floating Back Button (signature component)
-A pill-shaped (999px) glass chip fixed at top-left on every hero/credential page: `rgba(27,30,37,0.85)` background, 10px blur, Line border, Paper text + arrow icon, ambient pill shadow. Present wherever a page needs an escape hatch without a persistent header/nav bar — this product has no global nav chrome, only this one recurring floating control.
+### Card-Anchored Back Link (signature component)
+A glass chip carrying an arrow and a destination — "Back to home", never a bare "Back" — sitting in the flow directly above the card, sharing the card's 420px column and its left edge: `rgba(27,30,37,0.72)` background, 10px blur, Line border, Paper text, 6px radius, no shadow. On hover the arrow slides 3px **left**, the exact inverse of the index directory rows, which slide theirs 3px right; the two together make direction of travel a property of the whole system rather than a per-page flourish.
+
+It replaced a 999px pill fixed to the top-left corner of the viewport. Two things were wrong with that. It was the one rounded-full control in a system whose own Don'ts reject them, and being pinned to the corner while the card stayed centred meant that the wider the screen, the further the escape hatch drifted from the thing it belonged to — on a desktop it read as a stray chip lying on the photograph. Anchored to the card it needs no drop shadow, because it is no longer pretending to float above the page.
+
+Present wherever a page needs an escape hatch without a persistent header/nav bar — this product has no global nav chrome, only this one recurring control. Where a page has a session to end rather than a place to go back to, the card footer carries that instead (see `map/select-room.html`); the two never appear together.
 
 ### Route Strip (signature component, walkthrough-only)
 A 3px-tall strip of gap-separated ticks spanning the top of the viewport, one tick per step in the current path: unlit (faint paper), done (Muted), current (Signal Bright). This is the walkthrough's only persistent progress indicator and the single place Signal Bright is used as a state fill rather than a hover/focus accent.
@@ -314,5 +318,5 @@ A documented extension of this system, not a second design system. It covers `ad
 ### Don't:
 - **Don't** add rounded-full "friendly" buttons, pastel colors, or illustration — the system is deliberately institutional/editorial, not a consumer SaaS aesthetic.
 - **Don't** add a second accent hue (blue, green-as-accent, purple) for anything other than the two fixed semantic colors (danger/success).
-- **Don't** add a persistent top nav bar or hamburger menu; the floating pill back-button is the system's only wayfinding chrome outside the walkthrough itself.
+- **Don't** add a persistent top nav bar or hamburger menu; the card-anchored back link is the system's only wayfinding chrome outside the walkthrough itself.
 - **Don't** apply frosted glass to a flat utility page just for visual consistency — see The Photo-Earns-Glass Rule.

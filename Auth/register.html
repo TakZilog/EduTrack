@@ -14,18 +14,55 @@
     background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.35);
   }
-  .back-btn {
-    position: fixed; top: 16px; left: 16px; z-index: 10;
-    display: inline-flex; align-items: center; gap: 8px;
-    min-height: 44px; padding: 0 18px;
-    background: rgba(27,30,37,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border); border-radius: 999px;
-    color: var(--text); text-decoration: none; font-size: 0.95rem; font-weight: 600;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-    transition: background 0.15s ease, border-color 0.15s ease;
+  /*
+    The card and its way out share one column. Pinned to the viewport corner
+    the link drifted further from the card the wider the screen got, until on
+    a desktop it read as a stray chip on the photograph rather than as this
+    card's own way back. In the flow it stays where the eye already is.
+  */
+  .auth-stack {
+    width: 100%; max-width: 420px;
+    display: flex; flex-direction: column; gap: 14px;
   }
-  .back-btn:hover { background: rgba(27,30,37,0.98); border-color: var(--accent); }
-  .back-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .back-btn {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 16px;
+    /* Enough plate to stay legible on the photograph, without the drop shadow
+       it needed while it was floating above the page. */
+    background: rgba(27,30,37,0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    /* 6px, matching the inputs below it. The 999px pill was the one
+       rounded-full control in a system whose own rules reject them. */
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); text-decoration: none; font-size: 0.9rem; font-weight: 600;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  }
+
+  /* Gated: on a touch screen an ungated :hover sticks after the tap, leaving
+     the button looking permanently hovered. */
+  @media (hover: hover) and (pointer: fine) {
+    .back-btn:hover { background: rgba(27,30,37,0.92); border-color: var(--accent); }
+    /* The index directory nudges its arrow 3px right on hover to mean
+       "onward". The same 3px the other way is what going back looks like. */
+    .back-btn:hover svg { transform: translateX(-3px); }
+  }
+
+  /* The button spec every other control in the system already follows:
+     press feedback, and a focus ring a keyboard user can actually find. */
+  .back-btn:active { transform: scale(0.98); }
+  .back-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-btn, .back-btn svg { transition: background 0.15s ease, border-color 0.15s ease; }
+    .back-btn:active { transform: none; }
+    .back-btn:hover svg { transform: none; }
+  }
+
+  .back-btn svg {
+    width: 18px; height: 18px; flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
 
   .label-row { margin:16px 0 6px; }
   .label-row label { display:inline; margin:0; }
@@ -68,11 +105,12 @@
 </style>
 </head>
 <body>
-  <a href="../index.html" class="back-btn" aria-label="Back to home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-    Back
-  </a>
   <div class="page-center">
+    <div class="auth-stack">
+      <a href="../index.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to home
+      </a>
     <div class="card">
       <h1>Create your account</h1>
       <p class="subtitle">You'll need the one-time code given to you by the guard.</p>
@@ -113,6 +151,7 @@
       <div class="form-footer">
         Already have an account? <a href="login.html">Log in</a>
       </div>
+    </div>
     </div>
   </div>
 

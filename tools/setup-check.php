@@ -118,8 +118,42 @@ if (!is_file("{$root}/api/config.php")) {
 if ($pdo instanceof PDO) {
     $missing = db_missing_tables($pdo);
     empty($missing)
-        ? report('ok', 'all required tables present')
+        ? report('ok', 'all ' . count(DB_REQUIRED_TABLES) . ' required tables present')
         : report('fail', 'missing tables: ' . implode(', ', $missing), 'Import the schema: mysql -uroot < sql/schema.sql');
+
+    /*
+      Which migrations this database admits to. A database that predates
+      migration 004 has no schema_migrations table and cannot answer, which is
+      worth saying out loud rather than passing silently: it is the state the
+      whole drift problem grew out of.
+    */
+    $applied  = db_applied_migrations($pdo);
+    $versions = [];
+    $unnamed  = [];
+
+    // Only NNN_ prefixed files are migrations. Taking the first three
+    // characters of whatever happens to be in the directory would turn a
+    // README or a stray seed script into a version that can never be applied.
+    foreach (glob("{$root}/sql/migrations/*.sql") ?: [] as $path) {
+        $file = basename($path);
+        preg_match('/^(\d{3})_/', $file, $m)
+            ? $versions[] = $m[1]
+            : $unnamed[]  = $file;
+    }
+
+    if ($unnamed) {
+        report('warn', 'not named as migrations: ' . implode(', ', $unnamed), 'Files in sql/migrations/ must be named NNN_description.sql to be tracked. These are being ignored.');
+    }
+
+    if ($applied === null) {
+        report('fail', 'no schema_migrations table', 'This database predates migration 004, so nothing records what has run. Apply it: mysql -uroot < sql/migrations/004_schema_migrations.sql');
+    } else {
+        $pending = array_values(array_diff($versions, $applied));
+
+        empty($pending)
+            ? report('ok', sprintf('migrations up to date (%s)', implode(', ', $applied) ?: 'none'))
+            : report('fail', 'migrations not applied: ' . implode(', ', $pending), 'Run them in order, lowest first: mysql -uroot < sql/migrations/<file>.sql');
+    }
 
     if (!in_array('users', $missing, true)) {
         $columns = $pdo->query('SHOW COLUMNS FROM users')->fetchAll(PDO::FETCH_COLUMN);
@@ -162,6 +196,31 @@ if ($pdo instanceof PDO) {
 
         $users = $pdo->query('SELECT COUNT(*) c, SUM(email_verified = 1) v FROM users')->fetch();
         report('ok', sprintf('students: %d registered, %d verified', $users['c'], (int) $users['v']));
+    }
+
+    /*
+      Migration 003 added four columns as well as three tables, and the columns
+      come last in the file. MySQL DDL is not transactional, so a run that died
+      partway leaves the tables behind without them — and a check that only
+      counts tables would call that database healthy right up until the admin
+      panel or the login path hit an "Unknown column" error.
+    */
+    $expectedColumns = [
+        'users'       => ['deactivated_at', 'last_login_at'],
+        'guard_codes' => ['revoked_at', 'issued_by'],
+    ];
+
+    foreach ($expectedColumns as $table => $needed) {
+        if (in_array($table, $missing, true)) {
+            continue;
+        }
+
+        $present = $pdo->query("SHOW COLUMNS FROM `{$table}`")->fetchAll(PDO::FETCH_COLUMN);
+        $absent  = array_values(array_diff($needed, array_map('strval', $present)));
+
+        empty($absent)
+            ? report('ok', "{$table} has migration 003's columns")
+            : report('fail', "{$table} is missing: " . implode(', ', $absent), 'Migration 003 did not finish. Re-run it: mysql -uroot < sql/migrations/003_admin.sql');
     }
 }
 
