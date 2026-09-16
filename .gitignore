@@ -13,3 +13,4 @@ agentdb.rvf.lock
 # Map snapshots written by the admin panel before each change
 storage/
 assets/nodes/nodes-edges.json.lock
+.claude/.caveman-mode
