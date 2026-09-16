@@ -1,49 +1,34 @@
 #!/usr/bin/env node
 /*
- * Caveman mode indicator.
+ * Project status line: caveman badge + live skill indicator.
  *
  *   node caveman-status.mjs --hook        (UserPromptSubmit): parse the prompt,
  *                                         persist the active caveman level.
  *   node caveman-status.mjs --statusline  (statusLine): print the indicator.
  *
- * State lives in .claude/.caveman-mode (one word: full|lite|ultra|
- * wenyan-lite|wenyan-full|wenyan-ultra|off). Missing file defaults to "full"
- * because this user runs caveman full every session.
+ * State and rendering live in ~/.claude/skill-pulse/caveman.js so this project
+ * status line, the user status line, and the caveman hooks cannot disagree.
+ * The project status line overrides the user one, so it must render the skill
+ * segment too — otherwise the skill indicator disappears inside this project.
  */
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
+import { createRequire } from "node:module";
 
-const LEVELS = [
-  "lite",
-  "full",
-  "ultra",
-  "wenyan-lite",
-  "wenyan-full",
-  "wenyan-ultra",
-  "off",
-];
-const DEFAULT_LEVEL = "full";
+const require = createRequire(import.meta.url);
+const PULSE = path.join(os.homedir(), ".claude", "skill-pulse");
 
-const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const stateFile = path.join(projectDir, ".claude", ".caveman-mode");
-
-function readLevel() {
+// The status line must render even if skill-pulse is missing or broken.
+function load(mod) {
   try {
-    const v = fs.readFileSync(stateFile, "utf8").trim().toLowerCase();
-    return LEVELS.includes(v) ? v : DEFAULT_LEVEL;
+    return require(path.join(PULSE, mod));
   } catch {
-    return DEFAULT_LEVEL;
+    return null;
   }
 }
-
-function writeLevel(level) {
-  try {
-    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, level + "\n");
-  } catch {
-    /* non-fatal: indicator just keeps last known state */
-  }
-}
+const caveman = load("caveman.js");
+const lib = load("lib.js");
 
 function readStdin() {
   try {
@@ -53,20 +38,7 @@ function readStdin() {
   }
 }
 
-function levelFromPrompt(prompt) {
-  const p = prompt.toLowerCase();
-  const m = p.match(
-    /\/caveman(?:\s+(lite|full|ultra|wenyan-lite|wenyan-full|wenyan-ultra|off))?\b/,
-  );
-  if (m) return m[1] || "full";
-  if (/\b(stop caveman|normal mode)\b/.test(p)) return "off";
-  if (/\bcaveman mode\b|\btalk like (?:a )?caveman\b/.test(p)) return "full";
-  return null;
-}
-
-const mode = process.argv[2];
-
-if (mode === "--hook") {
+if (process.argv[2] === "--hook") {
   let raw = "";
   process.stdin.setEncoding("utf8");
   process.stdin.on("data", (d) => (raw += d));
@@ -77,25 +49,35 @@ if (mode === "--hook") {
     } catch {
       /* ignore malformed payload */
     }
-    const next = levelFromPrompt(prompt);
-    if (next) writeLevel(next);
+    const next = caveman && caveman.levelFromText(prompt);
+    if (next) caveman.writeLevel(next);
     process.exit(0);
   });
 } else {
-  const level = readLevel();
+  let session = "";
   let model = "";
   let dir = "";
   try {
     const j = JSON.parse(readStdin());
+    session = j?.session_id || "";
     model = j?.model?.display_name || "";
     dir = j?.workspace?.current_dir || j?.cwd || "";
   } catch {
-    /* statusline still renders without session json */
+    /* status line still renders without session json */
   }
-  const badge = level === "off" ? "caveman off" : `\u{1F9B4} caveman ${level}`;
-  const segments = [badge];
+  const segments = [];
+  if (caveman) segments.push(caveman.renderSegment(session));
   if (model) segments.push(model);
-  const base = path.basename(dir || projectDir);
+  const base = path.basename(dir || process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (base) segments.push(base);
+  if (lib) {
+    try {
+      // caveman has its own badge above; excluded so it is not named twice.
+      const seg = lib.renderSegment(session, { exclude: ["caveman"] });
+      if (seg) segments.push(seg);
+    } catch {
+      /* skill segment is optional */
+    }
+  }
   process.stdout.write(segments.join("  |  "));
 }

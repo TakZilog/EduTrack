@@ -85,6 +85,16 @@ Example destructive op:
 > ```
 > Caveman resume. Verify backup exist first.
 
+## Indicator
+
+Caveman wire to hook, not self-report. Never open reply with "caveman mode on" proof live outside text:
+
+- Status line: `🦴 caveman <level> ✓` green once skill load this session, dim `armed` when only saved level apply, `caveman off` when off.
+- Skill pulse: `⚡ Skill loading… caveman [<level>]` at start, `⚡ Skill ACTIVE ✅ caveman [<level>]` at end.
+- Level state: `~/.claude/caveman-mode.flag`. Written by `/caveman <level>`, by "stop caveman", and by skill own `args`.
+
+Badge stay `armed` and never turn green: skill never load. Run `/skill-pulse`.
+
 ## Boundaries
 
 Persisted outside chat: write normal prose code, comments, commits, docs, issue/PR/MR/defect/ticket/bug-report text, memory files, third-party messages (/caveman-compress exempt). "Open a defect" or "file a bug" mean the same as "open issue": body go to other humans, so body normal English. "stop caveman" or "normal mode": revert. Level persist until changed or session end.
