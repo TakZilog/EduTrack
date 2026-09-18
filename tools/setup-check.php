@@ -7,7 +7,7 @@
  *     php tools/setup-check.php
  *
  * Reports what is wrong and names the fix, so moving the project between
- * Laragon, XAMPP and a server does not turn into guesswork. Read only: it
+ * XAMPP and a server does not turn into guesswork. Read only: it
  * inspects the environment and changes nothing.
  */
 
@@ -63,7 +63,7 @@ section('php');
 
 PHP_VERSION_ID >= 80100
     ? report('ok', 'PHP ' . PHP_VERSION)
-    : report('fail', 'PHP ' . PHP_VERSION . ' is too old', 'EduTrack needs PHP 8.1 or newer. Pick a newer PHP in Laragon under Menu > PHP > Version.');
+    : report('fail', 'PHP ' . PHP_VERSION . ' is too old', 'EduTrack needs PHP 8.1 or newer. Install a newer version of XAMPP.');
 
 foreach (['pdo_mysql', 'mbstring', 'openssl', 'json'] as $ext) {
     extension_loaded($ext)

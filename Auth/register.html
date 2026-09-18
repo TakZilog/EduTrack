@@ -113,7 +113,7 @@
       </a>
     <div class="card">
       <h1>Create your account</h1>
-      <p class="subtitle">You'll need the one-time code given to you by the guard.</p>
+      <p class="subtitle">Enter your details to create a student account.</p>
 
       <div id="alertBox" class="alert"></div>
 
@@ -134,16 +134,7 @@
         <input type="password" id="confirmPassword" autocomplete="new-password">
         <div class="field-error" id="err-confirmPassword">Passwords do not match.</div>
 
-        <div class="label-row">
-          <label for="privateCode">One-time code (from the guard)</label>
-          <button type="button" class="info-btn" id="codeInfoBtn" aria-expanded="false" aria-describedby="codeInfoPopover" aria-label="Where do I get this code?">?</button>
-        </div>
-        <div class="info-popover" id="codeInfoPopover" role="tooltip">
-          <p class="info-popover-title">Don't have a code yet?</p>
-          <p>Visit the guard at the campus gate. Bring your <strong>student ID</strong> or <strong>study load</strong> — they'll confirm you're enrolled and hand you a one-time code on the spot.</p>
-        </div>
-        <input type="text" id="privateCode" autocomplete="off" maxlength="8" style="letter-spacing:2px; text-transform:uppercase;">
-        <div class="field-error" id="err-privateCode">Enter the code the guard gave you.</div>
+
 
         <button type="submit" class="btn" id="submitBtn">Create Account</button>
       </form>
@@ -156,30 +147,8 @@
   </div>
 
 <script src="auth.js"></script>
+
 <script>
-  const codeInfoBtn = document.getElementById('codeInfoBtn');
-  const codeInfoPopover = document.getElementById('codeInfoPopover');
-
-  codeInfoBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    const isOpen = codeInfoPopover.classList.toggle('visible');
-    codeInfoBtn.setAttribute('aria-expanded', isOpen);
-  });
-
-  document.addEventListener('click', function (e) {
-    if (!codeInfoPopover.contains(e.target) && e.target !== codeInfoBtn) {
-      codeInfoPopover.classList.remove('visible');
-      codeInfoBtn.setAttribute('aria-expanded', 'false');
-    }
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-      codeInfoPopover.classList.remove('visible');
-      codeInfoBtn.setAttribute('aria-expanded', 'false');
-    }
-  });
-
   document.getElementById('registerForm').addEventListener('submit', function (e) {
     e.preventDefault();
     clearErrors();
@@ -188,19 +157,18 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
-    const privateCode = document.getElementById('privateCode').value.trim();
 
     let valid = true;
     if (fullName.length < 2) { showError('fullName'); valid = false; }
     if (!isValidEmail(email)) { showError('email'); valid = false; }
     if (password.length < 8) { showError('password'); valid = false; }
     if (password !== confirmPassword) { showError('confirmPassword'); valid = false; }
-    if (privateCode.length < 4) { showError('privateCode'); valid = false; }
+
 
     if (!valid) return;
 
     setSubmitting(true);
-    apiPost('register.php', { fullName, email, password, privateCode })
+    apiPost('register.php', { fullName, email, password })
       .then(({ data }) => {
         if (!data.ok) {
           showAlert(data.error || 'Failed to send verification code.', 'error');

@@ -6,53 +6,15 @@ against the running system rather than carried forward.
 
 ## Where it runs
 
-- Project root: `C:\laragon\www\EduTrack` (Laragon, not XAMPP)
-- **There are exactly two addresses, and no others.** Use these; do not
-  bookmark anything else.
+- Project root: `C:\xampp\htdocs\EduTrack` (XAMPP)
+- **There is exactly one address.** Use this; do not bookmark anything else.
+  `http://localhost/EduTrack/`
 
-  | Who | Address |
-  | --- | --- |
-  | This machine | `http://localhost/EduTrack/` |
-  | The guard desk, or any other computer | `http://192.168.0.223/EduTrack/` |
-
-  Both reach the same Apache and the same files. Every page uses relative
-  paths, so no page is tied to a particular host.
-
-  The `edutrack.test` and `vendor.test` names were removed on 2026-09-02.
-  They were Laragon auto-vhosts nobody needed, and having four ways to open
-  one site made it impossible to tell a wrong address from a broken one.
-  `AutoVirtualHosts=0` in `C:\laragon\usr\laragon.ini` stops Laragon
-  recreating them; the vhost files themselves are gone from
-  `C:\laragon\etc\apache2\sites-enabled\`.
-
-  Apache still listens on every interface (`Listen 80`), which is what lets
-  the guard desk connect. The Windows Firewall rule "Apache HTTP Server" is
-  already enabled and allows the inbound connection.
-
-  `192.168.0.223` is a DHCP lease, so it moves. It was `192.168.0.127` in
-  early September. Give this machine a DHCP reservation on the router
-  (gateway `192.168.0.1`) for MAC `D8-43-AE-4B-6B-80` so the guard's
-  bookmark stops breaking. Until that is done, check the current address
-  with `ipconfig` whenever the guard desk cannot connect.
+  Every page uses relative paths.
 - MySQL 8.4 on port 3306, database `edutrack`
 - PHP 8.3
 
-This machine is Laragon-only. XAMPP is still installed at `C:\xampp` but every
-one of its services — Apache, MySQL, Tomcat, FileZilla — is stopped and set to
-Disabled, so none of them start at boot or contend for a port.
-
-That was not always true. XAMPP's Apache and MariaDB used to run as automatic
-services and won ports 80 and 3306 at every boot, which meant the site was
-being served from a stale copy at `C:\xampp\htdocs\EduTrack\EduTrack` while the
-database lived in `C:\xampp\mysql`. The `edutrack`, `campusvoice` and
-`squishy_db` databases were dumped out of MariaDB 10.4 and loaded into Laragon's
-MySQL 8.4 on 2026-09-01; `C:\xampp\mysql\data` is untouched and remains a
-fallback. The stale web copy is unserved but still on disk — delete it once you
-are confident nothing wants it.
-
-To bring XAMPP back for another project, re-enable only the service you need
-(`Set-Service mysql -StartupType Automatic`) and move Laragon off that port
-first, or the two will fight over it again.
+This machine now uses XAMPP exclusively. Make sure XAMPP's Apache and MySQL services are running.
 
 Run `php tools/setup-check.php` for a full environment report: PHP version and
 extensions, config, database, schema, and campus map integrity.

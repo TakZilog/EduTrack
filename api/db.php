@@ -23,7 +23,7 @@ class DatabaseUnavailableException extends RuntimeException
  * Resolves one connection setting.
  *
  * Environment variables win over config.php so the same checkout runs under
- * Laragon or a real server without anyone editing a tracked file.
+ * XAMPP or a real server without anyone editing a tracked file.
  */
 function db_setting(array $config, string $key, string $default = ''): string
 {
@@ -88,18 +88,16 @@ function db_failure_hint(PDOException $e, string $host, string $port, string $na
             . 'Create it by importing sql/schema.sql, for example: '
             . 'mysql -uroot < sql/schema.sql',
 
-        // Nothing listening. This normally means Laragon's MySQL is stopped.
-        // A dormant XAMPP install is still on this machine with its services
-        // disabled; if someone re-enables one it will fight for the port again.
+        // Nothing listening. This normally means XAMPP's MySQL is stopped.
         $driverCode === 2002 || str_contains($message, 'No connection could be made'),
         str_contains($message, "Can't connect") =>
             "No MySQL server answered on {$host}:{$port}. "
-            . 'Start MySQL in Laragon, and check nothing else has taken the port.',
+            . 'Start MySQL in XAMPP, and check nothing else has taken the port.',
 
         // Bad credentials.
         $driverCode === 1045 || str_contains($message, 'Access denied') =>
             "MySQL refused the user '{$user}'. "
-            . 'Check db_user and db_pass in api/config.php. Laragon defaults to root with an empty password.',
+            . 'Check db_user and db_pass in api/config.php. XAMPP defaults to root with an empty password.',
 
         default => 'Could not connect to MySQL. Run "php tools/setup-check.php" for a full diagnosis.',
     };

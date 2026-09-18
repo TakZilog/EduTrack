@@ -135,7 +135,7 @@ function is_local_request(): bool
  */
 function is_server_machine(string $ip): bool
 {
-    // Apache reports an IPv4 client as ::ffff:192.168.0.223 on a dual-stack
+    // Apache reports an IPv4 client as ::ffff:192.168.x.x on a dual-stack
     // listener, so both sides are flattened before they are compared.
     $flatten = static fn (string $a): string => stripos($a, '::ffff:') === 0 ? substr($a, 7) : $a;
 
