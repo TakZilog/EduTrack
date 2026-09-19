@@ -87,16 +87,8 @@ switch ($action) {
         }
 
         try {
-            $pdo->beginTransaction();
-            // The guard code keeps its history, it just stops pointing at a row
-            // that is about to disappear.
-            $pdo->prepare('UPDATE guard_codes SET used_by_user_id = NULL WHERE used_by_user_id = ?')->execute([$id]);
             $pdo->prepare('DELETE FROM users WHERE id = ?')->execute([$id]);
-            $pdo->commit();
         } catch (Throwable $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
             json_fail(500, 'The student could not be deleted. Nothing was changed.');
         }
 

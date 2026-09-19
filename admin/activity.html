@@ -3,31 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack Staff Panel — Activity</title>
+<title>EduTrack Staff Panel - Activity</title>
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/admin.css?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<link rel="stylesheet" href="../assets/css/admin.css?v=5">
+<meta name="robots" content="noindex">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
-  <aside class="rail" id="rail">
-    <div class="rail-head">
-      <div class="wordmark">EduTrack</div>
-      <div class="sub">Staff panel</div>
+  <aside class="rail" id="rail"></aside>
+
+  <main class="work" id="main">
+    <div class="work-head">
+      <h1>Activity</h1>
+      <p class="work-lede">A permanent record of everything staff have done in this panel. Nothing here can be edited or removed.</p>
     </div>
-  </aside>
 
-  <main class="main">
-    <div class="page">
-      <div class="page-head">
-        <div>
-          <h1>Activity</h1>
-          <p class="lede">A permanent record of everything staff have done in this panel. Nothing here can be edited or removed.</p>
-        </div>
-      </div>
-
+    <div class="work-body">
       <div class="toolbar">
         <div>
           <label class="sr-only" for="who">Person</label>
@@ -39,27 +37,22 @@
         </div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <caption class="sr-only">Staff activity log</caption>
-          <thead>
-            <tr>
-              <th scope="col">When</th>
-              <th scope="col">Who</th>
-              <th scope="col">What happened</th>
-              <th scope="col" class="hide-sm">From</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
+      <div class="desk">
+        <section class="panel" aria-labelledby="listTitle">
+          <div class="panel-head"><h2 id="listTitle">What has happened</h2></div>
+          <ul class="rows" id="rows"></ul>
+          <div class="pager" id="pager" hidden></div>
+        </section>
 
-      <div class="pager" id="pager"></div>
+        <section class="drawer" id="drawer" aria-live="polite"
+                 data-empty-title="No entry open"
+                 data-empty-text="Choose a line on the left to see the whole entry."></section>
+      </div>
     </div>
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js"></script>
+<script src="../assets/js/admin/admin.js?v=5"></script>
 <script>
 (async function () {
   const s = await boot();
@@ -67,10 +60,11 @@
 
   const rows = document.getElementById('rows');
   const pager = document.getElementById('pager');
+  const drawer = document.getElementById('drawer');
   const whoSelect = document.getElementById('who');
   const whatSelect = document.getElementById('what');
 
-  const state = { who: '', action: '', page: 1 };
+  const state = { who: '', action: '', page: 1, openKey: null };
   let filtersBuilt = false;
 
   /* The stored action name is a dotted key; these are the words for it. */
@@ -84,9 +78,6 @@
     'student.deactivate': 'Turned a student account off',
     'student.reactivate': 'Turned a student account on',
     'student.delete': 'Deleted a student',
-    'code.issue': 'Gave out a code',
-    'code.revoke': 'Cancelled a code',
-    'code.revoke_all': 'Cancelled all unused codes',
     'settings.save': 'Changed settings',
     'access.denied': 'Was refused access'
   };
@@ -94,8 +85,12 @@
   whoSelect.addEventListener('change', e => { state.who = e.target.value; state.page = 1; load(); });
   whatSelect.addEventListener('change', e => { state.action = e.target.value; state.page = 1; load(); });
 
+  /* Entries have no id of their own, so an open one is remembered by the
+     things that make it unique: when it happened, who did it, and what. */
+  const keyOf = entry => entry.created_at + '|' + entry.admin_name + '|' + entry.action;
+
   async function load() {
-    showSkeleton(rows, 8, 4);
+    showSkeleton(rows, 8);
     const { data } = await apiGet('activity.php', {
       who: state.who, action: state.action, page: state.page
     });
@@ -118,7 +113,7 @@
 
     if (data.data.length === 0) {
       const filtered = state.who !== '' || state.action !== '';
-      showEmpty(rows, 4,
+      showEmpty(rows,
         filtered ? 'Nothing matches' : 'Nothing has happened yet',
         filtered
           ? 'No activity fits the filters you chose.'
@@ -129,58 +124,59 @@
           whoSelect.value = ''; whatSelect.value = '';
           load();
         } : null);
-      pager.replaceChildren();
+      drawPager(pager, data, () => {});
+      openEntry(null);
       return;
     }
 
     rows.replaceChildren();
     data.data.forEach(entry => {
-      const tr = document.createElement('tr');
-      if (entry.action === 'access.denied') {
-        tr.style.background = 'var(--danger-wash)';
-      }
+      const end = [];
+      // A refused attempt is the one thing in this list worth a red mark.
+      if (entry.action === 'access.denied') end.push(pill('Refused', 'revoked'));
+      const when = document.createElement('span');
+      when.className = 'row-when';
+      when.textContent = relativeTime(entry.created_at);
+      end.push(when);
 
-      const when = document.createElement('td');
-      const rel = document.createElement('div');
-      rel.textContent = relativeTime(entry.created_at);
-      const exact = document.createElement('div');
-      exact.className = 'sub';
-      exact.textContent = formatDateTime(entry.created_at);
-      when.append(rel, exact);
-      when.style.whiteSpace = 'nowrap';
-      tr.appendChild(when);
-
-      const who = document.createElement('td');
-      const name = document.createElement('div');
-      name.className = 'strong';
-      name.textContent = entry.admin_name;
-      const role = document.createElement('div');
-      role.className = 'sub';
-      role.textContent = entry.role;
-      who.append(name, role);
-      tr.appendChild(who);
-
-      const what = document.createElement('td');
-      const head = document.createElement('div');
-      head.className = 'strong';
-      head.textContent = WORDS[entry.action] || entry.action;
-      what.appendChild(head);
-      if (entry.detail) {
-        const d = document.createElement('div');
-        d.className = 'sub';
-        d.textContent = entry.detail;
-        what.appendChild(d);
-      }
-      tr.appendChild(what);
-
-      tr.appendChild(cell(entry.ip || '—', 'hide-sm sub mono'));
-
-      rows.appendChild(tr);
+      rows.appendChild(listRow({
+        title: WORDS[entry.action] || entry.action,
+        sub: entry.admin_name + (entry.detail ? ' · ' + entry.detail : ''),
+        end,
+        selected: keyOf(entry) === state.openKey,
+        onOpen: row => { markOpenRow(rows, row); openEntry(entry); }
+      }));
     });
 
     drawPager(pager, data, page => { state.page = page; load(); });
+
+    const still = data.data.find(e => keyOf(e) === state.openKey);
+    openEntry(still || null);
   }
 
+  function openEntry(entry) {
+    state.openKey = entry ? keyOf(entry) : null;
+
+    if (!entry) { drawDrawer(drawer, null); return; }
+
+    const ip = document.createElement('span');
+    ip.className = 'mono';
+    ip.textContent = entry.ip || '—';
+
+    drawDrawer(drawer, {
+      title: WORDS[entry.action] || entry.action,
+      sub: relativeTime(entry.created_at),
+      body: facts([
+        ['Who', entry.admin_name],
+        ['Their access level', entry.role],
+        ['Exactly when', formatDateTime(entry.created_at)],
+        ['Details', entry.detail || 'None recorded'],
+        ['From this address', ip]
+      ])
+    });
+  }
+
+  drawDrawer(drawer, null);
   load();
 })();
 </script>

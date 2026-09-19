@@ -23,6 +23,17 @@
         "value": "inter",
         "createdAt": "2026-09-18T20:52:39.724Z",
         "reason": "user confirmed: redesign brief specifies 'Clean sans-serif (Inter or Outfit via Google Fonts)'; DESIGN.md is out of the brief's editable scope so its Barlow type system cannot be updated to match"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-09-19T12:08:24.644Z",
+        "reason": "DESIGN.md Typography documents Inter as a deliberate choice (legibility on low-end screens, personality carried by the display treatment); user chose 'Sharpen the current look' over a new direction on 2026-09-19"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "3.5rem",
+        "createdAt": "2026-09-19T14:55:00.712Z"
       }
     ]
   }

@@ -3,120 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack Staff Panel — Settings</title>
+<title>EduTrack Staff Panel - Settings</title>
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/admin.css?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<link rel="stylesheet" href="../assets/css/admin.css?v=5">
+<meta name="robots" content="noindex">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
-  <aside class="rail" id="rail">
-    <div class="rail-head">
-      <div class="wordmark">EduTrack</div>
-      <div class="sub">Staff panel</div>
-    </div>
-  </aside>
+  <aside class="rail" id="rail"></aside>
 
-  <main class="main">
-    <div class="page">
-      <div class="page-head">
-        <div>
-          <h1>Settings</h1>
-          <p class="lede">How long codes last, and who is allowed into this panel.</p>
+  <main class="work" id="main">
+    <div class="work-head">
+      <h1>Settings</h1>
+      <p class="work-lede">How long email codes last, who is allowed into this panel, and who works here.</p>
+    </div>
+
+    <div class="work-body">
+      <section class="panel">
+        <div class="panel-head"><h2>Timings</h2></div>
+        <div class="panel-body">
+          <form id="settingsForm">
+            <div class="form-grid" id="settingsFields"></div>
+            <button type="submit" class="btn" id="saveBtn">Save timings</button>
+          </form>
         </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Which computers can open this panel</h2></div>
+        <div class="panel-body">
+          <div id="accessState"></div>
+          <form id="accessForm">
+            <div class="field">
+              <label for="allowlist">Allowed addresses</label>
+              <textarea id="allowlist" rows="4" spellcheck="false"
+                placeholder="Leave empty to allow every computer on the network"></textarea>
+              <p class="field-hint">
+                One per line. Use a single address like <span class="mono">192.168.0.50</span> for one computer,
+                or <span class="mono">192.168.0.0/24</span> for a whole network. Leave it empty to turn the
+                restriction off. The server itself can always get in, so you cannot lock yourself out for good.
+              </p>
+            </div>
+            <p class="field-error" id="accessError"></p>
+            <div class="btn-row">
+              <button type="submit" class="btn" id="accessSave">Save</button>
+              <button type="button" class="btn btn-quiet" id="addMine">Add this computer</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div class="desk">
+        <section class="panel" aria-labelledby="staffTitle">
+          <div class="panel-head"><h2 id="staffTitle">Staff accounts</h2></div>
+          <ul class="rows" id="adminRows"></ul>
+        </section>
+
+        <section class="drawer" id="drawer" aria-live="polite"
+                 data-empty-title="No account open"
+                 data-empty-text="Choose someone on the left to see their access, or add a new account below."></section>
       </div>
 
       <section class="panel">
-        <h2>Timings</h2>
-        <form id="settingsForm">
-          <div class="form-grid" id="settingsFields"></div>
-          <button type="submit" class="btn" id="saveBtn">Save timings</button>
-        </form>
-      </section>
-
-      <section class="panel">
-        <h2>Which computers can open this panel</h2>
-        <div id="accessState"></div>
-        <form id="accessForm">
-          <div class="field">
-            <label for="allowlist">Allowed addresses</label>
-            <textarea id="allowlist" rows="4" spellcheck="false"
-              placeholder="Leave empty to allow every computer on the network"></textarea>
-            <p class="field-hint">
-              One per line. Use a single address like <span class="mono">192.168.0.50</span> for one computer,
-              or <span class="mono">192.168.0.0/24</span> for a whole network. Leave it empty to turn the
-              restriction off. The server itself can always get in, so you cannot lock yourself out for good.
-            </p>
-          </div>
-          <p class="field-error" id="accessError"></p>
-          <div class="row-actions" style="justify-content:flex-start">
-            <button type="submit" class="btn" id="accessSave">Save</button>
-            <button type="button" class="btn btn-quiet" id="addMine">Add this computer</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="panel">
-        <h2>Staff accounts</h2>
-        <div class="table-wrap">
-          <table>
-            <caption class="sr-only">People who can sign in to this panel</caption>
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Access level</th>
-                <th scope="col" class="hide-sm">Last signed in</th>
-                <th scope="col"><span class="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody id="adminRows"></tbody>
-          </table>
+        <div class="panel-head"><h2>Add a staff account</h2></div>
+        <div class="panel-body">
+          <form id="addForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="newName">Full name</label>
+                <input type="text" id="newName" autocomplete="off" maxlength="100">
+              </div>
+              <div class="field">
+                <label for="newUsername">Username for signing in</label>
+                <input type="text" id="newUsername" autocomplete="off" autocapitalize="none" spellcheck="false">
+                <p class="field-hint">Letters, numbers, dots, dashes and underscores.</p>
+              </div>
+              <div class="field">
+                <label for="newRole">Access level</label>
+                <select id="newRole">
+                  <option value="faculty">View only, cannot change anything</option>
+                  <option value="admin">Staff, day-to-day work</option>
+                  <option value="super_admin">Full access, including settings</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="newPassword">Password</label>
+                <input type="password" id="newPassword" autocomplete="new-password">
+                <p class="field-hint">At least 12 characters.</p>
+              </div>
+            </div>
+            <p class="field-error" id="addError"></p>
+            <button type="submit" class="btn" id="addBtn">Add this person</button>
+          </form>
         </div>
       </section>
 
       <section class="panel">
-        <h2>Add a staff account</h2>
-        <form id="addForm">
-          <div class="form-grid">
-            <div class="field">
-              <label for="newName">Full name</label>
-              <input type="text" id="newName" autocomplete="off" maxlength="100">
-            </div>
-            <div class="field">
-              <label for="newUsername">Username for signing in</label>
-              <input type="text" id="newUsername" autocomplete="off" autocapitalize="none" spellcheck="false">
-              <p class="field-hint">Letters, numbers, dots, dashes and underscores.</p>
-            </div>
-            <div class="field">
-              <label for="newRole">Access level</label>
-              <select id="newRole">
-                <option value="faculty">View only, cannot change anything</option>
-                <option value="admin">Staff, day-to-day work</option>
-                <option value="super_admin">Full access, including settings</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="newPassword">Password</label>
-              <input type="password" id="newPassword" autocomplete="new-password">
-              <p class="field-hint">At least 12 characters.</p>
-            </div>
-          </div>
-          <p class="field-error" id="addError"></p>
-          <button type="submit" class="btn" id="addBtn">Add this person</button>
-        </form>
-      </section>
-
-      <section class="panel">
-        <h2>Things kept outside this panel</h2>
-        <div class="notice notice-info">
-          <div>
+        <div class="panel-head"><h2>Things kept outside this panel</h2></div>
+        <div class="panel-body">
+          <div class="notice notice-info">
             <p class="t">Passwords for email and the database are not shown here</p>
             <p class="d">
               They live in a file on the server that is never sent to a browser. To change them, edit
-              <span class="mono">api/config.php</span> on the machine itself. The guard desk password
-              is in the same file.
+              <span class="mono">api/config.php</span> on the machine itself.
             </p>
           </div>
         </div>
@@ -125,7 +121,7 @@
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js"></script>
+<script src="../assets/js/admin/admin.js?v=5"></script>
 <script>
 (async function () {
   const s = await boot();
@@ -133,6 +129,9 @@
 
   const settingsFields = document.getElementById('settingsFields');
   const adminRows = document.getElementById('adminRows');
+  const drawer = document.getElementById('drawer');
+
+  let openId = null;
 
   async function load() {
     const { data } = await apiGet('settings.php');
@@ -164,9 +163,65 @@
     });
 
     adminRows.replaceChildren();
-    data.admins.forEach(admin => adminRows.appendChild(drawAdmin(admin)));
+    data.admins.forEach(admin => {
+      adminRows.appendChild(listRow({
+        title: admin.fullName + (admin.isYou ? ' (you)' : ''),
+        sub: admin.username,
+        end: [pill(admin.roleLabel, admin.active ? 'verified' : 'off')],
+        selected: admin.id === openId,
+        onOpen: row => { markOpenRow(adminRows, row); openAdmin(admin); }
+      }));
+    });
+
+    const still = data.admins.find(a => a.id === openId);
+    openAdmin(still || null);
 
     drawAccess(data.access);
+  }
+
+  function openAdmin(admin) {
+    openId = admin ? admin.id : null;
+
+    if (!admin) { drawDrawer(drawer, null); return; }
+
+    const actions = [];
+
+    // You cannot turn your own account off: that is a locked door with the
+    // key left inside.
+    if (!admin.isYou) {
+      actions.push(button(
+        admin.active ? 'Turn this account off' : 'Turn this account back on',
+        admin.active ? 'btn-danger' : 'btn',
+        async () => {
+          const yes = await confirmAction({
+            title: admin.active ? 'Turn this account off?' : 'Turn this account back on?',
+            message: admin.active
+              ? admin.fullName + ' will not be able to sign in to this panel.'
+              : admin.fullName + ' will be able to sign in again.',
+            confirmLabel: admin.active ? 'Yes, turn it off' : 'Yes, turn it on',
+            danger: admin.active
+          });
+          if (!yes) return;
+
+          const { data } = await apiPost('settings.php', {
+            action: 'set-admin-active', id: admin.id, active: !admin.active
+          });
+          if (!data.ok) { toast(data.error, 'bad'); return; }
+          toast(data.message);
+          load();
+        }));
+    }
+
+    drawDrawer(drawer, {
+      title: admin.fullName + (admin.isYou ? ' (you)' : ''),
+      sub: admin.username,
+      body: facts([
+        ['Access level', admin.roleLabel],
+        ['Account', admin.active ? pill('Can sign in', 'verified') : pill('Turned off', 'off')],
+        ['Last signed in', admin.lastLogin ? relativeTime(admin.lastLogin) : 'Never']
+      ]),
+      actions
+    });
   }
 
   let yourIp = '';
@@ -181,7 +236,6 @@
     const notice = document.createElement('div');
     notice.className = 'notice ' + (access.enabled ? 'notice-good' : 'notice-warning');
 
-    const box = document.createElement('div');
     const t = document.createElement('p');
     t.className = 't';
     t.textContent = access.enabled
@@ -195,8 +249,7 @@
       : 'This panel is served without encryption, so anyone on the same network can reach the sign-in page. '
         + 'You are on ' + access.yourIp + '.';
 
-    box.append(t, d);
-    notice.appendChild(box);
+    notice.append(t, d);
     host.appendChild(notice);
   }
 
@@ -249,67 +302,6 @@
     load();
   });
 
-  function drawAdmin(admin) {
-    const tr = document.createElement('tr');
-
-    const name = document.createElement('td');
-    const strong = document.createElement('div');
-    strong.className = 'strong';
-    strong.textContent = admin.fullName + (admin.isYou ? ' (you)' : '');
-    const sub = document.createElement('div');
-    sub.className = 'sub';
-    sub.textContent = admin.username;
-    name.append(strong, sub);
-    tr.appendChild(name);
-
-    const role = document.createElement('td');
-    role.appendChild(pill(admin.roleLabel, admin.active ? 'verified' : 'off'));
-    if (!admin.active) {
-      const off = document.createElement('div');
-      off.className = 'sub';
-      off.style.marginTop = '6px';
-      off.textContent = 'Turned off';
-      role.appendChild(off);
-    }
-    tr.appendChild(role);
-
-    tr.appendChild(cell(admin.lastLogin ? relativeTime(admin.lastLogin) : 'Never', 'hide-sm sub'));
-
-    const actions = document.createElement('td');
-    const box = document.createElement('div');
-    box.className = 'row-actions';
-
-    if (!admin.isYou) {
-      const b = document.createElement('button');
-      b.className = 'btn btn-small ' + (admin.active ? 'btn-quiet' : 'btn-quiet');
-      b.type = 'button';
-      b.textContent = admin.active ? 'Turn off' : 'Turn back on';
-      b.addEventListener('click', async () => {
-        const yes = await confirmAction({
-          title: admin.active ? 'Turn this account off?' : 'Turn this account back on?',
-          message: admin.active
-            ? admin.fullName + ' will not be able to sign in to this panel.'
-            : admin.fullName + ' will be able to sign in again.',
-          confirmLabel: admin.active ? 'Yes, turn it off' : 'Yes, turn it on',
-          danger: admin.active
-        });
-        if (!yes) return;
-
-        const { data } = await apiPost('settings.php', {
-          action: 'set-admin-active', id: admin.id, active: !admin.active
-        });
-        if (!data.ok) { toast(data.error, 'bad'); return; }
-        toast(data.message);
-        load();
-      });
-      box.appendChild(b);
-    }
-
-    actions.appendChild(box);
-    tr.appendChild(actions);
-    return tr;
-  }
-
   document.getElementById('settingsForm').addEventListener('submit', async e => {
     e.preventDefault();
     const btn = document.getElementById('saveBtn');
@@ -360,6 +352,7 @@
     load();
   });
 
+  drawDrawer(drawer, null);
   load();
 })();
 </script>

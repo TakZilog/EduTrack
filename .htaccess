@@ -1,0 +1,10 @@
+# Pages are always checked for a newer version before a cached copy is used.
+# Without this, browsers and the Android app's WebView guess how long to keep
+# a page, and keep showing an old one after the site changes. An unchanged
+# page still loads from cache after a quick 304, so this costs next to nothing.
+# Scripts and stylesheets are versioned in their URLs (?v=) instead.
+<IfModule mod_headers.c>
+    <FilesMatch "\.html$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>

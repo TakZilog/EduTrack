@@ -3,8 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>EduTrack — Walkthrough</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTrack - Walkthrough</title>
   <meta name="description" content="Walk to your room through real 360° photos of the ACLC College Mandaue Admin Building.">
   <!-- Dark, not brand blue: this is the one full-bleed surface, and the
        browser chrome should recede into the panorama rather than announce
@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css?v=7">
   <style>
     /*
       The one screen in the product that is not a light document: a 360° photo
@@ -40,6 +40,8 @@
       font-family: var(--font);
       overflow: hidden;
     }
+    /* The panorama fills the viewport edge to edge; no reserved gutter. */
+    html { scrollbar-gutter: auto; }
 
     #panorama { width: 100%; height: 100%; }
 
@@ -49,69 +51,52 @@
 
     /* ------------------------------------------------------------- top bar */
 
+    /* One calm row at a fixed height: back, where you are, the seal. The
+       place name never wraps (a long one is cut with an ellipsis), so the bar
+       stays still as you step through the route. */
     #topBar {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 10;
       display: flex;
-      flex-direction: column;
-      gap: var(--s2);
-      padding:
-        calc(var(--s3) + var(--s2) + env(safe-area-inset-top))
-        calc(var(--s4) + env(safe-area-inset-right))
-        var(--s3)
-        calc(var(--s4) + env(safe-area-inset-left));
+      align-items: center;
+      gap: var(--s4);
+      height: 64px;
+      padding: 0 var(--s4);
       background: var(--bar);
       color: var(--on-bar);
     }
 
     #backLink {
-      align-self: flex-start;
+      flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       gap: var(--s2);
-      min-height: 44px;      /* the target, even though the text is small */
-      color: var(--on-bar);
+      min-height: 44px;
+      color: var(--on-bar-dim);
       font-size: var(--fs-sm);
-      font-weight: 600;
+      font-weight: 500;
       text-decoration: none;
+      transition: color .15s var(--ease);
     }
+    #backLink svg { width: 18px; height: 18px; flex-shrink: 0; }
+    #backLink:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; border-radius: var(--r-input); }
 
-    #backLink svg {
-      width: 18px; height: 18px;
-      flex-shrink: 0;
-      transition: transform .15s var(--ease);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      #backLink:hover svg { transform: translateX(-3px); }
-    }
-
-    #backLink:focus-visible {
-      outline: 2px solid var(--on-bar);
-      outline-offset: 2px;
-      border-radius: var(--r-input);
-    }
-
-    /* Label and counter share a baseline. min-width:0 lets the label wrap
-       instead of pushing the counter off-screen — "Student Affairs Office" and
-       "Property Custodian" are real labels in this data. */
     #stepInfo {
+      flex: 1;
+      min-width: 0;
       display: flex;
       align-items: baseline;
-      justify-content: space-between;
       gap: var(--s3);
     }
-
     #stepLabel {
       min-width: 0;
-      font-size: var(--fs-h2);
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: -.01em;
-      overflow-wrap: break-word;
+      font-size: var(--fs-h3);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
     #stepCount {
       flex-shrink: 0;
       color: var(--on-bar-dim);
@@ -119,40 +104,66 @@
       font-variant-numeric: tabular-nums;   /* the counter stops twitching as it climbs */
     }
 
-    /* --------------------------------------------------------- route strip */
+    /* The same seal and blue ring as the other pages, on the right. */
+    #wtCrest {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s2);
+      min-height: 44px;
+      color: var(--on-bar);
+      font-family: var(--font-display);
+      font-size: var(--fs-body);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    #wtCrest img {
+      display: block;
+      width: 30px; height: 30px;
+      padding: 1px;
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 0 0 2px var(--blue);
+    }
+    #wtCrest:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; border-radius: var(--r-input); }
 
-    #routeStrip {
-      position: fixed;
-      top: env(safe-area-inset-top);
-      left: 0; right: 0;
-      z-index: 11;
-      display: flex;
-      gap: 3px;
-      height: 4px;
-      padding: 0 calc(var(--s4) + env(safe-area-inset-right)) 0 calc(var(--s4) + env(safe-area-inset-left));
-      pointer-events: none;
+    /* Progress: one hairline along the bar's bottom edge. It fills without
+       animating, so nothing at the top moves when you press Next; the count
+       beside the place name says the step in words. */
+    #routeProgress {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, .16);
+    }
+    #routeProgress span { display: block; width: 0; height: 100%; background: rgba(255, 255, 255, .8); }
+
+    /* Phones: arrow and seal only, the place name above its count. The back
+       link keeps its words for screen readers. */
+    @media (max-width: 599px) {
+      #backLink span, #wtCrest span {
+        position: absolute; width: 1px; height: 1px; overflow: hidden;
+        clip: rect(0 0 0 0); white-space: nowrap;
+      }
+      #backLink { justify-content: center; width: 44px; margin-left: calc(var(--s2) * -1); }
+      #stepInfo { flex-direction: column; align-items: flex-start; gap: 0; }
+      #stepLabel { max-width: 100%; }
     }
 
-    #routeStrip .tick {
-      flex: 1;
-      height: 100%;
-      background: rgba(255, 255, 255, .28);
-      transition: background .2s var(--ease);
+    @media (hover: hover) and (pointer: fine) {
+      #backLink:hover { color: var(--on-bar); }
     }
-
-    #routeStrip .tick.done { background: rgba(255, 255, 255, .7); }
-
-    /* "You are here" — wayfinding's own use of red, and the only red on the
-       screen. Never the sole signal: #stepCount states the position in words. */
-    #routeStrip .tick.current { background: var(--red); }
 
     /* --------------------------------------------------------- controls */
 
+    /* Walking happens on the arrows in the photo. These buttons stay for
+       keyboard and screen reader users: out of sight until one of them has
+       focus, then shown where they always were. */
     #controls {
       position: fixed;
-      bottom: calc(var(--s5) + env(safe-area-inset-bottom));
-      left: env(safe-area-inset-left);
-      right: env(safe-area-inset-right);
+      bottom: var(--s5);
+      left: 0;
+      right: 0;
       z-index: 10;
       display: flex;
       align-items: center;
@@ -160,6 +171,32 @@
       gap: var(--s3);
       padding: 0 var(--s4);
     }
+    #controls:not(:focus-within) {
+      clip-path: inset(50%);
+      height: 1px;
+      overflow: hidden;
+    }
+
+    /* First step only: says once how to walk, then goes for good. */
+    #walkHint {
+      position: fixed;
+      bottom: var(--s5);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9;
+      max-width: calc(100vw - 32px);
+      margin: 0;
+      padding: var(--s2) var(--s4);
+      border-radius: var(--r-panel);
+      background: var(--bar);
+      color: var(--on-bar);
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      text-align: center;
+      pointer-events: none;
+    }
+    #walkHint[hidden] { display: none; }
+    #controls:focus-within ~ #walkHint { display: none; }
 
     .navBtn {
       display: inline-flex;
@@ -180,10 +217,14 @@
 
     .navBtn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
+    /* Next wears the same bold condensed face as the Log in bar on home. */
     .navBtn.primary {
       background: var(--blue);
       border-color: var(--blue);
       color: var(--white);
+      font-family: var(--font-display);
+      font-size: var(--fs-h3);
+      font-weight: 700;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -202,165 +243,153 @@
     /* ---------------------------------------------------- arrived banner */
 
     /*
-      A plain white card, the same surface as every other page in the product.
-      It replaces a frosted panel: over an unknown photograph, opaque is both
-      more legible and far cheaper than a blur.
+      Arrival is said once, quietly, in the top bar's own dark: a notice just
+      under the bar that opens left to right like a sign being uncovered, its
+      words a beat behind the edge. It never covers the room you came to see.
+      Red is the pin, the "you are here" mark and nothing else.
     */
     #arrivedBanner {
       position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(.96);
+      top: calc(64px + var(--s3));
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 20;
-      display: none;
-      width: min(320px, calc(100vw - 48px));
-      padding: var(--s5);
-      background: var(--surface);
-      border-radius: var(--r-card);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, .38);
-      color: var(--text);
-      text-align: center;
-      opacity: 0;
-      animation: arrive .28s ease-out forwards;
+      display: none;               /* walkthrough.js shows it as flex */
+      align-items: center;
+      gap: var(--s3);
+      width: max-content;
+      max-width: calc(100vw - 32px);
+      padding: var(--s2) var(--s2) var(--s2) var(--s4);
+      border-radius: var(--r-panel);
+      background: rgba(26, 26, 26, .92);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+      color: var(--on-bar);
+      animation: arrive-wipe .38s cubic-bezier(.16, 1, .3, 1) both;
     }
+    #arrivedBanner > * { animation: arrive-words .24s .16s cubic-bezier(.16, 1, .3, 1) both; }
 
-    @keyframes arrive {
-      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    @keyframes arrive-wipe {
+      from { clip-path: inset(0 100% 0 0 round 6px); }
+      to   { clip-path: inset(0 0 0 0 round 6px); }
+    }
+    @keyframes arrive-words {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: none; }
     }
 
     /* walkthrough.js removes the banner 250ms after adding .hiding, so this
-       must not outrun that. Exit is also shorter than entry, which is what
-       "responsive" feels like. */
-    #arrivedBanner.hiding { animation: arrive-out .25s ease-out forwards; }
+       must not outrun that. It closes the way it opened, edge first. */
+    #arrivedBanner.hiding { animation: arrive-unwipe .22s cubic-bezier(.7, 0, .84, 0) both; }
+    #arrivedBanner.hiding > * { animation: none; }
 
-    @keyframes arrive-out {
-      to { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
+    @keyframes arrive-unwipe {
+      from { clip-path: inset(0 0 0 0 round 6px); }
+      to   { clip-path: inset(0 100% 0 0 round 6px); }
     }
 
-    #arrivedBanner .check {
-      width: 44px; height: 44px;
-      margin: 0 auto var(--s4);
-      border-radius: 50%;
-      background: var(--blue);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #arrivedBanner .eyebrow {
-      margin: 0 0 var(--s1);
-      color: var(--text-muted);
-      font-size: var(--fs-sm);
-    }
-
-    #arrivedBanner h2 {
-      margin: 0 0 var(--s5);
-      font-size: var(--fs-h1);
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: -.02em;
-      overflow-wrap: break-word;
-    }
+    #arrivedBanner .pin { flex-shrink: 0; width: 20px; height: 20px; color: var(--red); }
+    #arrivedBanner p { margin: 0; min-width: 0; }
+    #arrivedRoomName { font-weight: 700; }
 
     #arrivedBanner a {
-      display: block;
-      min-height: 48px;
-      padding: var(--s3) var(--s4);
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 var(--s3);
+      border: 1px solid var(--hairline);
       border-radius: var(--r-btn);
-      background: var(--blue);
-      color: var(--white);
-      font-size: var(--fs-body);
+      color: var(--on-bar);
+      font-size: var(--fs-sm);
       font-weight: 600;
-      line-height: 1.5;
+      white-space: nowrap;
       text-decoration: none;
-      transition: opacity .15s var(--ease), transform .12s var(--ease);
+      transition: background-color .15s var(--ease);
     }
 
     @media (hover: hover) and (pointer: fine) {
-      #arrivedBanner a:hover { opacity: .92; }
+      #arrivedBanner a:hover { background: rgba(255, 255, 255, .1); }
     }
 
-    #arrivedBanner a:active { transform: scale(.98); }
-
     #arrivedBanner a:focus-visible {
-      outline: 2px solid var(--blue);
+      outline: 2px solid var(--on-bar);
       outline-offset: 2px;
     }
 
     /* ------------------------------------------------- in-scene waypoint */
 
     /*
-      A solid marker, no pulse. The previous version ran a 2.2s scale/opacity
-      keyframe forever on a pseudo-element — continuous motion on exactly the
-      hardware this product targets. The white ring does the work the animation
-      was doing: it separates the marker from whatever is behind it.
+      Street View's grammar: a white chevron lying flat on the floor, pointing
+      the way you walk. Tilted back in perspective so it reads as painted on
+      the ground, with a dark edge under the white so it holds on a pale tiled
+      corridor as well as on dark asphalt. No pulse, no loop.
     */
+    .walk-hotspot { width: 0; height: 0; }   /* Pannellum positions this box's corner */
+
     .hotspot-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px; height: 44px;
-      box-sizing: border-box;
-      background: var(--blue);
-      border: 2px solid var(--white);
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
-      color: var(--white);
+      display: grid;
+      place-items: center;
+      width: 120px; height: 84px;
+      margin: -42px 0 0 -60px;              /* centre the arrow on the point */
       cursor: pointer;
-      transition: transform .12s var(--ease);
+      transform: perspective(260px) rotateX(55deg);
+      transition: transform .15s var(--ease);
     }
 
-    .hotspot-arrow svg { width: 18px; height: 18px; }
+    .hotspot-arrow svg { width: 104px; height: 65px; overflow: visible; }
+    .hotspot-arrow path { stroke-linecap: round; stroke-linejoin: round; }
+    .hotspot-arrow .edge { stroke: rgba(0, 0, 0, .45); stroke-width: 15; }
+    .hotspot-arrow .face { stroke: var(--white); stroke-width: 10; transition: stroke .15s var(--ease); }
 
-    .hotspot-arrow:active { transform: scale(.94); }
-
-    .hotspot-arrow:focus-visible {
-      outline: 2px solid var(--white);
-      outline-offset: 3px;
+    @media (hover: hover) and (pointer: fine) {
+      .hotspot-arrow:hover { transform: perspective(260px) rotateX(55deg) scale(1.12); }
     }
+
+    .hotspot-arrow:active { transform: perspective(260px) rotateX(55deg) scale(.94); }
+
+    .hotspot-arrow:focus-visible { outline: none; }
+    .hotspot-arrow:focus-visible .face { stroke: var(--blue-wash); }
+    .hotspot-arrow:focus-visible .edge { stroke: var(--blue); }
 
     /* ------------------------------------------------------ short viewports
        A phone turned landscape for a wider panorama: top chrome, bottom
        controls and the centred banner all get tight together on a ~360-420px
        tall viewport, so trim all three. */
     @media (max-height: 480px) {
-      #topBar { padding-top: calc(var(--s2) + env(safe-area-inset-top)); padding-bottom: var(--s2); }
-      #backLink { min-height: 36px; }
+      #topBar { height: 52px; }
       #stepLabel { font-size: var(--fs-body); }
-      #controls { bottom: calc(var(--s3) + env(safe-area-inset-bottom)); }
+      #controls { bottom: var(--s3); }
       .navBtn { min-height: 44px; padding: var(--s2) var(--s4); }
-      #arrivedBanner { width: min(280px, calc(100vw - 48px)); padding: var(--s4); }
-      #arrivedBanner .check { width: 36px; height: 36px; margin-bottom: var(--s3); }
-      #arrivedBanner h2 { font-size: var(--fs-h2); margin-bottom: var(--s4); }
+      #arrivedBanner { top: calc(52px + var(--s2)); }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #arrivedBanner {
-        animation: none;
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
-      .navBtn:active:not(:disabled),
-      .hotspot-arrow:active,
-      #arrivedBanner a:active { transform: none; }
-      #backLink:hover svg { transform: none; }
+      #arrivedBanner, #arrivedBanner > *, #arrivedBanner.hiding { animation: none; }
+      .navBtn:active:not(:disabled) { transform: none; }
+      /* Keep the arrow lying on the floor; only the press and hover scale go. */
+      .hotspot-arrow:active, .hotspot-arrow:hover { transform: perspective(260px) rotateX(55deg); }
     }
   </style>
 </head>
 
 <body>
 
-  <div id="routeStrip"></div>
-
   <div id="topBar">
     <a id="backLink" href="select-room.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Choose different room
+      <span>All rooms</span>
     </a>
     <div id="stepInfo">
       <span id="stepLabel">Loading…</span>
       <span id="stepCount"></span>
     </div>
+    <a id="wtCrest" href="../index.html" aria-label="EduTrack home">
+      <img src="../assets/img/aclc-logo.jpg" width="30" height="30" alt="">
+      <span>EduTrack</span>
+    </a>
+    <div id="routeProgress" aria-hidden="true"><span></span></div>
   </div>
+
 
   <div id="panorama"></div>
 
@@ -375,19 +404,21 @@
     </button>
   </div>
 
-  <div id="arrivedBanner">
-    <div class="check" aria-hidden="true">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M4 10.5L8 14.5L16 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </div>
-    <p class="eyebrow">Destination reached</p>
-    <h2 id="arrivedRoomName"></h2>
-    <a href="select-room.html">Choose another room</a>
+  <p id="walkHint" aria-hidden="true">Tap the arrow to walk. Drag to look around.</p>
+
+
+  <div id="arrivedBanner" role="status">
+    <svg class="pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>
+    <p>You've arrived at <span id="arrivedRoomName"></span></p>
+    <a href="select-room.html">Other rooms</a>
   </div>
 
+
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-  <script src="walkthrough.js?v=2"></script>
+  <script src="walkthrough.js?v=7"></script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=660438df-a7e3-451b-af21-d4b5f09e7eb9"></script>
+<!-- impeccable-live-end -->
 </body>
 
 </html>

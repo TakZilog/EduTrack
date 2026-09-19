@@ -13,8 +13,8 @@
   }
 */
 
-const GRAPH_URL = '../assets/nodes/nodes-edges.json';
-const IMAGE_BASE = '../assets/nodes/';
+const GRAPH_URL = '../api/tour.php';   // students only; 401 sends guests to log in
+const IMAGE_BASE = '../api/node-image.php?f=';
 
 let graph = null;
 let path = [];       // array of node_id, gate -> target room
@@ -34,8 +34,15 @@ async function init() {
   }
 
   try {
-    const res = await fetch(GRAPH_URL);
+    const res = await fetch(GRAPH_URL, { credentials: 'same-origin' });
     graph = await res.json();
+    if (res.status === 401) {
+      // No enrolment numbers yet: add them, then come straight back to this room.
+      window.location.href = graph.code === 'details_missing'
+        ? '../Auth/add-details.html?next=' + encodeURIComponent('walkthrough.html?room=' + encodeURIComponent(targetRoomName))
+        : '../Auth/login.html?next=tour';
+      return;
+    }
   } catch (err) {
     setLabel('Could not load map data.');
     console.error(err);
@@ -56,7 +63,6 @@ async function init() {
     return;
   }
 
-  buildRouteStrip();
   currentStep = 0;
   showStep(currentStep);
 
@@ -111,7 +117,9 @@ function showStep(index) {
   const isLast = index === path.length - 1;
 
   setLabel(displayLabel(node), `Step ${index + 1} of ${path.length}`);
-  updateRouteStrip(index);
+  // The how-to-walk hint goes after the first step and does not come back.
+  if (index !== 0) document.getElementById('walkHint').hidden = true;
+  updateRouteProgress(index);
   document.getElementById('prevBtn').disabled = (index === 0);
   document.getElementById('nextBtn').style.display = isLast ? 'none' : '';
 
@@ -122,8 +130,8 @@ function showStep(index) {
   arrivedBanner.classList.remove('hiding');
 
   if (isLast) {
-    document.getElementById('arrivedRoomName').textContent = `${node.label}`;
-    arrivedBanner.style.display = 'block';
+    document.getElementById('arrivedRoomName').textContent = roomLabel(node.label);
+    arrivedBanner.style.display = 'flex';
     scheduleArrivedBannerHide(arrivedBanner);
   } else {
     arrivedBanner.style.display = 'none';
@@ -166,21 +174,26 @@ function loadPanorama(imageUrl) {
   });
 }
 
-/* Optional: a clickable hotspot inside the panorama itself, in addition
-   to the on-screen Next button. Default position (center-ish) — adjust
-   pitch/yaw per-node later in nodes-edges.json for accurate placement. */
-function buildHotspots() {
-  if (currentStep >= path.length - 1) return [];
-  return [{
-    pitch: 0,
-    yaw: 0,
+/* Walking is done in the photo, the way Street View does it: a chevron on
+   the floor ahead walks forward, one on the floor behind walks back. The
+   photos are taken facing along the route, so ahead is yaw 0 and behind is
+   yaw 180; turn around to see the way back. The Back/Next buttons remain in
+   the page for keyboard and screen reader users only (see #controls). */
+const GROUND_PITCH = -20;
+const CHEVRON = '<svg viewBox="0 0 64 40" fill="none" aria-hidden="true">'
+  + '<path class="edge" d="M10 32 32 10l22 22"/>'
+  + '<path class="face" d="M10 32 32 10l22 22"/>'
+  + '</svg>';
+
+function groundArrow(yaw, label, buttonId) {
+  return {
+    pitch: GROUND_PITCH,
+    yaw,
     type: 'custom',
-    cssClass: 'next-hotspot',
+    cssClass: 'walk-hotspot',
     createTooltipFunc: (hotSpotDiv) => {
-      hotSpotDiv.innerHTML = '<div class="hotspot-arrow" role="button" tabindex="0" aria-label="Continue to next step">'
-        + '<svg viewBox="0 0 20 20" fill="none"><path d="M10 15.5V4.5M10 4.5L4.5 10M10 4.5L15.5 10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        + '</div>';
-      const trigger = () => document.getElementById('nextBtn').click();
+      hotSpotDiv.innerHTML = '<div class="hotspot-arrow" role="button" tabindex="0" aria-label="' + label + '">' + CHEVRON + '</div>';
+      const trigger = () => document.getElementById(buttonId).click();
       const arrow = hotSpotDiv.querySelector('.hotspot-arrow');
       arrow.addEventListener('click', trigger);
       arrow.addEventListener('keydown', (e) => {
@@ -190,7 +203,14 @@ function buildHotspots() {
         }
       });
     }
-  }];
+  };
+}
+
+function buildHotspots() {
+  const spots = [];
+  if (currentStep < path.length - 1) spots.push(groundArrow(0, 'Walk forward', 'nextBtn'));
+  if (currentStep > 0) spots.push(groundArrow(180, 'Walk back', 'prevBtn'));
+  return spots;
 }
 
 /* Room/landmark nodes carry a meaningful label already. Hallway/junction
@@ -198,27 +218,24 @@ function buildHotspots() {
    happened to create that shared node first, which is misleading to show
    ("101" while walking to room 103) — show the node's type instead. */
 function displayLabel(node) {
-  if (node.type === 'room' || node.type === 'landmark') return node.label;
+  if (node.type === 'room') return roomLabel(node.label);
+  if (node.type === 'landmark') return node.label;
   if (node.type === 'junction') return 'Junction';
   return 'Hallway';
 }
 
-function buildRouteStrip() {
-  const strip = document.getElementById('routeStrip');
-  strip.innerHTML = '';
-  for (let i = 0; i < path.length; i++) {
-    const tick = document.createElement('div');
-    tick.className = 'tick';
-    strip.appendChild(tick);
-  }
+/* Room names are stored in capitals and numbered rooms as bare numbers.
+   Shown the same way the room picker shows them: "Room 103", "Kitchen Lab". */
+function roomLabel(raw) {
+  if (/^\d+$/.test(raw)) return 'Room ' + raw;
+  return raw.toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase());
 }
 
-function updateRouteStrip(index) {
-  const ticks = document.querySelectorAll('#routeStrip .tick');
-  ticks.forEach((tick, i) => {
-    tick.classList.toggle('done', i < index);
-    tick.classList.toggle('current', i === index);
-  });
+/* The hairline under the top bar fills to the current step. Set, never
+   animated: nothing at the top should move when you press Next. */
+function updateRouteProgress(index) {
+  const fill = document.querySelector('#routeProgress span');
+  if (fill) fill.style.width = ((index + 1) / path.length * 100) + '%';
 }
 
 function setLabel(main, sub) {

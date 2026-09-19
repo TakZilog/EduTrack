@@ -17,7 +17,6 @@ const ADMIN_PERMISSIONS = [
     // Day-to-day running of the desk.
     'admin' => [
         'student.view', 'student.export', 'student.verify', 'student.deactivate',
-        'code.view', 'code.issue', 'code.revoke',
         // Renaming a room and moving it to another floor. Not the photos or
         // the route: those come from walking the building with a camera.
         'room.view', 'room.edit',
@@ -27,7 +26,6 @@ const ADMIN_PERMISSIONS = [
     // Teaching staff who need to look things up but hold no destructive power.
     'faculty' => [
         'student.view',
-        'code.view.redacted',
         'room.view',
     ],
 ];
@@ -44,7 +42,6 @@ const ADMIN_PERMISSIONS = [
 */
 const ALL_PERMISSIONS = [
     'student.view', 'student.export', 'student.verify', 'student.deactivate', 'student.delete',
-    'code.view', 'code.view.redacted', 'code.issue', 'code.revoke',
     'room.view', 'room.edit',
     'audit.view',
     'settings.manage',

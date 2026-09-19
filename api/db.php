@@ -113,7 +113,6 @@ function db_failure_hint(PDOException $e, string $host, string $port, string $na
  */
 const DB_REQUIRED_TABLES = [
     'users',
-    'guard_codes',
     'login_attempts',
     'admins',
     'admin_audit',

@@ -12,7 +12,6 @@ require __DIR__ . '/_bootstrap.php';
  */
 
 const EDITABLE_SETTINGS = [
-    'code_lifetime_minutes' => ['label' => 'How long a code lasts',        'min' => 5, 'max' => 1440, 'unit' => 'minutes'],
     'otp_lifetime_minutes'  => ['label' => 'How long an email code lasts', 'min' => 5, 'max' => 60,   'unit' => 'minutes'],
     'login_max_attempts'    => ['label' => 'Wrong password tries allowed', 'min' => 3, 'max' => 20,   'unit' => 'tries'],
     'login_lockout_minutes' => ['label' => 'Lock-out length',              'min' => 5, 'max' => 120,  'unit' => 'minutes'],
@@ -112,7 +111,7 @@ switch ((string) ($input['action'] ?? '')) {
         }
 
         /*
-          The guard that makes this feature safe to offer. Saving a list that
+          The check that makes this feature safe to offer. Saving a list that
           does not include the computer you are sitting at would lock you out
           of the screen you would need to undo it. The server's own machine
           always passes, so whoever is at it can still recover.

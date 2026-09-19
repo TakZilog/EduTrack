@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The app is the EduTrack website in a WebView, so it needs the network
+         in release builds too, not only in debug. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- usesCleartextTraffic: the XAMPP site is served over plain http during
+         development. Turn it off once the site has an https address. -->
     <application
-        android:label="mobile_app"
+        android:label="EduTrack"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

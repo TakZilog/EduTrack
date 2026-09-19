@@ -1,173 +1,336 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-09-19T00:00:00.000Z",
-  "title": "Design System: EduTrack",
-  "extensions": {
-    "colorMeta": {
-      "brand-blue": {
-        "role": "primary",
-        "displayName": "Directory Blue",
-        "canonical": "#0044d6",
-        "tonalRamp": ["#000d2b", "#001a55", "#002880", "#0035ab", "#0044d6", "#3a70e6", "#7da3f0", "#c2d4f9"]
-      },
-      "brand-red": {
-        "role": "secondary",
-        "displayName": "Signal Red",
-        "canonical": "#D3112A",
-        "tonalRamp": ["#2a0308", "#550611", "#800a19", "#ab0d22", "#D3112A", "#e4485a", "#ef8894", "#f8c7cd"]
-      },
-      "ink": {
-        "role": "neutral",
-        "displayName": "Ink",
-        "canonical": "#1A1A1A",
-        "tonalRamp": ["#000000", "#0d0d0d", "#1A1A1A", "#3d3d3d", "#666666", "#949494", "#c2c2c2", "#f0f0f0"]
-      },
-      "muted": {
-        "role": "neutral",
-        "displayName": "Muted",
-        "canonical": "#6B7280",
-        "tonalRamp": ["#15171a", "#2a2e33", "#40454d", "#555c66", "#6B7280", "#949aa6", "#bcc0c8", "#e5e7eb"]
-      },
-      "page": {
-        "role": "neutral",
-        "displayName": "Page",
-        "canonical": "#F8F9FA",
-        "tonalRamp": ["#18191a", "#2f3133", "#474a4d", "#5f6266", "#8e9296", "#bcc0c4", "#e3e5e7", "#F8F9FA"]
-      },
-      "hairline": {
-        "role": "neutral",
-        "displayName": "Hairline",
-        "canonical": "#E5E7EB",
-        "tonalRamp": ["#1c1d1f", "#37393d", "#53565c", "#6f727a", "#9a9da5", "#c1c3c9", "#E5E7EB", "#f5f6f8"]
-      }
+    "schemaVersion": 2,
+    "generatedAt": "2026-09-19T12:11:37.000Z",
+    "title": "Design System: EduTrack",
+    "extensions": {
+        "colorMeta": {
+            "brand-blue": {
+                "role": "primary",
+                "displayName": "Directory Blue",
+                "canonical": "#0044d6",
+                "tonalRamp": [
+                    "#000d2b",
+                    "#001a55",
+                    "#002880",
+                    "#0035ab",
+                    "#0044d6",
+                    "#3a70e6",
+                    "#7da3f0",
+                    "#c2d4f9"
+                ]
+            },
+            "brand-red": {
+                "role": "secondary",
+                "displayName": "Signal Red",
+                "canonical": "#D3112A",
+                "tonalRamp": [
+                    "#2a0308",
+                    "#550611",
+                    "#800a19",
+                    "#ab0d22",
+                    "#D3112A",
+                    "#e4485a",
+                    "#ef8894",
+                    "#f8c7cd"
+                ]
+            },
+            "ink": {
+                "role": "neutral",
+                "displayName": "Ink",
+                "canonical": "#1A1A1A",
+                "tonalRamp": [
+                    "#000000",
+                    "#0d0d0d",
+                    "#1A1A1A",
+                    "#3d3d3d",
+                    "#666666",
+                    "#949494",
+                    "#c2c2c2",
+                    "#f0f0f0"
+                ]
+            },
+            "muted": {
+                "role": "neutral",
+                "displayName": "Muted",
+                "canonical": "#6B7280",
+                "tonalRamp": [
+                    "#15171a",
+                    "#2a2e33",
+                    "#40454d",
+                    "#555c66",
+                    "#6B7280",
+                    "#949aa6",
+                    "#bcc0c8",
+                    "#e5e7eb"
+                ]
+            },
+            "page": {
+                "role": "neutral",
+                "displayName": "Page",
+                "canonical": "#F8F9FA",
+                "tonalRamp": [
+                    "#18191a",
+                    "#2f3133",
+                    "#474a4d",
+                    "#5f6266",
+                    "#8e9296",
+                    "#bcc0c4",
+                    "#e3e5e7",
+                    "#F8F9FA"
+                ]
+            },
+            "hairline": {
+                "role": "neutral",
+                "displayName": "Hairline",
+                "canonical": "#E5E7EB",
+                "tonalRamp": [
+                    "#1c1d1f",
+                    "#37393d",
+                    "#53565c",
+                    "#6f727a",
+                    "#9a9da5",
+                    "#c1c3c9",
+                    "#E5E7EB",
+                    "#f5f6f8"
+                ]
+            }
+        },
+        "typographyMeta": {
+            "display": {
+                "displayName": "Display",
+                "purpose": "The EduTrack wordmark on the identity field. Nowhere else. The -0.045em tracking is load-bearing."
+            },
+            "headline": {
+                "displayName": "Headline",
+                "purpose": "Surface titles, the lead destination row, the arrival room name."
+            },
+            "title": {
+                "displayName": "Title",
+                "purpose": "Secondary destination rows, walkthrough step label, identity tagline."
+            },
+            "body": {
+                "displayName": "Body",
+                "purpose": "All reading text and all form input text. Never below 16px in an input."
+            },
+            "label": {
+                "displayName": "Label",
+                "purpose": "Field labels, helper and error text, floor headers (at 700), step counters. Sentence case, never uppercase."
+            }
+        },
+        "gradients": [
+            {
+                "name": "field-gradient",
+                "value": "linear-gradient(135deg, #001253 0%, #0033a0 50%, #0072ff 100%)",
+                "purpose": "The identity field and every primary button. The only gradient in the system; never mixed with red."
+            }
+        ],
+        "shadows": [
+            {
+                "name": "resting-panel",
+                "value": "0 2px 8px rgba(0,0,0,0.04)",
+                "purpose": "Directory rows and the room-list panel at rest."
+            },
+            {
+                "name": "lifted",
+                "value": "0 8px 24px rgba(0,0,0,0.08)",
+                "purpose": "The same objects on hover, paired with a 2px rise."
+            },
+            {
+                "name": "pressed",
+                "value": "0 1px 3px rgba(0,0,0,0.06)",
+                "purpose": "The object settling back onto the page under a press."
+            },
+            {
+                "name": "brand-lift",
+                "value": "0 4px 12px rgba(0,68,214,0.15), 0 2px 4px rgba(0,68,214,0.1)",
+                "purpose": "Primary buttons only. The single exception to neutral-black shadows."
+            },
+            {
+                "name": "focus-ring",
+                "value": "0 0 0 4px rgba(0,68,214,0.15)",
+                "purpose": "The focused input, paired with a white fill."
+            },
+            {
+                "name": "over-photo",
+                "value": "0 8px 32px rgba(0,0,0,0.38)",
+                "purpose": "The arrival card floating on a 360 panorama."
+            }
+        ],
+        "motion": [
+            {
+                "name": "ease-standard",
+                "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+                "purpose": "Default easing for every state transition in the system."
+            },
+            {
+                "name": "press",
+                "value": "160ms",
+                "purpose": "Button press feedback. Never longer."
+            },
+            {
+                "name": "state",
+                "value": "200ms",
+                "purpose": "Hover, focus and colour transitions. The ceiling for UI motion."
+            },
+            {
+                "name": "page-fade",
+                "value": "150ms",
+                "purpose": "Opt-in .fade-in entrance, opacity only, suppressed under prefers-reduced-motion."
+            }
+        ],
+        "breakpoints": [
+            {
+                "name": "narrow",
+                "value": "380px"
+            },
+            {
+                "name": "shell-split",
+                "value": "900px"
+            }
+        ]
     },
-    "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "The EduTrack wordmark on the identity field. Nowhere else. The -0.045em tracking is load-bearing." },
-      "headline": { "displayName": "Headline", "purpose": "Surface titles, the lead destination row, the arrival room name." },
-      "title": { "displayName": "Title", "purpose": "Secondary destination rows, walkthrough step label, identity tagline." },
-      "body": { "displayName": "Body", "purpose": "All reading text and all form input text. Never below 16px in an input." },
-      "label": { "displayName": "Label", "purpose": "Field labels, helper and error text, floor tags, step counters. Sentence case, never uppercase." }
-    },
-    "gradients": [
-      { "name": "field-gradient", "value": "linear-gradient(135deg, #001253 0%, #0033a0 50%, #0072ff 100%)", "purpose": "The identity field and every primary button. The only gradient in the system; never mixed with red." }
+    "components": [
+        {
+            "name": "Primary Button",
+            "kind": "button",
+            "refersTo": "button-primary",
+            "description": "The one committed action on a surface. Gradient fill, brand-lift shadow, flex-centred so a wrapping label cannot spill out.",
+            "html": "<button class=\"ds-btn-primary\">Log In</button>",
+            "css": ".ds-btn-primary { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; padding: 12px 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, #001253 0%, #0033a0 50%, #0072ff 100%); color: #fff; font-family: 'Inter', system-ui, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; line-height: 1.4; cursor: pointer; box-shadow: 0 4px 12px rgba(0,68,214,0.15), 0 2px 4px rgba(0,68,214,0.1); transition: transform 160ms cubic-bezier(0.32,0.72,0,1), box-shadow 200ms cubic-bezier(0.32,0.72,0,1); } .ds-btn-primary:hover { box-shadow: 0 8px 24px rgba(0,68,214,0.25), 0 4px 8px rgba(0,68,214,0.15); transform: translateY(-2px); } .ds-btn-primary:active { transform: scale(0.98) translateY(1px); box-shadow: 0 2px 6px rgba(0,68,214,0.15); } .ds-btn-primary:focus-visible { outline: 2px solid #0044d6; outline-offset: 2px; }"
+        },
+        {
+            "name": "Text Field",
+            "kind": "input",
+            "refersTo": "input-field",
+            "description": "Filled field with a sentence-case label above it. Focus swaps the fill to white and adds the ring; it never transforms, so the field cannot walk away from its own label.",
+            "html": "<label class=\"ds-label\" for=\"ds-email\">Email</label><input class=\"ds-input\" id=\"ds-email\" type=\"email\" placeholder=\"Enter your email\">",
+            "css": ".ds-label { display: block; margin: 12px 0 4px; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: #1A1A1A; } .ds-input { width: 100%; min-height: 52px; padding: 0 16px; border: 1px solid transparent; border-radius: 12px; background: #f3f4f6; color: #1A1A1A; font-family: 'Inter', system-ui, sans-serif; font-size: 1rem; transition: background-color 200ms cubic-bezier(0.32,0.72,0,1), border-color 200ms cubic-bezier(0.32,0.72,0,1), box-shadow 200ms cubic-bezier(0.32,0.72,0,1); } .ds-input::placeholder { color: #646b78; } .ds-input:focus { outline: none; background: #fff; border-color: #0044d6; box-shadow: 0 0 0 4px rgba(0,68,214,0.15); }"
+        },
+        {
+            "name": "Ghost Button / Back Link",
+            "kind": "button",
+            "refersTo": "button-ghost",
+            "description": "The way out of any inner surface. Muted boundary at 4.83:1, and the icon nudges 3px in the direction of travel on hover.",
+            "html": "<a class=\"ds-back\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 12H5M12 19l-7-7 7-7\"/></svg>Back to home</a>",
+            "css": ".ds-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid #6B7280; border-radius: 10px; background: #fff; color: #1A1A1A; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: border-color 200ms cubic-bezier(0.32,0.72,0,1), color 200ms cubic-bezier(0.32,0.72,0,1), transform 120ms cubic-bezier(0.32,0.72,0,1); } .ds-back svg { width: 18px; height: 18px; flex-shrink: 0; transition: transform 200ms cubic-bezier(0.32,0.72,0,1); } .ds-back:hover { border-color: #0044d6; color: #0044d6; } .ds-back:hover svg { transform: translateX(-3px); } .ds-back:active { transform: scale(0.98); } .ds-back:focus-visible { outline: 2px solid #0044d6; outline-offset: 2px; }"
+        },
+        {
+            "name": "Lead Destination Row",
+            "kind": "card",
+            "refersTo": "directory-row-lead",
+            "description": "The one destination that needs no account. Headline type plus the only filled disc on the surface; hierarchy by scale, not by a coloured slab.",
+            "html": "<a class=\"ds-dest ds-dest-lead\" href=\"#\"><span class=\"ds-dest-body\"><span class=\"ds-dest-title\">Find your enrollment room</span><span class=\"ds-dest-desc\">Walk there from the gate, through real photos of the building. No account needed.</span></span><span class=\"ds-dest-go\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></span></a>",
+            "css": ".ds-dest { display: flex; align-items: center; gap: 16px; padding: 32px 24px; background: #fff; border: 1px solid #6B7280; border-radius: 20px; color: #1A1A1A; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.04); font-family: 'Inter', system-ui, sans-serif; transition: transform 180ms cubic-bezier(0.32,0.72,0,1), box-shadow 180ms cubic-bezier(0.32,0.72,0,1), border-color 180ms cubic-bezier(0.32,0.72,0,1); } .ds-dest-body { flex: 1; min-width: 0; } .ds-dest-title { display: block; font-size: 1.75rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; } .ds-dest-desc { display: block; margin-top: 8px; font-size: 1rem; color: #1A1A1A; } .ds-dest-go { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: #0044d6; color: #fff; transition: transform 180ms cubic-bezier(0.32,0.72,0,1); } .ds-dest-go svg { width: 22px; height: 22px; } .ds-dest:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #0044d6; } .ds-dest:hover .ds-dest-title { color: #0044d6; } .ds-dest:hover .ds-dest-go { transform: translateX(3px) scale(1.05); } .ds-dest:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(0,0,0,0.06); background: #F8F9FA; } .ds-dest:focus-visible { outline: 2px solid #0044d6; outline-offset: -2px; }"
+        },
+        {
+            "name": "Room List Row",
+            "kind": "custom",
+            "refersTo": "directory-row",
+            "description": "The room picker, grouped by floor. The floor is stated once in a header that stays pinned while its rooms scroll under it; each row is a link with a readable name and a chevron that slides toward the room on hover.",
+            "html": "<div class=\"ds-rooms\"><h3 class=\"ds-floor-head\">2nd floor <span>17 rooms</span></h3><ul><li><a class=\"ds-room\" href=\"#\">Room 204<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></a></li><li><a class=\"ds-room\" href=\"#\">Guidance Office<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></a></li><li><a class=\"ds-room\" href=\"#\">Library<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></a></li></ul></div>",
+            "css": ".ds-rooms { background: #fff; border: 1px solid #edf2f7; border-radius: 20px; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; } .ds-rooms ul { list-style: none; margin: 0; padding: 0; } .ds-floor-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0; padding: 12px 16px; background: #F8F9FA; border-bottom: 1px solid #E5E7EB; color: #1A1A1A; font-size: 0.875rem; font-weight: 700; } .ds-floor-head span { color: #6B7280; font-weight: 400; } .ds-room { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 8px 16px; border-bottom: 1px solid #E5E7EB; color: #1A1A1A; font-size: 1rem; font-weight: 600; text-decoration: none; transition: background 120ms cubic-bezier(0.32,0.72,0,1); } .ds-rooms li:last-child .ds-room { border-bottom: none; } .ds-room svg { width: 18px; height: 18px; color: #6B7280; transition: transform 160ms cubic-bezier(0.32,0.72,0,1), color 160ms cubic-bezier(0.32,0.72,0,1); } .ds-room:hover { background: #F8F9FA; } .ds-room:hover svg { color: #0044d6; transform: translateX(3px); } .ds-room:focus-visible { outline: 2px solid #0044d6; outline-offset: -2px; }"
+        },
+        {
+            "name": "Route Strip",
+            "kind": "custom",
+            "refersTo": "route-strip",
+            "description": "Signature component. One tick per node on the computed path across the top of the panorama; the current step is the only red mark in the product.",
+            "html": "<div class=\"ds-strip\"><i class=\"ds-tick ds-done\"></i><i class=\"ds-tick ds-done\"></i><i class=\"ds-tick ds-current\"></i><i class=\"ds-tick\"></i><i class=\"ds-tick\"></i><i class=\"ds-tick\"></i></div>",
+            "css": ".ds-strip { display: flex; gap: 3px; height: 4px; padding: 0 16px; background: rgba(26,26,26,0.88); } .ds-tick { flex: 1; height: 100%; background: rgba(255,255,255,0.28); transition: background 200ms cubic-bezier(0.32,0.72,0,1); } .ds-done { background: rgba(255,255,255,0.7); } .ds-current { background: #D3112A; }"
+        },
+        {
+            "name": "Alert",
+            "kind": "custom",
+            "refersTo": "alert",
+            "description": "Form-level feedback. The palette allows no tinted fill, so the semantic colour runs through the whole border and the text. Success speaks in Directory Blue because green is out of the palette.",
+            "html": "<div class=\"ds-alert ds-alert-error\">Could not reach server. Try again.</div><div class=\"ds-alert ds-alert-success\">A new code has been sent.</div>",
+            "css": ".ds-alert { display: block; margin-bottom: 16px; padding: 12px 16px; border: 1px solid #6B7280; border-radius: 8px; background: #fff; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; } .ds-alert-error { border-color: #D3112A; color: #D3112A; } .ds-alert-success { border-color: #0044d6; color: #0044d6; margin-top: 8px; }"
+        }
     ],
-    "shadows": [
-      { "name": "resting-panel", "value": "0 2px 8px rgba(0,0,0,0.04)", "purpose": "Directory rows and the room-list panel at rest." },
-      { "name": "lifted", "value": "0 8px 24px rgba(0,0,0,0.08)", "purpose": "The same objects on hover, paired with a 2px rise." },
-      { "name": "pressed", "value": "0 1px 3px rgba(0,0,0,0.06)", "purpose": "The object settling back onto the page under a press." },
-      { "name": "brand-lift", "value": "0 4px 12px rgba(0,68,214,0.15), 0 2px 4px rgba(0,68,214,0.1)", "purpose": "Primary buttons only. The single exception to neutral-black shadows." },
-      { "name": "focus-ring", "value": "0 0 0 4px rgba(0,68,214,0.15)", "purpose": "The focused input, paired with a white fill." },
-      { "name": "over-photo", "value": "0 8px 32px rgba(0,0,0,0.38)", "purpose": "The arrival card floating on a 360 panorama." }
-    ],
-    "motion": [
-      { "name": "ease-standard", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Default easing for every state transition in the system." },
-      { "name": "press", "value": "160ms", "purpose": "Button press feedback. Never longer." },
-      { "name": "state", "value": "200ms", "purpose": "Hover, focus and colour transitions. The ceiling for UI motion." },
-      { "name": "page-fade", "value": "150ms", "purpose": "Opt-in .fade-in entrance, opacity only, suppressed under prefers-reduced-motion." }
-    ],
-    "breakpoints": [
-      { "name": "narrow", "value": "380px" },
-      { "name": "shell-split", "value": "900px" }
-    ]
-  },
-  "components": [
-    {
-      "name": "Primary Button",
-      "kind": "button",
-      "refersTo": "button-primary",
-      "description": "The one committed action on a surface. Gradient fill, brand-lift shadow, flex-centred so a wrapping label cannot spill out.",
-      "html": "<button class=\"ds-btn-primary\">Log In</button>",
-      "css": ".ds-btn-primary { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; padding: 12px 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, #001253 0%, #0033a0 50%, #0072ff 100%); color: #fff; font-family: 'Inter', system-ui, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; line-height: 1.4; cursor: pointer; box-shadow: 0 4px 12px rgba(0,68,214,0.15), 0 2px 4px rgba(0,68,214,0.1); transition: transform 160ms cubic-bezier(0.32,0.72,0,1), box-shadow 200ms cubic-bezier(0.32,0.72,0,1); } .ds-btn-primary:hover { box-shadow: 0 8px 24px rgba(0,68,214,0.25), 0 4px 8px rgba(0,68,214,0.15); transform: translateY(-2px); } .ds-btn-primary:active { transform: scale(0.98) translateY(1px); box-shadow: 0 2px 6px rgba(0,68,214,0.15); } .ds-btn-primary:focus-visible { outline: 2px solid #0044d6; outline-offset: 2px; }"
-    },
-    {
-      "name": "Text Field",
-      "kind": "input",
-      "refersTo": "input-field",
-      "description": "Filled field with a sentence-case label above it. Focus swaps the fill to white and adds the ring; it never transforms, so the field cannot walk away from its own label.",
-      "html": "<label class=\"ds-label\" for=\"ds-email\">Email</label><input class=\"ds-input\" id=\"ds-email\" type=\"email\" placeholder=\"Enter your email\">",
-      "css": ".ds-label { display: block; margin: 12px 0 4px; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: #1A1A1A; } .ds-input { width: 100%; min-height: 52px; padding: 0 16px; border: 1px solid transparent; border-radius: 12px; background: #f3f4f6; color: #1A1A1A; font-family: 'Inter', system-ui, sans-serif; font-size: 1rem; transition: background-color 200ms cubic-bezier(0.32,0.72,0,1), border-color 200ms cubic-bezier(0.32,0.72,0,1), box-shadow 200ms cubic-bezier(0.32,0.72,0,1); } .ds-input::placeholder { color: #9ca3af; } .ds-input:focus { outline: none; background: #fff; border-color: #0044d6; box-shadow: 0 0 0 4px rgba(0,68,214,0.15); }"
-    },
-    {
-      "name": "Ghost Button / Back Link",
-      "kind": "button",
-      "refersTo": "button-ghost",
-      "description": "The way out of any inner surface. Muted boundary at 4.83:1, and the icon nudges 3px in the direction of travel on hover.",
-      "html": "<a class=\"ds-back\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 12H5M12 19l-7-7 7-7\"/></svg>Back to home</a>",
-      "css": ".ds-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid #6B7280; border-radius: 10px; background: #fff; color: #1A1A1A; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: border-color 200ms cubic-bezier(0.32,0.72,0,1), color 200ms cubic-bezier(0.32,0.72,0,1), transform 120ms cubic-bezier(0.32,0.72,0,1); } .ds-back svg { width: 18px; height: 18px; flex-shrink: 0; transition: transform 200ms cubic-bezier(0.32,0.72,0,1); } .ds-back:hover { border-color: #0044d6; color: #0044d6; } .ds-back:hover svg { transform: translateX(-3px); } .ds-back:active { transform: scale(0.98); } .ds-back:focus-visible { outline: 2px solid #0044d6; outline-offset: 2px; }"
-    },
-    {
-      "name": "Lead Destination Row",
-      "kind": "card",
-      "refersTo": "directory-row-lead",
-      "description": "The one destination that needs no account. Headline type plus the only filled disc on the surface; hierarchy by scale, not by a coloured slab.",
-      "html": "<a class=\"ds-dest ds-dest-lead\" href=\"#\"><span class=\"ds-dest-body\"><span class=\"ds-dest-title\">Enrollment Room Map</span><span class=\"ds-dest-desc\">Find your enrollment room — no account needed</span></span><span class=\"ds-dest-go\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></span></a>",
-      "css": ".ds-dest { display: flex; align-items: center; gap: 16px; padding: 32px 24px; background: #fff; border: 1px solid #6B7280; border-radius: 20px; color: #1A1A1A; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.04); font-family: 'Inter', system-ui, sans-serif; transition: transform 180ms cubic-bezier(0.32,0.72,0,1), box-shadow 180ms cubic-bezier(0.32,0.72,0,1), border-color 180ms cubic-bezier(0.32,0.72,0,1); } .ds-dest-body { flex: 1; min-width: 0; } .ds-dest-title { display: block; font-size: 1.75rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; } .ds-dest-desc { display: block; margin-top: 8px; font-size: 1rem; color: #1A1A1A; } .ds-dest-go { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: #0044d6; color: #fff; transition: transform 180ms cubic-bezier(0.32,0.72,0,1); } .ds-dest-go svg { width: 22px; height: 22px; } .ds-dest:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #0044d6; } .ds-dest:hover .ds-dest-title { color: #0044d6; } .ds-dest:hover .ds-dest-go { transform: translateX(3px) scale(1.05); } .ds-dest:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(0,0,0,0.06); background: #F8F9FA; } .ds-dest:focus-visible { outline: 2px solid #0044d6; outline-offset: -2px; }"
-    },
-    {
-      "name": "Room List Row",
-      "kind": "custom",
-      "refersTo": "directory-row",
-      "description": "One room in the picker. Name over floor, never side by side: both strings run to 24 characters and cannot share a 360px row.",
-      "html": "<ul class=\"ds-rooms\"><li>STUDENT AFFAIRS OFFICE <span class=\"ds-floor\">2ND FLOOR ADMIN BUILDING</span></li><li>CASHIER <span class=\"ds-floor\">1ST FLOOR ADMIN BUILDING</span></li></ul>",
-      "css": ".ds-rooms { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid #edf2f7; border-radius: 20px; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; } .ds-rooms li { display: block; padding: 12px 16px; min-height: 44px; border-bottom: 1px solid #E5E7EB; color: #1A1A1A; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 120ms cubic-bezier(0.32,0.72,0,1); } .ds-rooms li:last-child { border-bottom: none; } .ds-floor { display: block; margin-top: 4px; color: #6B7280; font-size: 0.875rem; font-weight: 400; } .ds-rooms li:hover { background: #F8F9FA; }"
-    },
-    {
-      "name": "Route Strip",
-      "kind": "custom",
-      "refersTo": "route-strip",
-      "description": "Signature component. One tick per node on the computed path across the top of the panorama; the current step is the only red mark in the product.",
-      "html": "<div class=\"ds-strip\"><i class=\"ds-tick ds-done\"></i><i class=\"ds-tick ds-done\"></i><i class=\"ds-tick ds-current\"></i><i class=\"ds-tick\"></i><i class=\"ds-tick\"></i><i class=\"ds-tick\"></i></div>",
-      "css": ".ds-strip { display: flex; gap: 3px; height: 4px; padding: 0 16px; background: rgba(26,26,26,0.88); } .ds-tick { flex: 1; height: 100%; background: rgba(255,255,255,0.28); transition: background 200ms cubic-bezier(0.32,0.72,0,1); } .ds-done { background: rgba(255,255,255,0.7); } .ds-current { background: #D3112A; }"
-    },
-    {
-      "name": "Alert",
-      "kind": "custom",
-      "refersTo": "alert",
-      "description": "Form-level feedback. The palette allows no tinted fill, so the semantic colour runs through the whole border and the text. Success speaks in Directory Blue because green is out of the palette.",
-      "html": "<div class=\"ds-alert ds-alert-error\">Could not reach server. Try again.</div><div class=\"ds-alert ds-alert-success\">A new code has been sent.</div>",
-      "css": ".ds-alert { display: block; margin-bottom: 16px; padding: 12px 16px; border: 1px solid #6B7280; border-radius: 8px; background: #fff; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; } .ds-alert-error { border-color: #D3112A; color: #D3112A; } .ds-alert-success { border-color: #0044d6; color: #0044d6; margin-top: 8px; }"
+    "narrative": {
+        "northStar": "The Building Directory",
+        "overview": "This is the board bolted to the wall in a lobby, rebuilt for a phone. Someone arrives at the Admin Building gate on enrolment day, does not know where room 302 is, and does not want to read a map — they want the list of places, ranked, and then to be walked there. Every decision in this system answers to that board: destinations are ranked by type size rather than presented as equal peers, the institution's seal sits on a solid field of its own colour, rooms are listed under the floor they are on, and the whole thing is set to be read at arm's length in daylight on a cheap screen.\n\nThe system is built from two surfaces that never blend. A blue identity field carries the seal, the wordmark and the campus name; a white working surface carries everything the visitor actually does. On a phone the field is a header band with the surface running beneath it; from 900px they are two full-height columns. Nothing in this product is a small card floating in grey — that is the shape a mobile layout takes when nobody designed the desktop, and it is the specific failure this world replaced.\n\nRestraint is the discipline that makes the boldness work. The identity field and the primary action are loud; everything else is quiet. Red is almost absent by design, so that the two places it does appear — a field you filled in wrong, and the step you are standing on in the walkthrough — carry real weight.",
+        "keyCharacteristics": [
+            "Two surfaces, never blended: blue identity field, white working surface",
+            "Destinations are bordered cards, ranked by type size — the lead at roughly twice the height of its peers, never equal-weight",
+            "One accent used as a field, not as decoration",
+            "Red reserved for error and for \"you are here\"",
+            "Built for a low-end phone on weak campus Wi-Fi: no photo backgrounds, no blur, no continuous motion"
+        ],
+        "rules": [
+            {
+                "name": "The Scalpel Rule",
+                "body": "Red appears at most once per screen, and only where it means wrong or here. If a screen has no error and no position marker, it has no red. Most screens have no red.",
+                "section": "colors"
+            },
+            {
+                "name": "The Two-Greys Rule",
+                "body": "#E5E7EB draws dividers and panel edges; #6B7280 draws anything a finger or a keyboard can land on. The split is not cosmetic: a control whose only boundary is #E5E7EB sits at 1.24:1 on white and fails WCAG 1.4.11, which is exactly how the underline inputs became invisible once before.",
+                "section": "colors"
+            },
+            {
+                "name": "The No-Red-On-Blue Rule",
+                "body": "Red text or a red mark never sits on a blue surface, and blue never sits on red. On the identity field the location pin is white for this reason.",
+                "section": "colors"
+            },
+            {
+                "name": "The Five-Step Rule",
+                "body": "The ramp is five steps and display is set per page as a clamp so it does not become a sixth. A new size is a design failure, not a design decision.",
+                "section": "typography"
+            },
+            {
+                "name": "The Sentence-Case Rule",
+                "body": "Labels are sentence case at 0.875rem in Ink. Tracked-out uppercase micro-labels are banned: they are one of the most recognisable generated-UI tells, and 12.8px uppercase in grey is the hardest possible way to read \"Confirm password\".",
+                "section": "typography"
+            },
+            {
+                "name": "The Sixteen-Pixel Rule",
+                "body": "Input text is never below 1rem. Below it, iOS zooms the page on focus and the visitor loses their place.",
+                "section": "typography"
+            },
+            {
+                "name": "The No-Marooned-Card Rule",
+                "body": "No surface is a fixed-width card centred in empty space. A max-width: 420px card is a mobile layout shown on a monitor; the shell is full-bleed at every width.",
+                "section": "layout"
+            },
+            {
+                "name": "The One-Scroller Rule",
+                "body": "A screen has one scrolling region. Where a list must scroll, the page around it does not.",
+                "section": "layout"
+            },
+            {
+                "name": "The Earned-Shadow Rule",
+                "body": "Shadows respond to state. A flat page is the resting state; lift is an answer to a pointer, and press is an answer to a finger.",
+                "section": "elevation"
+            },
+            {
+                "name": "The No-Blur Rule",
+                "body": "backdrop-filter is banned outright. It composites every frame the panorama moves, on exactly the hardware this product targets. Where UI must sit over a photograph, it uses a solid or high-opacity flat bar instead — rgba(26,26,26,.88) holds white text at 11:1 even against a white corridor wall.",
+                "section": "elevation"
+            },
+            {
+                "name": "The Plain Words Rule",
+                "body": "Controls say what will happen in ordinary language: \"Turn off\", not \"Deactivate\"; \"Ran out of time\", not \"Expired\". No control is icon-only, and every destructive action is confirmed in a dialog that states the consequence in a full sentence.",
+                "section": "components"
+            }
+        ],
+        "dos": [
+            "Do let Directory Blue occupy large areas — it is the one hue with that permission, and the identity field is the system's signature.",
+            "Do rank destinations by type size and height (28px lead at roughly twice the row height, 20px secondary), so the entry that needs no account is unmistakable. Destinations are bordered cards; the ranking, not the container, carries the hierarchy.",
+            "Do give every interactive control a boundary of at least 3:1 against its background; use Muted #6B7280, not Hairline #E5E7EB.",
+            "Do keep every touch target at 44px or above at every breakpoint, and 48–52px for primary actions.",
+            "Do name the exact properties in every transition, and keep UI motion at or under 200ms.",
+            "Do group rooms under a pinned floor header (\"2nd floor · 17 rooms\") rather than repeating the floor on every row. Room rows are real links, show a readable name (\"Room 204\", \"Guidance Office\") and pass the raw room_name to the walkthrough."
+        ],
+        "donts": [
+            "Don't use backdrop-filter anywhere. See The No-Blur Rule.",
+            "Don't put red on blue, or blue on red, and don't let red exceed one small mark per screen.",
+            "Don't add a third hue. The palette is blue, red, and neutrals — no green, orange, teal, purple, or yellow, including for success states, which speak in Directory Blue.",
+            "Don't centre a fixed-width card in empty space on desktop. See The No-Marooned-Card Rule.",
+            "Don't scale any element that contains text on hover. scale(1.01) re-rasterises the label at a fractional size and leaves it visibly soft for the whole interaction; lift instead.",
+            "Don't use transition: all, or any easing curve that overshoots (cubic-bezier(…, 1.275)), on a state a visitor triggers repeatedly.",
+            "Don't set labels in tracked-out uppercase, and don't introduce a sixth type size.",
+            "Don't run continuous or infinite animation. The in-scene waypoint marker is a solid disc with a white ring for exactly this reason."
+        ]
     }
-  ],
-  "narrative": {
-    "northStar": "The Building Directory",
-    "overview": "This is the board bolted to the wall in a lobby, rebuilt for a phone. Someone arrives at the Admin Building gate on enrolment day, does not know where room 302 is, and does not want to read a map — they want the list of places, ranked, and then to be walked there. Every decision in this system answers to that board: destinations are ranked by type size rather than presented as equal peers, the institution's seal sits on a solid field of its own colour, a room name is always paired with its floor beneath it, and the whole thing is set to be read at arm's length in daylight on a cheap screen.\n\nThe system is built from two surfaces that never blend. A blue identity field carries the seal, the wordmark and the campus name; a white working surface carries everything the visitor actually does. On a phone the field is a header band with the surface running beneath it; from 900px they are two full-height columns. Nothing in this product is a small card floating in grey — that is the shape a mobile layout takes when nobody designed the desktop, and it is the specific failure this world replaced.\n\nRestraint is the discipline that makes the boldness work. The identity field and the primary action are loud; everything else is quiet. Red is almost absent by design, so that the two places it does appear — a field you filled in wrong, and the step you are standing on in the walkthrough — carry real weight.",
-    "keyCharacteristics": [
-      "Two surfaces, never blended: blue identity field, white working surface",
-      "Destinations are bordered cards, ranked by type size — the lead at roughly twice the height of its peers, never equal-weight",
-      "One accent used as a field, not as decoration",
-      "Red reserved for error and for \"you are here\"",
-      "Built for a low-end phone on weak campus Wi-Fi: no photo backgrounds, no blur, no continuous motion"
-    ],
-    "rules": [
-      { "name": "The Scalpel Rule", "body": "Red appears at most once per screen, and only where it means wrong or here. If a screen has no error and no position marker, it has no red. Most screens have no red.", "section": "colors" },
-      { "name": "The Two-Greys Rule", "body": "#E5E7EB draws dividers and panel edges; #6B7280 draws anything a finger or a keyboard can land on. The split is not cosmetic: a control whose only boundary is #E5E7EB sits at 1.24:1 on white and fails WCAG 1.4.11, which is exactly how the underline inputs became invisible once before.", "section": "colors" },
-      { "name": "The No-Red-On-Blue Rule", "body": "Red text or a red mark never sits on a blue surface, and blue never sits on red. On the identity field the location pin is white for this reason.", "section": "colors" },
-      { "name": "The Five-Step Rule", "body": "The ramp is five steps and display is set per page as a clamp so it does not become a sixth. A new size is a design failure, not a design decision.", "section": "typography" },
-      { "name": "The Sentence-Case Rule", "body": "Labels are sentence case at 0.875rem in Ink. Tracked-out uppercase micro-labels are banned: they are one of the most recognisable generated-UI tells, and 12.8px uppercase in grey is the hardest possible way to read \"Confirm password\".", "section": "typography" },
-      { "name": "The Sixteen-Pixel Rule", "body": "Input text is never below 1rem. Below it, iOS zooms the page on focus and the visitor loses their place.", "section": "typography" },
-      { "name": "The No-Marooned-Card Rule", "body": "No surface is a fixed-width card centred in empty space. A max-width: 420px card is a mobile layout shown on a monitor; the shell is full-bleed at every width.", "section": "layout" },
-      { "name": "The One-Scroller Rule", "body": "A screen has one scrolling region. Where a list must scroll, the page around it does not.", "section": "layout" },
-      { "name": "The Earned-Shadow Rule", "body": "Shadows respond to state. A flat page is the resting state; lift is an answer to a pointer, and press is an answer to a finger.", "section": "elevation" },
-      { "name": "The No-Blur Rule", "body": "backdrop-filter is banned outright. It composites every frame the panorama moves, on exactly the hardware this product targets. Where UI must sit over a photograph, it uses a solid or high-opacity flat bar instead — rgba(26,26,26,.88) holds white text at 11:1 even against a white corridor wall.", "section": "elevation" },
-      { "name": "The Plain Words Rule", "body": "Controls say what will happen in ordinary language: \"Turn off\", not \"Deactivate\"; \"Ran out of time\", not \"Expired\". No control is icon-only, and every destructive action is confirmed in a dialog that states the consequence in a full sentence.", "section": "components" }
-    ],
-    "dos": [
-      "Do let Directory Blue occupy large areas — it is the one hue with that permission, and the identity field is the system's signature.",
-      "Do rank destinations by type size and height (28px lead at roughly twice the row height, 20px secondary), so the entry that needs no account is unmistakable. Destinations are bordered cards; the ranking, not the container, carries the hierarchy.",
-      "Do give every interactive control a boundary of at least 3:1 against its background; use Muted #6B7280, not Hairline #E5E7EB.",
-      "Do keep every touch target at 44px or above at every breakpoint, and 48–52px for primary actions.",
-      "Do name the exact properties in every transition, and keep UI motion at or under 200ms.",
-      "Do pair a room name with its floor on a second line; the two strings are each up to 24 characters and cannot share a 360px row."
-    ],
-    "donts": [
-      "Don't use backdrop-filter anywhere. See The No-Blur Rule.",
-      "Don't put red on blue, or blue on red, and don't let red exceed one small mark per screen.",
-      "Don't add a third hue. The palette is blue, red, and neutrals — no green, orange, teal, purple, or yellow, including for success states, which speak in Directory Blue.",
-      "Don't centre a fixed-width card in empty space on desktop. See The No-Marooned-Card Rule.",
-      "Don't scale any element that contains text on hover. scale(1.01) re-rasterises the label at a fractional size and leaves it visibly soft for the whole interaction; lift instead.",
-      "Don't use transition: all, or any easing curve that overshoots (cubic-bezier(…, 1.275)), on a state a visitor triggers repeatedly.",
-      "Don't set labels in tracked-out uppercase, and don't introduce a sixth type size.",
-      "Don't run continuous or infinite animation. The in-scene waypoint marker is a solid disc with a white ring for exactly this reason."
-    ]
-  }
 }

@@ -172,42 +172,20 @@ if ($pdo instanceof PDO) {
             : report('ok', 'users.full_name is not unique, as intended');
     }
 
-    if (!in_array('guard_codes', $missing, true)) {
-        $columns = $pdo->query('SHOW COLUMNS FROM guard_codes')->fetchAll(PDO::FETCH_COLUMN);
-        $strays  = array_intersect(['student_name', 'student_id'], $columns);
-
-        empty($strays)
-            ? report('ok', 'guard_codes has no student_name/student_id, as intended')
-            : report('fail', 'guard_codes has stray NOT NULL columns: ' . implode(', ', $strays), 'The guard types nothing at issue time, so issue-code.php never fills these and every insert fails. Drop them.');
-
-        $counts = $pdo->query(
-            'SELECT COUNT(*) total,
-                    SUM(used = 1) redeemed,
-                    SUM(used = 0 AND expires_at > NOW()) active
-               FROM guard_codes'
-        )->fetch();
-
-        report('ok', sprintf(
-            'codes: %d total, %d redeemed, %d active',
-            $counts['total'],
-            (int) $counts['redeemed'],
-            (int) $counts['active']
-        ));
-
+    if (!in_array('users', $missing, true)) {
         $users = $pdo->query('SELECT COUNT(*) c, SUM(email_verified = 1) v FROM users')->fetch();
         report('ok', sprintf('students: %d registered, %d verified', $users['c'], (int) $users['v']));
     }
 
     /*
-      Migration 003 added four columns as well as three tables, and the columns
+      Migration 003 added columns to users as well as three tables, and the columns
       come last in the file. MySQL DDL is not transactional, so a run that died
       partway leaves the tables behind without them — and a check that only
       counts tables would call that database healthy right up until the admin
       panel or the login path hit an "Unknown column" error.
     */
     $expectedColumns = [
-        'users'       => ['deactivated_at', 'last_login_at'],
-        'guard_codes' => ['revoked_at', 'issued_by'],
+        'users' => ['deactivated_at', 'last_login_at'],
     ];
 
     foreach ($expectedColumns as $table => $needed) {

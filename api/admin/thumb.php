@@ -59,6 +59,20 @@ if (!is_file($source)) {
 
 $cache = THUMB_DIR . '/' . $requested . '.webp';
 
+/*
+  Shrinking needs PHP's GD extension with WebP support, which XAMPP ships
+  turned off (;extension=gd in php.ini). Rather than showing a broken picture
+  in the staff panel, serve the real photo: heavier, but the screen works.
+  Turning GD on restores the small previews with no other change.
+*/
+if (!function_exists('imagecreatefromwebp')) {
+    header('Content-Type: image/webp');
+    header('Content-Length: ' . filesize($source));
+    header('Cache-Control: private, max-age=86400');
+    readfile($source);
+    exit;
+}
+
 // Rebuild when the photo is newer than its thumbnail, so replacing a panorama
 // does not leave a stale preview behind.
 if (!is_file($cache) || filemtime($cache) < filemtime($source)) {

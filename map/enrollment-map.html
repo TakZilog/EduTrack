@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack - Enrollment map</title>
+<meta name="description" content="Find any room in the ACLC College Mandaue Admin Building. EduTrack walks you there from the gate through real photos of the building. No account needed.">
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<style>
+  /* Public: enrolling visitors need no account. The image is a placeholder
+     until the real enrollment map is supplied (assets/img/enrollment-map.webp). */
+  .map-figure { margin: var(--s5) 0 0; }
+  .map-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--blue); border-radius: var(--r-panel); background: var(--surface); }
+  .map-figure figcaption { margin-top: var(--s2); color: var(--text-muted); font-size: var(--fs-sm); }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the map</a>
+  <header class="brand">
+    <a class="brand-link" href="../index.html" aria-label="EduTrack home">
+      <img class="brand-seal" src="../assets/img/aclc-logo.jpg" width="56" height="56" alt="">
+      <span class="brand-text">
+        <span class="brand-mark">EduTrack</span>
+        <span class="brand-sub">ACLC College, Mandaue Campus</span>
+      </span>
+    </a>
+  </header>
+  <main class="page fade-in" id="main">
+    <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Home</a>
+    <h1 class="page-title">Enrollment map</h1>
+    <p class="page-lede">Where to go on enrollment day, starting from the main gate. No account needed.</p>
+    <figure class="map-figure">
+      <img src="../assets/img/enrollment-map.webp" alt="Enrollment map of the Admin Building (placeholder image)" width="1600" height="800">
+      <figcaption>Placeholder image. The final enrollment map will replace it.</figcaption>
+    </figure>
+  </main>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=660438df-a7e3-451b-af21-d4b5f09e7eb9"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

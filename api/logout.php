@@ -1,10 +1,9 @@
 <?php
 /**
- * Ends the current session for whoever holds it, student or guard.
+ * Ends the current session for whoever holds it.
  *
- * This matters most at the guard desk: that machine is shared and sits in a
- * public corridor, and without this endpoint a session there stayed valid
- * until PHP expired it, leaving anyone who walked up able to issue codes.
+ * Without this a session stayed valid until PHP expired it, which on a shared
+ * machine left the next person signed in as the last one.
  */
 
 declare(strict_types=1);

@@ -12,8 +12,6 @@ web
 - **Registered student** — has a verified account (email + 6-digit OTP), gets full walkthrough access beyond the guest map.
 - **Staff / registrar (prototype)** — a staff panel exists at `admin/*` as scaffolding. It is **not** considered shipped. Seven pages and a dedicated stylesheet are present; treat them as a prototype, not a contract. Scope and permissions remain undecided, and whether faculty is distinct from registrar is undecided. Do not invent a permission model.
 
-A **Guard** role previously existed — an in-person desk that issued one-time registration codes. It has been removed from the product. Do not reinstate it, do not recreate `Guard/*`, `guard_codes`, a `guard_login` scope, or an issue-code flow, and do not treat surviving references to it as a feature to restore.
-
 ## Product Purpose
 
 EduTrack helps people physically navigate a campus building they don't already know, by walking them room-to-room through real 360° photos along a computed path, rather than making them read a static floor map. Success is a visitor or student reaching the correct room without needing to ask staff for directions.
@@ -35,7 +33,6 @@ The mechanism a static campus map or directory can't copy: a real photographic w
 - OTP codes are session-based (`$_SESSION['otp']`), not a DB table — accepted tradeoff, not a gap to silently fix.
 - Staff panel scope and permissions: undecided (see Users).
 - Multi-building/multi-campus expansion: direction confirmed, timeline and design not yet started.
-- **Known dead files left by the Guard removal**, confirmed as leftovers rather than features. They are not in use and should be removed when someone is working in those directories: `admin/codes.html`, `api/guard-login.php`, and stale comments in `api/register.php` that refer to "the guard" and to guessing registration codes. The six-digit `code` in `api/register.php` is the email OTP, not a registration code.
 
 ## Brand Commitments
 

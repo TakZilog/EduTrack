@@ -38,8 +38,8 @@ $stmt->execute($params);
 $total = (int) $stmt->fetch()['n'];
 
 $stmt = get_db()->prepare(
-    "SELECT id, full_name, email, email_verified, deactivated_at,
-            registered_with_code, created_at, last_login_at
+    "SELECT id, full_name, email, student_no, study_load_no, email_verified,
+            deactivated_at, created_at, last_login_at
        FROM users{$clause}
       ORDER BY {$sort['column']} {$sort['direction']}
       LIMIT {$page['perPage']} OFFSET {$page['offset']}"
@@ -51,9 +51,12 @@ $rows = array_map(static function (array $r): array {
         'id'         => (int) $r['id'],
         'fullName'   => $r['full_name'],
         'email'      => $r['email'],
+        // Accounts made before migration 006 have neither; the panel shows
+        // "Not on file" so staff can see who still needs to add them.
+        'studentNo'   => $r['student_no'],
+        'studyLoadNo' => $r['study_load_no'],
         'status'     => $r['deactivated_at'] !== null ? 'off'
                         : ((int) $r['email_verified'] === 1 ? 'verified' : 'pending'),
-        'code'       => $r['registered_with_code'],
         'createdAt'  => $r['created_at'],
         'lastLogin'  => $r['last_login_at'],
     ];

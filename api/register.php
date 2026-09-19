@@ -34,8 +34,18 @@ if (strlen($password) < 8) {
     json_fail(400, 'Passwords need at least 8 characters.');
 }
 
-// Guessing registration codes is the way into an account without visiting the
-// guard, so wrong codes are counted per address.
+// Enrolment details. Formats vary by intake, so this accepts letters, digits
+// and dashes; checking them against the registrar's records is left to staff.
+$studentNo   = strtoupper(trim((string) ($input['studentNo'] ?? '')));
+$studyLoadNo = strtoupper(trim((string) ($input['studyLoadNo'] ?? '')));
+if (!preg_match('/^[A-Z0-9-]{4,20}$/', $studentNo)) {
+    json_fail(400, 'Enter your student ID number exactly as it appears on your school ID.');
+}
+if (!preg_match('/^[A-Z0-9-]{3,30}$/', $studyLoadNo)) {
+    json_fail(400, 'Enter the number printed on your study load.');
+}
+
+// Registration is throttled per address so one machine cannot mass-create accounts.
 $ip = client_ip();
 rate_limit_check($ip, 'register', 10, 15, 'Too many registration attempts. Wait %d minutes and try again.');
 
@@ -56,17 +66,24 @@ try {
         json_fail(400, 'That email is already registered. Log in instead.');
     }
 
+    // One account per enrolled student.
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE student_no = ?');
+    $stmt->execute([$studentNo]);
+    if ($stmt->fetch()) {
+        $pdo->rollBack();
+        json_fail(400, 'That student ID number already has an account. Log in instead.');
+    }
+
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('INSERT INTO users (full_name, email, password_hash, email_verified) VALUES (?, ?, ?, 0)');
-    $stmt->execute([$fullName, $email, $passwordHash]);
+    $stmt = $pdo->prepare('INSERT INTO users (full_name, email, student_no, study_load_no, password_hash, email_verified) VALUES (?, ?, ?, ?, ?, 0)');
+    $stmt->execute([$fullName, $email, $studentNo, $studyLoadNo, $passwordHash]);
     $userId = (int) $pdo->lastInsertId();
 
 
     // The verification email is sent before the commit on purpose. Sending it
-    // afterwards meant a mail failure left the code spent and the student
-    // stranded with an account they could never verify, needing a second trip
-    // to the guard. Holding the row lock across the SMTP round trip costs a
-    // little concurrency, which at this volume is a trade worth making.
+    // afterwards meant a mail failure left the student stranded with an account
+    // they could never verify. Holding the transaction open across the SMTP
+    // round trip costs a little concurrency, which at this volume is worth it.
     send_otp_email($email, $code);
 
     $pdo->commit();

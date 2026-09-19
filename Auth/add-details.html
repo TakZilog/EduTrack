@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack - Log in</title>
-<meta name="description" content="Log in to your EduTrack student account at ACLC College Mandaue.">
+<title>EduTrack - Add your enrolment details</title>
+<meta name="description" content="Add your student ID number and study load number to open the EduTrack room tour.">
 <meta name="theme-color" content="#0044d6">
 <link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,24 +28,22 @@
   <main class="page auth fade-in" id="main">
     <div class="auth-form">
       <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Home</a>
-      <h1 class="page-title">Log in</h1>
-      <p class="page-lede">Use the email and password you registered with.</p>
+      <h1 class="page-title">One more step</h1>
+      <p class="page-lede">The room tour is for enrolled students. Your account was made before we asked for these, so add them once and you're in.</p>
 
       <div id="alertBox" class="alert" role="alert"></div>
 
-      <form id="loginForm" class="form" novalidate>
-        <label for="email">Email</label>
-        <input type="email" id="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
-        <div class="field-error" id="err-email">Enter the email you registered with.</div>
+      <form id="detailsForm" class="form" novalidate>
+        <label for="studentNo">Student ID number</label>
+        <input type="text" id="studentNo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" placeholder="As printed on your school ID">
+        <div class="field-error" id="err-studentNo">Enter your student ID number.</div>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" autocomplete="current-password" placeholder="Your password">
-        <div class="field-error" id="err-password">Enter your password.</div>
+        <label for="studyLoadNo">Study load number</label>
+        <input type="text" id="studyLoadNo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" placeholder="As printed on your study load">
+        <div class="field-error" id="err-studyLoadNo">Enter your study load number.</div>
 
-        <button type="submit" class="btn" id="submitBtn">Log in</button>
+        <button type="submit" class="btn" id="submitBtn">Open the room tour</button>
       </form>
-
-      <p class="form-footer">No account yet? <a href="register.html">Create one</a></p>
     </div>
 
     <aside class="auth-aside" aria-labelledby="asideTitle">
@@ -57,28 +55,33 @@
 
 <script src="auth.js"></script>
 <script>
-  document.getElementById('loginForm').addEventListener('submit', function (e) {
+  /* Where to go once the numbers are saved. Only the two tour pages are
+     accepted, so ?next= cannot be used to bounce someone off the site. */
+  function nextPage() {
+    const next = new URLSearchParams(window.location.search).get('next') || '';
+    return /^(select-room|walkthrough)\.html(\?[^#]*)?$/.test(next) ? '../map/' + next : '../map/select-room.html';
+  }
+
+  document.getElementById('detailsForm').addEventListener('submit', function (e) {
     e.preventDefault();
     clearErrors();
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const studentNo = document.getElementById('studentNo').value.trim();
+    const studyLoadNo = document.getElementById('studyLoadNo').value.trim();
 
     let valid = true;
-    if (!email) { showError('email'); valid = false; }
-    if (!password) { showError('password'); valid = false; }
+    if (!/^[A-Za-z0-9-]{4,20}$/.test(studentNo)) { showError('studentNo'); valid = false; }
+    if (!/^[A-Za-z0-9-]{3,30}$/.test(studyLoadNo)) { showError('studyLoadNo'); valid = false; }
     if (!valid) return;
 
     setSubmitting(true);
-    apiPost('login.php', { email, password })
-      .then(({ data }) => {
+    apiPost('enrolment-details.php', { studentNo, studyLoadNo })
+      .then(({ status, data }) => {
+        // 409: already on file, so the tour is open anyway.
+        if (data.ok || status === 409) { window.location.href = nextPage(); return; }
+        if (data.code === 'tour_locked') { window.location.href = 'login.html?next=tour'; return; }
         setSubmitting(false);
-        if (!data.ok) {
-          showAlert(data.error || 'Login failed.', 'error');
-          return;
-        }
-        // Older accounts have no enrolment numbers; the tour would refuse them.
-        window.location.href = data.needsDetails ? 'add-details.html' : '../map/select-room.html';
+        showAlert(data.error || 'Could not save your details.', 'error');
       })
       .catch(() => {
         setSubmitting(false);
@@ -89,7 +92,7 @@
   function setSubmitting(state) {
     const btn = document.getElementById('submitBtn');
     btn.disabled = state;
-    btn.textContent = state ? 'Logging in…' : 'Log in';
+    btn.textContent = state ? 'Saving…' : 'Open the room tour';
   }
 </script>
 <!-- impeccable-live-start -->

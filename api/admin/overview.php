@@ -18,15 +18,6 @@ $students = $pdo->query(
      FROM users'
 )->fetch();
 
-$codes = $pdo->query(
-    'SELECT
-        SUM(used = 0 AND revoked_at IS NULL AND expires_at > NOW())  AS active,
-        SUM(used = 1)                                                AS redeemed,
-        SUM(used = 1 AND used_at > DATE_SUB(NOW(), INTERVAL 7 DAY))  AS redeemed_week,
-        SUM(used = 0 AND revoked_at IS NULL AND expires_at <= NOW()) AS expired_unused
-     FROM guard_codes'
-)->fetch();
-
 $graph    = load_graph();
 $problems = graph_health($graph);
 
@@ -46,12 +37,6 @@ json_ok([
         'verified'   => (int) $students['verified'],
         'pending'    => (int) $students['pending'],
         'turnedOff'  => (int) $students['turned_off'],
-    ],
-    'codes' => [
-        'active'        => (int) $codes['active'],
-        'redeemed'      => (int) $codes['redeemed'],
-        'redeemedWeek'  => (int) $codes['redeemed_week'],
-        'expiredUnused' => (int) $codes['expired_unused'],
     ],
     'rooms' => [
         'total'    => count($graph['rooms']),

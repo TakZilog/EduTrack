@@ -3,48 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack Staff Panel — Overview</title>
+<title>EduTrack Staff Panel - Overview</title>
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/admin.css?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<link rel="stylesheet" href="../assets/css/admin.css?v=5">
+<meta name="robots" content="noindex">
 </head>
 <body>
+<!--
+  THESIS: the staff panel is the same building directory as the student site,
+  seen from behind the counter. It refuses the dark dashboard with its own
+  palette: one product, one blue, one crest.
+  OWN-WORLD: white plates on the blue-grey wall, 1px borders, 6px corners,
+  Barlow Condensed headings over Barlow text, floor numerals beside each
+  section in the rail, red only for a real problem.
+  STORY: a member of staff signs in, sees what changed, opens a student or a
+  room, and acts on it without losing the list.
+  FIRST VIEWPORT: numbered rail on the left with the crest above it; the page
+  title and one line of plain English; four counts that are links; below them
+  the map's health and the latest activity.
+  FORM: desk and drawer, index 4 of the seven structures listed; seed 40a3bc34.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the
+  finish review, the verdict, DESIGN.md, and every shipping raster carrying
+  its provenance.
+-->
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
-  <aside class="rail" id="rail">
-    <div class="rail-head">
-      <div class="wordmark">EduTrack</div>
-      <div class="sub">Staff panel</div>
+  <aside class="rail" id="rail"></aside>
+
+  <main class="work" id="main">
+    <div class="work-head">
+      <h1>Overview</h1>
+      <p class="work-lede" id="greeting">Everything at a glance.</p>
     </div>
-  </aside>
 
-  <main class="main">
-    <div class="page">
-      <div class="page-head">
-        <div>
-          <h1>Overview</h1>
-          <p class="lede" id="greeting">Everything at a glance.</p>
-        </div>
-      </div>
-
-      <h2 class="sr-only">Students and codes</h2>
-      <div class="cards" id="cards"></div>
+    <div class="work-body">
+      <h2 class="sr-only">Students and rooms</h2>
+      <div class="counts" id="counts"></div>
 
       <section class="panel">
-        <h2>Campus map</h2>
-        <div id="problems"></div>
+        <div class="panel-head"><h2>The campus map</h2></div>
+        <div class="panel-body" id="problems"></div>
       </section>
 
       <section class="panel" id="activityPanel" hidden>
-        <h2>Recent activity</h2>
-        <div id="recent"></div>
+        <div class="panel-head">
+          <h2>Recent activity</h2>
+          <a class="btn btn-quiet btn-small" href="activity.html">See all activity</a>
+        </div>
+        <ul class="rows" id="recent"></ul>
       </section>
     </div>
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js"></script>
+<script src="../assets/js/admin/admin.js?v=5"></script>
 <script>
 (async function () {
   const s = await boot();
@@ -61,27 +79,25 @@
 
   /* Each figure links to the list it summarises, with the filter already
      applied, so a number is something you can act on rather than just read. */
-  const cards = [
-    { n: data.students.verified,  l: 'Students who can sign in', href: 'students.html?status=verified', tone: 'good' },
-    { n: data.students.pending,   l: 'Waiting to verify email',  href: 'students.html?status=pending',  tone: data.students.pending > 0 ? 'warn' : '' },
-    { n: data.codes.active,       l: 'Codes ready to use',       href: 'codes.html?status=active',      tone: '' },
-    { n: data.codes.redeemedWeek, l: 'Codes used this week',     href: 'codes.html?status=redeemed',    tone: '' },
-    { n: data.rooms.total,        l: 'Rooms on the map',         href: 'rooms.html',                    tone: '' },
-    { n: data.rooms.problems,     l: 'Map problems found',       href: 'rooms.html',                    tone: data.rooms.problems > 0 ? 'bad' : 'good' }
+  const counts = [
+    { n: data.students.verified, l: 'Students who can sign in', href: 'students.html?status=verified', tone: '' },
+    { n: data.students.pending,  l: 'Waiting to verify email',  href: 'students.html?status=pending',  tone: '' },
+    { n: data.rooms.total,       l: 'Rooms on the map',         href: 'rooms.html',                    tone: 'is-quiet' },
+    { n: data.rooms.problems,    l: 'Map problems found',       href: 'rooms.html',                    tone: data.rooms.problems > 0 ? 'is-bad' : 'is-quiet' }
   ];
 
-  const host = document.getElementById('cards');
-  cards.forEach(c => {
+  const host = document.getElementById('counts');
+  counts.forEach(c => {
     const a = document.createElement('a');
-    a.className = 'card';
+    a.className = 'count-card';
     a.href = c.href;
 
-    const n = document.createElement('div');
-    n.className = 'n' + (c.tone ? ' ' + c.tone : '');
+    const n = document.createElement('span');
+    n.className = 'count-n' + (c.tone ? ' ' + c.tone : '');
     n.textContent = c.n;
 
-    const l = document.createElement('div');
-    l.className = 'l';
+    const l = document.createElement('span');
+    l.className = 'count-l';
     l.textContent = c.l;
 
     a.append(n, l);
@@ -91,56 +107,59 @@
   /* Map problems */
   const problems = document.getElementById('problems');
   if (data.problems.length === 0) {
-    const ok = document.createElement('div');
-    ok.className = 'notice notice-good';
-    const box = document.createElement('div');
-    const t = document.createElement('p');
-    t.className = 't';
-    t.textContent = 'The map is healthy';
-    const d = document.createElement('p');
-    d.className = 'd';
-    d.textContent = 'Every room can be reached from the gate.';
-    box.append(t, d);
-    ok.appendChild(box);
-    problems.appendChild(ok);
+    problems.appendChild(notice('good', 'The map is healthy',
+      'Every room can be reached from the gate.'));
   } else {
     data.problems.forEach(p => {
-      const el = document.createElement('div');
-      el.className = 'notice notice-' + (p.severity === 'error' ? 'error' : 'warning');
-      const box = document.createElement('div');
-      const t = document.createElement('p');
-      t.className = 't';
-      t.textContent = p.title;
-      const d = document.createElement('p');
-      d.className = 'd';
-      d.textContent = p.detail;
-      box.append(t, d);
-      el.appendChild(box);
-      problems.appendChild(el);
+      problems.appendChild(notice(p.severity === 'error' ? 'error' : 'warning', p.title, p.detail));
     });
   }
 
-  /* Recent activity, only for roles that may read the log */
+  function notice(kind, title, detail) {
+    const el = document.createElement('div');
+    el.className = 'notice notice-' + kind;
+    const t = document.createElement('p');
+    t.className = 't';
+    t.textContent = title;
+    const d = document.createElement('p');
+    d.className = 'd';
+    d.textContent = detail;
+    el.append(t, d);
+    return el;
+  }
+
+  /* Recent activity, only for the roles that may read the log */
   if (data.recent && data.recent.length) {
     document.getElementById('activityPanel').hidden = false;
     const list = document.getElementById('recent');
-    const wrap = document.createElement('div');
-    wrap.className = 'table-wrap';
-    const table = document.createElement('table');
-    const tbody = document.createElement('tbody');
 
     data.recent.forEach(r => {
-      const tr = document.createElement('tr');
-      const when = cell(relativeTime(r.created_at));
-      when.className = 'sub';
-      when.style.whiteSpace = 'nowrap';
-      tr.append(cell(r.admin_name), when, cell(r.detail || r.action));
-      tbody.appendChild(tr);
-    });
+      const li = document.createElement('li');
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.style.cursor = 'default';
 
-    table.appendChild(tbody);
-    wrap.appendChild(table);
-    list.appendChild(wrap);
+      const main = document.createElement('div');
+      main.className = 'row-main';
+      const title = document.createElement('span');
+      title.className = 'row-title';
+      title.textContent = r.detail || r.action;
+      const sub = document.createElement('span');
+      sub.className = 'row-sub';
+      sub.textContent = r.admin_name;
+      main.append(title, sub);
+
+      const end = document.createElement('div');
+      end.className = 'row-end';
+      const when = document.createElement('span');
+      when.className = 'row-when';
+      when.textContent = relativeTime(r.created_at);
+      end.appendChild(when);
+
+      row.append(main, end);
+      li.appendChild(row);
+      list.appendChild(li);
+    });
   }
 })();
 </script>

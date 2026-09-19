@@ -1,0 +1,4 @@
+# The 360 photos and the building graph are for enrolled students only.
+# PHP still reads them from disk (api/tour.php, api/node-image.php, the
+# staff panel); only direct browser requests are refused.
+Require all denied

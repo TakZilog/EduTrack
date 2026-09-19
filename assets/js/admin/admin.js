@@ -4,6 +4,10 @@
   Loaded as a plain script (no bundler anywhere in this project). Every page
   calls boot() first, which confirms who is signed in, draws the menu, and
   hands back the session so the page can hide what the person cannot use.
+
+  The panel is built as a desk and a drawer: a list of records on the left,
+  the open one on the right. The helpers at the bottom of this file draw both,
+  so every page's list rows and record panels behave the same way.
 */
 
 const API = '../api/admin/';
@@ -68,10 +72,11 @@ function toSignIn() {
 
 /* ------------------------------------------------------------------ start */
 
+/* Numbered like the floors on the lobby directory, so the menu reads as one
+   list of places rather than five unrelated links. */
 const MENU = [
   { href: 'index.html',    label: 'Overview',  needs: 'student.view' },
   { href: 'students.html', label: 'Students',  needs: 'student.view' },
-  { href: 'codes.html',    label: 'Codes',     needs: 'code.view.redacted', or: 'code.view' },
   { href: 'rooms.html',    label: 'Rooms',     needs: 'room.view' },
   { href: 'activity.html', label: 'Activity',  needs: 'audit.view' },
   { href: 'settings.html', label: 'Settings',  needs: 'settings.manage' }
@@ -99,16 +104,50 @@ function drawRail() {
 
   const here = window.location.pathname.split('/').pop() || 'index.html';
 
+  const head = document.createElement('div');
+  head.className = 'rail-head';
+
+  const crest = document.createElement('a');
+  crest.className = 'rail-crest';
+  crest.href = 'index.html';
+
+  const seal = document.createElement('img');
+  seal.src = '../assets/img/aclc-logo.jpg';
+  seal.width = 44;
+  seal.height = 44;
+  seal.alt = '';
+
+  const words = document.createElement('span');
+  const mark = document.createElement('span');
+  mark.className = 'rail-mark';
+  mark.textContent = 'EduTrack';
+  const sub = document.createElement('span');
+  sub.className = 'rail-sub';
+  sub.textContent = 'Staff panel';
+  words.append(mark, sub);
+
+  crest.append(seal, words);
+  head.appendChild(crest);
+
   const nav = document.createElement('nav');
   nav.className = 'rail-nav';
   nav.setAttribute('aria-label', 'Sections');
 
-  MENU.filter(item => allowed(item.needs) || (item.or && allowed(item.or)))
-    .forEach(item => {
+  MENU.filter(item => allowed(item.needs))
+    .forEach((item, index) => {
       const a = document.createElement('a');
       a.className = 'nav-item';
       a.href = item.href;
-      a.textContent = item.label;
+
+      const num = document.createElement('span');
+      num.className = 'nav-num';
+      num.setAttribute('aria-hidden', 'true');
+      num.textContent = String(index + 1);
+
+      const label = document.createElement('span');
+      label.textContent = item.label;
+
+      a.append(num, label);
       if (item.href === here) a.setAttribute('aria-current', 'page');
       nav.appendChild(a);
     });
@@ -118,10 +157,10 @@ function drawRail() {
 
   const who = document.createElement('div');
   const name = document.createElement('div');
-  name.className = 'who';
+  name.className = 'rail-who';
   name.textContent = session.admin.fullName;
   const role = document.createElement('div');
-  role.className = 'role';
+  role.className = 'rail-role';
   role.textContent = session.admin.roleLabel;
   who.append(name, role);
 
@@ -129,11 +168,10 @@ function drawRail() {
   out.className = 'btn btn-quiet btn-small';
   out.type = 'button';
   out.textContent = 'Sign out';
-  out.style.marginTop = '14px';
   out.addEventListener('click', signOut);
 
   foot.append(who, out);
-  rail.append(nav, foot);
+  rail.append(head, nav, foot);
 }
 
 async function signOut() {
@@ -168,7 +206,8 @@ function toast(message, kind = 'good') {
 /* ----------------------------------------------------------------- dialog */
 
 /**
- * Asks before doing something that cannot be undone.
+ * Asks before doing something that cannot be undone. Routine work happens in
+ * the drawer; this is only for the questions that must interrupt.
  * When `typeToConfirm` is given, the person must type it exactly.
  */
 function confirmAction({ title, message, confirmLabel = 'Yes, do it', danger = false, typeToConfirm = null }) {
@@ -275,7 +314,7 @@ function relativeTime(value) {
   return formatDate(value);
 }
 
-/* ------------------------------------------------------------ table pieces */
+/* --------------------------------------------------------- desk + drawer */
 
 function pill(text, kind) {
   const span = document.createElement('span');
@@ -284,34 +323,149 @@ function pill(text, kind) {
   return span;
 }
 
-function cell(text, className) {
-  const td = document.createElement('td');
-  if (className) td.className = className;
-  td.textContent = text ?? '—';
-  return td;
+function button(label, kind, onClick) {
+  const b = document.createElement('button');
+  b.className = 'btn ' + kind;
+  b.type = 'button';
+  b.addEventListener('click', onClick);
+  b.textContent = label;
+  return b;
 }
 
-function showSkeleton(tbody, rows = 6, columns = 5) {
-  tbody.replaceChildren();
-  for (let i = 0; i < rows; i++) {
-    const tr = document.createElement('tr');
-    for (let c = 0; c < columns; c++) {
-      const td = document.createElement('td');
-      const bar = document.createElement('div');
-      bar.className = 'skeleton-bar';
-      bar.style.width = (40 + ((i * 13 + c * 27) % 45)) + '%';
-      td.appendChild(bar);
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
+/**
+ * One row on the desk. The whole row opens the record, so it is a button:
+ * a title, a quieter second line, and whatever belongs at the right edge
+ * (a status word, a date).
+ */
+function listRow({ title, sub, end = [], selected = false, onOpen }) {
+  const li = document.createElement('li');
+
+  const row = document.createElement('button');
+  row.className = 'row';
+  row.type = 'button';
+  if (selected) row.setAttribute('aria-current', 'true');
+
+  const main = document.createElement('div');
+  main.className = 'row-main';
+
+  const t = document.createElement('span');
+  t.className = 'row-title';
+  t.textContent = title;
+  main.appendChild(t);
+
+  if (sub) {
+    const s = document.createElement('span');
+    s.className = 'row-sub';
+    s.textContent = sub;
+    main.appendChild(s);
+  }
+
+  row.appendChild(main);
+
+  if (end.length) {
+    const tail = document.createElement('div');
+    tail.className = 'row-end';
+    end.forEach(node => tail.appendChild(node));
+    row.appendChild(tail);
+  }
+
+  row.addEventListener('click', () => onOpen(row));
+  li.appendChild(row);
+  return li;
+}
+
+/** Marks the row that is open, so the list shows where the drawer came from. */
+function markOpenRow(list, row) {
+  list.querySelectorAll('.row[aria-current]').forEach(r => r.removeAttribute('aria-current'));
+  if (row) row.setAttribute('aria-current', 'true');
+}
+
+/** A short list of facts inside the drawer: label on the left, value right. */
+function facts(pairs) {
+  const dl = document.createElement('dl');
+  dl.className = 'facts';
+  pairs.forEach(([label, value]) => {
+    if (value === null || value === undefined) return;
+    const wrap = document.createElement('div');
+    const dt = document.createElement('dt');
+    dt.textContent = label;
+    const dd = document.createElement('dd');
+    if (value instanceof Node) dd.appendChild(value);
+    else dd.textContent = value === '' ? '—' : value;
+    wrap.append(dt, dd);
+    dl.appendChild(wrap);
+  });
+  return dl;
+}
+
+/**
+ * Fills the drawer: a heading, a quieter line under it, the facts, then the
+ * buttons. Called with nothing, it shows the "pick one" hint instead.
+ */
+function drawDrawer(host, record) {
+  host.replaceChildren();
+
+  if (!record) {
+    const hint = document.createElement('div');
+    hint.className = 'drawer-hint';
+    const strong = document.createElement('strong');
+    strong.textContent = host.dataset.emptyTitle || 'Nothing open';
+    const p = document.createElement('p');
+    p.style.margin = '0';
+    p.textContent = host.dataset.emptyText || 'Choose one from the list to see it here.';
+    hint.append(strong, p);
+    host.appendChild(hint);
+    return;
+  }
+
+  const head = document.createElement('div');
+  head.className = 'drawer-head';
+  const h = document.createElement('h2');
+  h.textContent = record.title;
+  head.appendChild(h);
+  if (record.sub) {
+    const s = document.createElement('p');
+    s.className = 'drawer-sub';
+    s.textContent = record.sub;
+    head.appendChild(s);
+  }
+  host.appendChild(head);
+
+  if (record.body) {
+    const body = document.createElement('div');
+    body.className = 'drawer-body';
+    (Array.isArray(record.body) ? record.body : [record.body]).forEach(node => body.appendChild(node));
+    host.appendChild(body);
+  }
+
+  if (record.actions && record.actions.length) {
+    const foot = document.createElement('div');
+    foot.className = 'drawer-foot';
+    record.actions.forEach(node => foot.appendChild(node));
+    host.appendChild(foot);
   }
 }
 
-function showEmpty(tbody, columns, title, detail, actionLabel, onAction) {
-  tbody.replaceChildren();
-  const tr = document.createElement('tr');
-  const td = document.createElement('td');
-  td.colSpan = columns;
+/* Loading rows, so the list has a shape before the answer arrives. */
+function showSkeleton(list, rows = 6) {
+  list.replaceChildren();
+  for (let i = 0; i < rows; i++) {
+    const li = document.createElement('li');
+    li.className = 'skeleton';
+    li.setAttribute('aria-hidden', 'true');
+    const wide = document.createElement('div');
+    wide.className = 'skeleton-bar';
+    wide.style.width = (45 + ((i * 17) % 35)) + '%';
+    const narrow = document.createElement('div');
+    narrow.className = 'skeleton-bar';
+    li.append(wide, narrow);
+    list.appendChild(li);
+  }
+}
+
+function showEmpty(list, title, detail, actionLabel, onAction) {
+  list.replaceChildren();
+  const li = document.createElement('li');
 
   const box = document.createElement('div');
   box.className = 'empty';
@@ -322,23 +476,18 @@ function showEmpty(tbody, columns, title, detail, actionLabel, onAction) {
   box.append(h, p);
 
   if (actionLabel && onAction) {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-quiet';
-    btn.type = 'button';
-    btn.textContent = actionLabel;
-    btn.addEventListener('click', onAction);
-    box.appendChild(btn);
+    box.appendChild(button(actionLabel, 'btn-quiet', onAction));
   }
 
-  td.appendChild(box);
-  tr.appendChild(td);
-  tbody.appendChild(tr);
+  li.appendChild(box);
+  list.appendChild(li);
 }
 
-/** Draws "Showing 1 to 25 of 138" plus previous/next. */
+/** Draws "Showing 1 to 25 of 138" plus previous and next. */
 function drawPager(host, result, onPage) {
   host.replaceChildren();
-  if (!result || result.total === 0) return;
+  host.hidden = !result || result.total === 0;
+  if (host.hidden) return;
 
   const from = (result.page - 1) * result.per_page + 1;
   const to = Math.min(result.total, result.page * result.per_page);

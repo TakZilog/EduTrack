@@ -1,7 +1,6 @@
 /*
   EduTrack — shared auth form helpers
-  Used by Auth/login.html, Auth/register.html, Auth/verify-otp.html,
-  Guard/login.html and Guard/issue-code.html.
+  Used by Auth/login.html, Auth/register.html and Auth/verify-otp.html.
 
   All POSTs go through apiPost(), which attaches the CSRF token the server
   requires on every state-changing request. Calling fetch() directly will be

@@ -28,7 +28,7 @@ function app_session_start(): void
     session_start();
 
     // Idle timeout. Anything older than the window starts over with a fresh id,
-    // which matters most for the guard desk machine, which is shared and public.
+    // which matters most on shared machines.
     $now = time();
     if (isset($_SESSION['last_activity']) && ($now - $_SESSION['last_activity']) > SESSION_IDLE_TIMEOUT) {
         $_SESSION = [];

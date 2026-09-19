@@ -31,17 +31,11 @@ PHPMailer.
 `sql/migrations/` apply the same changes to an existing install.
 
 - **users** — `full_name` (not unique), `email` (unique, the login identifier),
-  `password_hash`, `registered_with_code`, `email_verified`, `deactivated_at`,
-  `last_login_at`, `created_at`
-- **guard_codes** — `code`, `used`, `used_by_user_id`, `revoked_at`,
-  `issued_by`, timestamps. **No `student_name` or `student_id` columns.** An
-  earlier note claimed these existed and were `NOT NULL`; the live tablespace
-  was read directly and they do not, and never did. The guard types nothing
-  when issuing a code: the link to a person is made at redemption through
-  `used_by_user_id`.
-- **admins** — separate from `users` on purpose. Student accounts sit behind a
-  guard-issued code, and putting admin rights on that table would mean a
-  privilege bug could mint an admin through the enrolment path.
+  `password_hash`, `email_verified`, `deactivated_at`, `last_login_at`,
+  `created_at`
+- **admins** — separate from `users` on purpose. Anyone can register a student
+  account, so putting admin rights on that table would mean a privilege bug
+  could mint an admin through the enrolment path.
 - **admin_audit** — append-only. Nothing in the application updates or deletes it.
 - **app_settings** — operational values only, never credentials.
 - **login_attempts** — throttling for every sign-in path.
@@ -51,13 +45,10 @@ tradeoff, not a gap.
 
 ## Accounts
 
-- Student: registers with a guard code, then verifies by email. Logs in with
-  **email**, not a username. Full names are not unique, so they cannot be the
-  identifier.
-- Guard: one shared passphrase in `api/config.php`. No individual accounts, so
-  the log cannot tell two guards apart.
+- Student: registers, then verifies by email. Logs in with **email**, not a
+  username. Full names are not unique, so they cannot be the identifier.
 - Admin: three roles. `super_admin` (everything), `admin` (day to day),
-  `faculty` (view only, codes redacted). Created with
+  `faculty` (view only). Created with
   `php tools/create-admin.php`.
 
 ## The campus map
@@ -99,8 +90,6 @@ room list is authoritative; the id is a better fallback than the label.
   `tools/create-admin.php` on the server.
 - **Adding a room is command line only.** Replacing a single photo works in the
   panel; adding a room needs the image matching, which lives in Python.
-- Guard codes are stored in plain text. Short-lived and single-use; an accepted
-  tradeoff.
 
 ## Safety nets
 

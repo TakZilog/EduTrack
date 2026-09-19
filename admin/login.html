@@ -3,46 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack Staff Panel — Sign in</title>
+<title>EduTrack Staff Panel - Sign in</title>
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/admin.css?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<link rel="stylesheet" href="../assets/css/admin.css?v=5">
+<meta name="robots" content="noindex">
 </head>
 <body>
 
-<div class="signin-wrap">
-  <div class="signin">
-    <h1 class="wordmark">EduTrack</h1>
-    <p class="sub">Staff panel</p>
+  <main class="signin-wrap">
+    <div class="signin">
+      <div class="signin-crest">
+        <img src="../assets/img/aclc-logo.jpg" width="56" height="56" alt="">
+        <span>
+          <span class="m">EduTrack</span>
+          <span class="s">Staff panel</span>
+        </span>
+      </div>
 
-    <!-- The heading is set from the server's answer rather than being fixed
-         text, so a lock-out reads as a lock-out instead of a wrong password. -->
-    <div id="alert" class="notice notice-error" hidden>
-      <div><p class="t" id="alertTitle">Could not sign in</p><p class="d" id="alertText"></p></div>
+      <h1>Sign in</h1>
+      <p class="lede">For campus staff. Students sign in on the main site.</p>
+
+      <!-- The heading is set from the server's answer rather than being fixed
+           text, so a lock-out reads as a lock-out instead of a wrong password. -->
+      <div id="alert" class="notice notice-error" hidden>
+        <p class="t" id="alertTitle">Could not sign in</p>
+        <p class="d" id="alertText"></p>
+      </div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" autocomplete="username" autocapitalize="none" spellcheck="false">
+          <p class="field-error" id="err-username">Enter your username.</p>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password">
+          <p class="field-error" id="err-password">Enter your password.</p>
+        </div>
+        <button type="submit" class="btn" id="submit">Sign in</button>
+      </form>
+
+      <p class="signin-foot">
+        Staff accounts are created by a full-access admin. If you do not have one, ask them to add you.
+      </p>
     </div>
-
-    <form id="form" novalidate>
-      <div class="field">
-        <label for="username">Username</label>
-        <input type="text" id="username" autocomplete="username" autocapitalize="none" spellcheck="false">
-        <p class="field-error" id="err-username">Enter your username.</p>
-      </div>
-
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" autocomplete="current-password">
-        <p class="field-error" id="err-password">Enter your password.</p>
-      </div>
-
-      <button type="submit" class="btn" id="submit" style="width:100%">Sign in</button>
-    </form>
-
-    <p class="field-hint" style="margin-top:24px">
-      Staff accounts are created by a full-access admin. If you do not have one, ask them to add you.
-    </p>
-  </div>
-</div>
+  </main>
 
 <script>
   const form = document.getElementById('form');

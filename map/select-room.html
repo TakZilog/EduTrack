@@ -1,368 +1,550 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduTrack — Where do you want to go?</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack - Choose a room</title>
 <meta name="description" content="Search any room in the ACLC College Mandaue Admin Building and start the walkthrough from the gate.">
-<meta name="theme-color" content="#0033a0">
+<meta name="theme-color" content="#0044d6">
 <link rel="icon" href="../assets/img/aclc-logo.jpg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <style>
-    /*
-      The room list is the only scrolling region on this screen. With 41 rooms
-      that matters twice over: the search field stays put instead of scrolling
-      away, and the session footer — a guest's only way back, a student's only
-      way out — stays reachable without travelling to the bottom of the list.
-    */
-    .picker {
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      padding: var(--s4);
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<style>
+  /*
+    An app shell: the page never scrolls, the room list is the one scroller.
+    With 41 rooms that keeps the search field and the session footer in reach
+    at all times. The floor rail is the lift panel beside it: press a floor,
+    the list goes there, and the rail shows which floor you are looking at.
+  */
+  /* Full-height app shell: nothing scrolls at page level, so no gutter. */
+  html { scrollbar-gutter: auto; }
+  html, body { height: 100%; }
+  body { display: flex; flex-direction: column; overflow: hidden; }
 
-    /* Use the same padding-left as .surface for the overlap, but keep other paddings comfortable */
-    @media (min-width: 900px) {
-      .picker { 
-        padding: clamp(24px, 4vw, 48px); 
-        padding-left: clamp(40px, 6vw, 80px); /* Restore the overlap padding */
-      }
-    }
+  .picker {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: var(--s5) clamp(16px, 4vw, 40px);
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: var(--s4);
+  }
 
-    /* Matches .picker-body's measure so the heading aligns to the list's left
-       edge instead of shrink-wrapping and centring inside the surface. */
-    .picker-head {
-      flex-shrink: 0;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: var(--s4);
-    }
+  /* The crest sits on the page, not in a bar, the same as home, login and
+     register. It must not shrink when the list below needs the room. */
+  .brand { flex-shrink: 0; width: 100%; }
 
-    .picker h1 {
-      margin: 0 0 var(--s2);
-      font-size: var(--fs-h1);
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: -.02em;
-    }
+  /* Head set like the home page: centred, with the seal's two inks under
+     the title. */
+  .picker-head { text-align: center; }
+  .picker-head .page-title::after {
+    content: "";
+    display: block;
+    width: 28px; height: 4px;
+    margin: var(--s3) auto 0;
+    background: var(--blue);
+    box-shadow: 28px 0 0 var(--red);
+    transform: translateX(-14px);
+  }
+  /* Red for what red means here: the point every route begins. */
+  .gate-note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    margin: var(--s3) 0 0;
+    color: var(--red-deep);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .gate-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--red); }
 
-    .picker p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: var(--fs-sm);
-    }
+  /* On a short screen every pixel above the list is a room not shown. The
+     crest keeps its size (it must not move between pages); the head tightens. */
+  @media (max-height: 820px) {
+    .picker { padding-top: var(--s3); gap: var(--s3); }
+    .picker-head .page-title::after { margin-top: var(--s2); }
+    .gate-note { margin-top: var(--s2); }
+  }
 
-    .picker-body {
-      flex: 1;
-      min-height: 0;          /* lets the list scroll instead of the shell growing */
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid #edf2f7;
-      border-radius: 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-    }
+  .search { position: relative; }
+  .search svg {
+    position: absolute;
+    left: var(--s4);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; height: 20px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  #roomSearch { padding-left: 48px; }
+  #roomSearch::-webkit-search-cancel-button { -webkit-appearance: none; }
 
-    .search-wrap {
-      position: relative;
-      flex-shrink: 0;
-      padding: var(--s4);
-      border-bottom: 1px solid #edf2f7;
-    }
+  .picker-body {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--s3);
+  }
 
-    .search-wrap svg {
-      position: absolute;
-      left: 28px;             /* 16px wrap padding + 12px input padding */
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px; height: 18px;
-      color: var(--text-muted);
-      pointer-events: none;
-    }
+  @media (min-width: 900px) {
+    .picker { gap: var(--s5); }
+    .picker-body { grid-template-rows: none; grid-template-columns: 220px 1fr; gap: var(--s6); }
+  }
 
-    #roomSearch {
-      padding-left: 40px;     /* clears the glyph above */
-      margin: 0;
-    }
+  /* ------------------------------------------------------------- floor rail */
 
-    #roomList {
-      flex: 1;
-      min-height: 0;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-    }
+  .rail {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 
-    /*
-      Two lines, not two columns. The real data pairs names up to 24 characters
-      ("COMFORT ROOM (2nd floor)") with floor strings of the same length
-      ("1ST FLOOR ADMIN BUILDING"); side by side they cannot both fit a 360px
-      row. Stacked, the bold name carries the scan and the floor recedes.
-      The markup is untouched — this restyles what renderList() already emits.
-    */
-    #roomList li {
-      display: block;
-      padding: var(--s3) var(--s4);
-      min-height: 44px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      font-size: var(--fs-body);
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .12s var(--ease);
-    }
+  @media (min-width: 900px) {
+    .rail { grid-template-columns: none; align-content: start; }
+  }
 
-    #roomList li:last-child { border-bottom: none; }
+  .rail a {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    min-height: 48px;
+    padding: var(--s2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-chip);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color .15s var(--ease), border-color .15s var(--ease);
+  }
 
-    #roomList li .floor-tag {
-      display: block;
-      margin-top: var(--s1);
-      color: var(--text-muted);
-      font-size: var(--fs-sm);
-      font-weight: 400;
-    }
+  .rail-name { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; line-height: 1.1; }
 
-    @media (hover: hover) and (pointer: fine) {
-      #roomList li:hover { background: var(--bg); }
-    }
+  /* The same numeral size as the floor rows on the home page. */
+  @media (min-width: 900px) {
+    .rail .floor-num { width: 40px; height: 40px; font-size: var(--fs-h2); }
+  }
+  .rail-count { display: block; color: var(--text-muted); font-size: var(--fs-sm); font-weight: 500; }
 
-    #roomList li:active { background: var(--bg); }
+  @media (max-width: 899px) {
+    .rail a { justify-content: center; gap: var(--s2); padding: var(--s2) var(--s1); }
+    .rail-name { font-size: var(--fs-sm); white-space: nowrap; }
+    .rail .floor-num { width: 32px; height: 32px; font-size: var(--fs-h3); }
+    .rail-count { display: none; }
+  }
 
-    /* ------------------------------------------------------------- session */
+  @media (min-width: 900px) { .rail a { padding: var(--s3); } }
 
-    .session {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--s3);
-      padding: var(--s4);
-      background: var(--surface);
-      border-top: 1px solid #edf2f7;
-      position: relative;
-      z-index: 10;
-    }
+  @media (hover: hover) and (pointer: fine) {
+    .rail a:hover { border-color: var(--blue); }
+  }
 
-    /* Hidden until api/whoami.php answers: this page serves both signed-in
-       students and guests, and showing the wrong control first would be worse
-       than showing none. */
-    .session[hidden] { display: none; }
+  .rail a[aria-current="true"] { background: var(--blue-wash); border-color: var(--blue); color: var(--blue); }
+  .rail a[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+  .rail a[aria-disabled="true"] .floor-num { background: var(--border-control); }
 
-    .session-who {
-      min-width: 0;
-      color: var(--text-muted);
-      font-size: var(--fs-sm);
-      line-height: 1.3;
-    }
+  /* ------------------------------------------------------------------ panel */
 
-    .session-who strong {
-      display: block;
-      color: var(--text);
-      font-weight: 600;
-      overflow-wrap: anywhere;   /* a long name wraps rather than shoving the control off the card */
-    }
+  .panel {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-panel);
+  }
 
-    /* One shape for both states, so the footer keeps its rhythm either way. */
-    .session-action {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s2);
-      flex-shrink: 0;
-      min-height: 44px;
-      padding: 0 var(--s4);
-      border: 1px solid var(--border-control);
-      border-radius: var(--r-btn);
-      background: var(--surface);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: var(--fs-sm);
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: border-color .2s var(--ease), color .2s var(--ease), transform .12s var(--ease), box-shadow .2s var(--ease);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
+  #roomList {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 
-    .session-action svg { width: 17px; height: 17px; flex-shrink: 0; }
+  /* The floor is said once, pinned while its rooms scroll beneath it. */
+  .floor-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin: 0;
+    padding: var(--s2) var(--s4);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+  }
+  .floor-head .count { margin-left: auto; color: var(--text-muted); font-family: var(--font); font-size: var(--fs-sm); font-weight: 500; }
 
-    @media (hover: hover) and (pointer: fine) {
-      .session-action:hover { 
-        border-color: var(--blue); 
-        color: var(--blue); 
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.04);
-      }
-    }
+  .floor-rooms { margin: 0; padding: 0; list-style: none; }
 
-    .session-action:active { transform: scale(.98); }
+  .room {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s3);
+    min-height: 56px;
+    padding: var(--s2) var(--s4);
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .12s var(--ease);
+  }
+  .floor-rooms li:last-child .room { border-bottom: none; }
 
-    .session-action:focus-visible {
-      outline: 2px solid var(--blue);
-      outline-offset: 2px;
-    }
+  .room svg {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    color: var(--text-muted);
+    transition: transform .15s var(--ease), color .15s var(--ease);
+  }
 
-    .session-action[disabled] { opacity: .45; cursor: default; transform: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .room:hover { background: var(--blue-wash); color: var(--blue); }
+    .room:hover svg { color: var(--blue); transform: translateX(3px); }
+  }
+  .room:active { background: var(--blue-wash); }
+  .room:focus-visible { outline-offset: -3px; }
 
-    /* Narrow phones: let the row stack instead of squeezing the 44px target. */
-    @media (max-width: 380px) {
-      .session { flex-direction: column; align-items: stretch; }
-      .session-action { justify-content: center; }
-    }
+  .list-note { padding: var(--s7) var(--s5); color: var(--text-muted); text-align: center; }
+  .list-note strong { display: block; margin-bottom: var(--s1); color: var(--text); font-size: var(--fs-h3); }
 
-    @media (prefers-reduced-motion: reduce) {
-      .session-action:active { transform: none; }
-    }
-  </style>
+  /* ---------------------------------------------------------------- session */
+
+  .session {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s3);
+    padding: var(--s3) var(--s4);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .session[hidden] { display: none; }
+
+  .session-who { min-width: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.3; }
+  .session-who strong { display: block; color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
+
+  .session-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 0 var(--s4);
+    border: 1px solid var(--border-control);
+    border-radius: var(--r-btn);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color .15s var(--ease), color .15s var(--ease);
+  }
+  .session-action svg { width: 18px; height: 18px; flex-shrink: 0; transition: transform .15s var(--ease); }
+  @media (hover: hover) and (pointer: fine) {
+    .session-action:hover { border-color: var(--blue); color: var(--blue); }
+    .session-action:hover svg { transform: translateX(-3px); }
+    .session-action.is-exit:hover svg { transform: translateX(3px); }
+  }
+  .session-action:active { transform: scale(.98); }
+  .session-action[disabled] { opacity: .5; cursor: default; transform: none; }
+
+  /* Narrow phones: one row still, so the footer does not eat the list. The
+     name gives way (it wraps) before the button does. */
+  @media (max-width: 380px) {
+    .session { padding: var(--s2) var(--s3); }
+    .session-action { padding: 0 var(--s3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .session-action:active { transform: none; }
+    .session-action:hover svg, .room:hover svg { transform: none; }
+  }
+</style>
 </head>
-
 <body>
-  <a class="skip-link" href="#main">Skip to the room list</a>
 
-  <div class="shell shell-fixed">
+  <a class="skip-link" href="#roomSearch">Skip to the room search</a>
 
-    <header class="identity identity-slim" aria-label="EduTrack, ACLC College Mandaue Campus">
-      <div class="identity-main">
-        <img class="identity-logo" src="../assets/img/aclc-logo.jpg" width="192" height="192" alt="ACLC College &mdash; Mandaue Campus">
-        <h1 class="identity-mark">EduTrack</h1>
-        <p class="identity-tagline">Campus map &amp; <span class="nowrap">room-to-room</span> walkthrough</p>
-      </div>
-      <p class="locality">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        ACLC College &mdash; Mandaue Campus
+  <header class="brand">
+    <a class="brand-link" href="../index.html" aria-label="EduTrack home">
+      <img class="brand-seal" src="../assets/img/aclc-logo.jpg" width="56" height="56" alt="">
+      <span class="brand-text">
+        <span class="brand-mark">EduTrack</span>
+        <span class="brand-sub">ACLC College, Mandaue Campus</span>
+      </span>
+    </a>
+  </header>
+
+  <main class="picker fade-in" id="main" aria-labelledby="pickerTitle">
+
+    <div class="picker-head">
+      <h1 class="page-title" id="pickerTitle">Choose a room</h1>
+      <p class="gate-note">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>
+        Every route starts at the main gate.
       </p>
-    </header>
+    </div>
 
-    <main class="surface picker" id="main" aria-label="Room picker">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <label class="visually-hidden" for="roomSearch">Search rooms</label>
+      <input id="roomSearch" type="search" placeholder="Room or office, e.g. 302"
+             autocomplete="off" enterkeyhint="go" aria-controls="roomList">
+    </div>
 
-      <div class="picker-head fade-in">
-        <h1>Where do you want to go?</h1>
-        <p>Search or pick a room to start the walkthrough from the gate.</p>
-      </div>
+    <div class="picker-body">
+      <nav aria-label="Floors">
+        <ul class="rail" id="rail">
+          <li><a href="#floor-1" data-floor="1"><span class="floor-num" aria-hidden="true">1</span><span><span class="rail-name">1st floor</span><span class="rail-count"></span></span></a></li>
+          <li><a href="#floor-2" data-floor="2"><span class="floor-num" aria-hidden="true">2</span><span><span class="rail-name">2nd floor</span><span class="rail-count"></span></span></a></li>
+          <li><a href="#floor-3" data-floor="3"><span class="floor-num" aria-hidden="true">3</span><span><span class="rail-name">3rd floor</span><span class="rail-count"></span></span></a></li>
+        </ul>
+      </nav>
 
-      <div class="picker-body">
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input id="roomSearch" type="text" placeholder="Search room, e.g. 101 or Clinic">
+      <div class="panel">
+        <div id="roomList" aria-live="polite" aria-busy="true">
+          <p class="list-note">Loading rooms...</p>
         </div>
-        <ul id="roomList"></ul>
         <div class="session" id="sessionFooter" hidden></div>
       </div>
+    </div>
 
-    </main>
-
-  </div>
+  </main>
 
   <!-- apiPost() attaches the CSRF token api/logout.php requires. -->
   <script src="../Auth/auth.js"></script>
   <script>
-    let allRooms = [];
+    const list = document.getElementById('roomList');
+    const search = document.getElementById('roomSearch');
+    const railLinks = [...document.querySelectorAll('#rail a')];
+    const CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    fetch('../assets/nodes/nodes-edges.json')
-      .then(r => r.json())
-      .then(data => {
+    let allRooms = [];
+    let observer = null;
+
+    /* The data stores names and floors in capitals. These change only what is
+       shown; the raw room_name still goes to the walkthrough, which matches on it. */
+    function roomLabel(raw) {
+      if (/^\d+$/.test(raw)) return 'Room ' + raw;
+      return raw.toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase());
+    }
+
+    function floorOf(raw) {
+      const m = /^(\d+)(st|nd|rd|th)\s+floor/i.exec(raw || '');
+      return m ? { n: Number(m[1]), label: m[1] + m[2].toLowerCase() + ' floor' } : { n: 0, label: 'Other' };
+    }
+
+    const plural = n => n + (n === 1 ? ' room' : ' rooms');
+
+    function setActive(n) {
+      railLinks.forEach(a => a.setAttribute('aria-current', String(a.dataset.floor === String(n))));
+    }
+
+    function render(rooms, query) {
+      list.replaceChildren();
+      list.setAttribute('aria-busy', 'false');
+      if (observer) observer.disconnect();
+
+      // Rail counts follow the search, and a floor with nothing to show goes quiet.
+      const counts = {};
+      rooms.forEach(r => { const n = floorOf(r.floor).n; counts[n] = (counts[n] || 0) + 1; });
+      railLinks.forEach(a => {
+        const c = counts[a.dataset.floor] || 0;
+        a.querySelector('.rail-count').textContent = plural(c);
+        a.setAttribute('aria-disabled', String(c === 0));
+      });
+
+      if (rooms.length === 0) {
+        const note = document.createElement('div');
+        note.className = 'list-note';
+        const strong = document.createElement('strong');
+        strong.textContent = 'No room matches "' + query + '"';
+        note.append(strong, 'Try a room number like 204, or part of an office name.');
+        list.appendChild(note);
+        setActive(null);
+        return;
+      }
+
+      const floors = new Map();
+      rooms.forEach(r => {
+        const f = floorOf(r.floor);
+        if (!floors.has(f.n)) floors.set(f.n, { label: f.label, rooms: [] });
+        floors.get(f.n).rooms.push(r);
+      });
+
+      // Ground floor first: 1, 2, 3, the order a student climbs from the gate.
+      const order = [...floors.keys()].sort((a, b) => a - b);
+
+      order.forEach(n => {
+        const group = floors.get(n);
+        const section = document.createElement('section');
+        section.setAttribute('aria-labelledby', 'floor-' + n);
+        section.dataset.floor = n;
+
+        const head = document.createElement('h2');
+        head.className = 'floor-head';
+        head.id = 'floor-' + n;
+        const num = document.createElement('span');
+        num.className = 'floor-num is-small';
+        num.setAttribute('aria-hidden', 'true');
+        num.textContent = n;
+        const count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = plural(group.rooms.length);
+        head.append(num, group.label, count);
+
+        const ul = document.createElement('ul');
+        ul.className = 'floor-rooms';
+        group.rooms.forEach(r => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'room';
+          a.href = 'walkthrough.html?room=' + encodeURIComponent(r.room_name);
+          const name = document.createElement('span');
+          name.textContent = roomLabel(r.room_name);
+          a.appendChild(name);
+          a.insertAdjacentHTML('beforeend', CHEVRON);
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        section.append(head, ul);
+        list.appendChild(section);
+      });
+
+      setActive(order[0]);
+
+      // The rail follows the list: whichever floor's header sits at the top.
+      observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length) setActive(visible[0].target.dataset.floor);
+      }, { root: list, rootMargin: '0px 0px -85% 0px' });
+      list.querySelectorAll('section').forEach(s => observer.observe(s));
+    }
+
+    function goToFloor(n, smooth) {
+      const head = document.getElementById('floor-' + n);
+      if (!head) return;
+      list.scrollTo({ top: head.parentElement.offsetTop, behavior: smooth && !reduceMotion ? 'smooth' : 'auto' });
+      setActive(n);
+    }
+
+    railLinks.forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      history.replaceState(null, '', '#floor-' + a.dataset.floor);
+      goToFloor(a.dataset.floor, true);
+    }));
+
+    function matches(r, q) {
+      return r.room_name.toLowerCase().includes(q) || roomLabel(r.room_name).toLowerCase().includes(q);
+    }
+
+    function current() {
+      const q = search.value.trim().toLowerCase();
+      return { q, rooms: q ? allRooms.filter(r => matches(r, q)) : allRooms };
+    }
+
+    fetch('../api/tour.php', { credentials: 'same-origin' })
+      .then(r => r.json().then(data => ({ status: r.status, data })))
+      .then(({ status, data }) => {
+        // The full tour is for enrolled students. A guest is sent to log in; a
+        // signed-in student with no enrolment numbers yet is sent to add them.
+        if (status === 401) {
+          window.location.href = data.code === 'details_missing'
+            ? '../Auth/add-details.html?next=select-room.html'
+            : '../Auth/login.html?next=tour';
+          throw new Error('locked');
+        }
         allRooms = data.rooms.sort((a, b) => a.room_name.localeCompare(b.room_name, undefined, { numeric: true }));
-        renderList(allRooms);
+        render(current().rooms, '');
+        // Arriving from a floor on the home page: open at that floor.
+        const m = /^#floor-(\d+)$/.exec(location.hash);
+        if (m) goToFloor(m[1], false);
       })
       .catch(err => {
-        document.getElementById('roomList').innerHTML = '<li>Could not load room list. Check assets/nodes/nodes-edges.json exists.</li>';
+        list.setAttribute('aria-busy', 'false');
+        list.innerHTML = '<div class="list-note"><strong>The room list did not load</strong>Check your connection and reload the page.</div>';
         console.error(err);
       });
 
-    function renderList(rooms) {
-      const list = document.getElementById('roomList');
-      list.innerHTML = '';
-      rooms.forEach(r => {
-        const li = document.createElement('li');
-        li.innerHTML = `${r.room_name} <span class="floor-tag">${r.floor || ''}</span>`;
-        li.onclick = () => {
-          window.location.href = `walkthrough.html?room=${encodeURIComponent(r.room_name)}`;
-        };
-        list.appendChild(li);
-      });
-    }
-
-    document.getElementById('roomSearch').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      renderList(allRooms.filter(r => r.room_name.toLowerCase().includes(q)));
+    search.addEventListener('input', () => {
+      render(current().rooms, search.value.trim());
+      list.scrollTop = 0;
     });
 
-    /* ------------------------------------------------------------- session */
+    // Enter on a search with exactly one result opens it: "302" then Enter.
+    search.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const { rooms } = current();
+      if (rooms.length === 1) {
+        e.preventDefault();
+        window.location.href = 'walkthrough.html?room=' + encodeURIComponent(rooms[0].room_name);
+      }
+    });
 
-    /*
-      This page is opened two ways: by a student who has just signed in
-      (Auth/login.html) and by a guest who has not (guest-map.html). Ask the
-      server which one this is before drawing anything, so a guest is never
-      offered a way to log out of a session they do not have, and a signed-in
-      student is never left without one.
+    /* ---------------------------------------------------------- session */
 
-      Either way the room picker above is already usable; the footer is the
-      only thing waiting on this.
-    */
+    /* Reached both by a student who just signed in and by a guest. Ask the
+       server which before drawing anything, so a guest is never offered a
+       logout and a student is never left without one. */
     const ICON_LOGOUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 17l5-5-5-5M20 12H9M12 3H6a1 1 0 00-1 1v16a1 1 0 001 1h6"/></svg>';
     const ICON_BACK   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>';
-
     const sessionFooter = document.getElementById('sessionFooter');
 
-    function escapeHtml(text) {
-      const p = document.createElement('p');
-      p.textContent = text;
-      return p.innerHTML;
-    }
+    function escapeHtml(text) { const p = document.createElement('p'); p.textContent = text; return p.innerHTML; }
 
     function showGuestFooter() {
       sessionFooter.innerHTML =
         '<span class="session-who">Browsing as a guest</span>' +
-        '<a class="session-action" href="../index.html">' + ICON_BACK + 'Back to home</a>';
+        '<a class="session-action" href="../index.html">' + ICON_BACK + 'Home</a>';
       sessionFooter.hidden = false;
     }
 
     function showSignedInFooter(fullName) {
       sessionFooter.innerHTML =
         '<span class="session-who">Signed in as <strong>' + escapeHtml(fullName) + '</strong></span>' +
-        '<button type="button" class="session-action" id="logoutBtn">' + ICON_LOGOUT + 'Log out</button>';
+        '<button type="button" class="session-action is-exit" id="logoutBtn">' + ICON_LOGOUT + 'Log out</button>';
       sessionFooter.hidden = false;
 
       document.getElementById('logoutBtn').addEventListener('click', function () {
         this.disabled = true;
-        this.textContent = 'Logging out…';
-
+        this.textContent = 'Logging out...';
         apiPost('logout.php')
           .then(() => { window.location.href = '../index.html'; })
           .catch(() => {
-            // Still signed in, so put the control back rather than stranding
-            // them, and say what happened where they are already looking.
             this.disabled = false;
             this.innerHTML = ICON_LOGOUT + 'Log out';
             const who = sessionFooter.querySelector('.session-who');
-            if (who) {
-              who.textContent = 'Could not reach the server. Try again.';
-              who.setAttribute('role', 'alert');
-            }
+            if (who) { who.textContent = 'Could not reach the server. Try again.'; who.setAttribute('role', 'alert'); }
           });
       });
     }
 
     fetch('../api/whoami.php', { credentials: 'same-origin' })
       .then(r => r.json())
-      .then(data => {
-        data.signedIn ? showSignedInFooter(data.fullName) : showGuestFooter();
-      })
-      .catch(() => {
-        // Server unreachable: offer the way out that needs no server.
-        showGuestFooter();
-      });
+      .then(data => { data.signedIn ? showSignedInFooter(data.fullName) : showGuestFooter(); })
+      .catch(() => showGuestFooter());
   </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=660438df-a7e3-451b-af21-d4b5f09e7eb9"></script>
+<!-- impeccable-live-end -->
 </body>
-
 </html>

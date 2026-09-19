@@ -1,0 +1,7 @@
+{
+  "files": ["index.html", "Auth/*.html", "map/*.html"],
+  "exclude": ["guest-map.html"],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}

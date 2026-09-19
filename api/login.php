@@ -25,7 +25,7 @@ rate_limit_check($email, 'student_login');
 rate_limit_check($ip, 'student_login_ip', 20);
 
 $pdo  = get_db();
-$stmt = $pdo->prepare('SELECT id, full_name, email, password_hash, email_verified, deactivated_at FROM users WHERE email = ?');
+$stmt = $pdo->prepare('SELECT id, full_name, email, password_hash, email_verified, deactivated_at, student_no, study_load_no FROM users WHERE email = ?');
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
@@ -80,4 +80,9 @@ $_SESSION['user_id']   = $user['id'];
 $_SESSION['full_name'] = $user['full_name'];
 $_SESSION['email']     = $user['email'];
 
-json_ok(['fullName' => $user['full_name']]);
+// Accounts made before migration 006 have no enrolment numbers yet. They can
+// log in, but the room tour needs both, so the page sends them to add them.
+json_ok([
+    'fullName'     => $user['full_name'],
+    'needsDetails' => $user['student_no'] === null || $user['study_load_no'] === null,
+]);
