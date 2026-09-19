@@ -4,97 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EduTrack — Log In</title>
+<meta name="description" content="Log in to your EduTrack student account at ACLC College Mandaue.">
+<meta name="theme-color" content="#0033a0">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
-<style>
-  body {
-    background-image: linear-gradient(rgba(21,24,29,0.62), rgba(21,24,29,0.62)), url('../assets/img/campus-bg.webp');
-    background-size: cover; background-position: center; background-repeat: no-repeat;
-  }
-  .card {
-    background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  }
-  /*
-    The card and its way out share one column. Pinned to the viewport corner
-    the link drifted further from the card the wider the screen got, until on
-    a desktop it read as a stray chip on the photograph rather than as this
-    card's own way back. In the flow it stays where the eye already is.
-  */
-  .auth-stack {
-    width: 100%; max-width: 420px;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-
-  .back-btn {
-    align-self: flex-start;
-    display: inline-flex; align-items: center; gap: 8px;
-    min-height: 44px; padding: 0 16px;
-    /* Enough plate to stay legible on the photograph, without the drop shadow
-       it needed while it was floating above the page. */
-    background: rgba(27,30,37,0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    /* 6px, matching the inputs below it. The 999px pill was the one
-       rounded-full control in a system whose own rules reject them. */
-    border: 1px solid var(--border); border-radius: 6px;
-    color: var(--text); text-decoration: none; font-size: 0.9rem; font-weight: 600;
-    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
-  }
-
-  /* Gated: on a touch screen an ungated :hover sticks after the tap, leaving
-     the button looking permanently hovered. */
-  @media (hover: hover) and (pointer: fine) {
-    .back-btn:hover { background: rgba(27,30,37,0.92); border-color: var(--accent); }
-    /* The index directory nudges its arrow 3px right on hover to mean
-       "onward". The same 3px the other way is what going back looks like. */
-    .back-btn:hover svg { transform: translateX(-3px); }
-  }
-
-  /* The button spec every other control in the system already follows:
-     press feedback, and a focus ring a keyboard user can actually find. */
-  .back-btn:active { transform: scale(0.98); }
-  .back-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .back-btn, .back-btn svg { transition: background 0.15s ease, border-color 0.15s ease; }
-    .back-btn:active { transform: none; }
-    .back-btn:hover svg { transform: none; }
-  }
-
-  .back-btn svg {
-    width: 18px; height: 18px; flex-shrink: 0;
-    transition: transform 0.15s ease;
-  }
-</style>
 </head>
 <body>
-  <div class="page-center">
-    <div class="auth-stack">
-      <a href="../index.html" class="back-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to home
-      </a>
-    <div class="card">
-      <h1>Log in</h1>
-      <p class="subtitle">Enter your student account details.</p>
 
-      <div id="alertBox" class="alert"></div>
+  <a class="skip-link" href="#main">Skip to the form</a>
 
-      <form id="loginForm" novalidate>
-        <label for="email">Email</label>
-        <input type="email" id="email" autocomplete="email" inputmode="email">
-        <div class="field-error" id="err-email">Enter the email you registered with.</div>
+  <div class="shell">
 
-        <label for="password">Password</label>
-        <input type="password" id="password" autocomplete="current-password">
-        <div class="field-error" id="err-password">Enter your password.</div>
-
-        <button type="submit" class="btn" id="submitBtn">Log In</button>
-      </form>
-
-      <div class="form-footer">
-        No account yet? <a href="register.html">Register</a>
+    <header class="identity" aria-label="EduTrack, ACLC College Mandaue Campus">
+      <div class="identity-main">
+        <img class="identity-logo" src="../assets/img/aclc-logo.jpg" width="192" height="192" alt="ACLC College &mdash; Mandaue Campus">
+        <h1 class="identity-mark">EduTrack</h1>
+        <p class="identity-tagline">Campus map &amp; <span class="nowrap">room-to-room</span> walkthrough</p>
       </div>
-    </div>
-    </div>
+      <p class="locality">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        ACLC College &mdash; Mandaue Campus
+      </p>
+    </header>
+
+    <main class="surface" id="main" aria-label="Main content">
+      <div class="surface-inner is-narrow fade-in">
+
+        <a href="../index.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to home
+        </a>
+
+        <h2 class="surface-title">Log in</h2>
+        <p class="surface-lede">Enter your student account details.</p>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="loginForm" class="surface-form" novalidate>
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" inputmode="email" placeholder="Enter your email">
+          <div class="field-error" id="err-email">Enter the email you registered with.</div>
+
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" placeholder="Enter your password">
+          <div class="field-error" id="err-password">Enter your password.</div>
+
+          <button type="submit" class="btn" id="submitBtn">Log In</button>
+        </form>
+
+        <div class="form-footer">
+          No account yet? <a href="register.html">Register</a>
+        </div>
+
+      </div>
+    </main>
+
   </div>
 
 <script src="auth.js"></script>

@@ -4,146 +4,72 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EduTrack — Register</title>
+<meta name="description" content="Create an EduTrack student account for ACLC College Mandaue.">
+<meta name="theme-color" content="#0033a0">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
-<style>
-  body {
-    background-image: linear-gradient(rgba(21,24,29,0.62), rgba(21,24,29,0.62)), url('../assets/img/campus-bg.webp');
-    background-size: cover; background-position: center; background-repeat: no-repeat;
-  }
-  .card {
-    background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  }
-  /*
-    The card and its way out share one column. Pinned to the viewport corner
-    the link drifted further from the card the wider the screen got, until on
-    a desktop it read as a stray chip on the photograph rather than as this
-    card's own way back. In the flow it stays where the eye already is.
-  */
-  .auth-stack {
-    width: 100%; max-width: 420px;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-
-  .back-btn {
-    align-self: flex-start;
-    display: inline-flex; align-items: center; gap: 8px;
-    min-height: 44px; padding: 0 16px;
-    /* Enough plate to stay legible on the photograph, without the drop shadow
-       it needed while it was floating above the page. */
-    background: rgba(27,30,37,0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    /* 6px, matching the inputs below it. The 999px pill was the one
-       rounded-full control in a system whose own rules reject them. */
-    border: 1px solid var(--border); border-radius: 6px;
-    color: var(--text); text-decoration: none; font-size: 0.9rem; font-weight: 600;
-    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
-  }
-
-  /* Gated: on a touch screen an ungated :hover sticks after the tap, leaving
-     the button looking permanently hovered. */
-  @media (hover: hover) and (pointer: fine) {
-    .back-btn:hover { background: rgba(27,30,37,0.92); border-color: var(--accent); }
-    /* The index directory nudges its arrow 3px right on hover to mean
-       "onward". The same 3px the other way is what going back looks like. */
-    .back-btn:hover svg { transform: translateX(-3px); }
-  }
-
-  /* The button spec every other control in the system already follows:
-     press feedback, and a focus ring a keyboard user can actually find. */
-  .back-btn:active { transform: scale(0.98); }
-  .back-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .back-btn, .back-btn svg { transition: background 0.15s ease, border-color 0.15s ease; }
-    .back-btn:active { transform: none; }
-    .back-btn:hover svg { transform: none; }
-  }
-
-  .back-btn svg {
-    width: 18px; height: 18px; flex-shrink: 0;
-    transition: transform 0.15s ease;
-  }
-
-  .label-row { margin:16px 0 6px; }
-  .label-row label { display:inline; margin:0; }
-
-  .info-btn {
-    position:relative;
-    width:18px; height:18px; border-radius:50%; padding:0;
-    background:transparent; border:1px solid var(--text-dim); color:var(--text-dim);
-    font-family:'Barlow', sans-serif; font-size:0.78rem; font-weight:600; line-height:16px;
-    cursor:pointer; display:inline-block; vertical-align:middle; margin-left:6px;
-    transition:border-color 0.15s ease, color 0.15s ease;
-  }
-  /* The glyph stays small so it does not compete with the field label, but the
-     tappable area is expanded to 44px. An 18px control fails both DESIGN.md's
-     44px rule and WCAG 2.2's 24px minimum. The expansion is biased right and
-     vertical so it does not steal taps from the label to its left. */
-  .info-btn::after {
-    content:''; position:absolute;
-    top:-13px; bottom:-13px; left:-6px; right:-20px;
-  }
-  .info-btn:hover, .info-btn[aria-expanded="true"] { border-color:var(--accent); color:var(--accent); }
-  .info-btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-
-  /* An accent wash, following the same shape as .alert in style.css, rather
-     than a 3px left border. DESIGN.md reserves that treatment for the code
-     chip, and a help panel should not borrow the credential signature. The
-     wash also keeps this from reading as another text input, which shares the
-     ink background, hairline border and radius. */
-  .info-popover {
-    display:none; background:rgba(179,67,31,0.08);
-    border:1px solid rgba(179,67,31,0.28); border-radius:var(--radius);
-    padding:12px 14px; margin:-2px 0 12px; font-size:0.8rem; line-height:1.5; color:var(--text-dim);
-  }
-  .info-popover.visible { display:block; }
-  .info-popover p { margin:0; }
-  /* Inherits the popover's 0.8rem. Weight and color already carry the
-     hierarchy, so a second size 1.025x apart was doing no work. */
-  .info-popover p.info-popover-title { margin:0 0 4px; color:var(--text); font-weight:600; }
-  .info-popover strong { color:var(--text); font-weight:600; }
-</style>
 </head>
 <body>
-  <div class="page-center">
-    <div class="auth-stack">
-      <a href="../index.html" class="back-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to home
-      </a>
-    <div class="card">
-      <h1>Create your account</h1>
-      <p class="subtitle">Enter your details to create a student account.</p>
 
-      <div id="alertBox" class="alert"></div>
+  <a class="skip-link" href="#main">Skip to the form</a>
 
-      <form id="registerForm" novalidate>
-        <label for="fullName">Full name</label>
-        <input type="text" id="fullName" autocomplete="name" maxlength="100" spellcheck="false">
-        <div class="field-error" id="err-fullName">Enter your full name as it appears on your school records.</div>
+  <div class="shell">
 
-        <label for="email">Email</label>
-        <input type="email" id="email" autocomplete="email">
-        <div class="field-error" id="err-email">Enter a valid email address.</div>
-
-        <label for="password">Password</label>
-        <input type="password" id="password" autocomplete="new-password">
-        <div class="field-error" id="err-password">Password must be at least 8 characters.</div>
-
-        <label for="confirmPassword">Confirm password</label>
-        <input type="password" id="confirmPassword" autocomplete="new-password">
-        <div class="field-error" id="err-confirmPassword">Passwords do not match.</div>
-
-
-
-        <button type="submit" class="btn" id="submitBtn">Create Account</button>
-      </form>
-
-      <div class="form-footer">
-        Already have an account? <a href="login.html">Log in</a>
+    <header class="identity" aria-label="EduTrack, ACLC College Mandaue Campus">
+      <div class="identity-main">
+        <img class="identity-logo" src="../assets/img/aclc-logo.jpg" width="192" height="192" alt="ACLC College &mdash; Mandaue Campus">
+        <h1 class="identity-mark">EduTrack</h1>
+        <p class="identity-tagline">Campus map &amp; <span class="nowrap">room-to-room</span> walkthrough</p>
       </div>
-    </div>
-    </div>
+      <p class="locality">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        ACLC College &mdash; Mandaue Campus
+      </p>
+    </header>
+
+    <main class="surface" id="main" aria-label="Main content">
+      <div class="surface-inner is-narrow fade-in">
+
+        <a href="../index.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to home
+        </a>
+
+        <h2 class="surface-title">Create your account</h2>
+        <p class="surface-lede">Enter your details to create a student account.</p>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="registerForm" class="surface-form" novalidate>
+          <label for="fullName">Full name</label>
+          <input type="text" id="fullName" autocomplete="name" maxlength="100" spellcheck="false" placeholder="Enter your name">
+          <div class="field-error" id="err-fullName">Enter your full name as it appears on your school records.</div>
+
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" placeholder="Enter your email">
+          <div class="field-error" id="err-email">Enter a valid email address.</div>
+
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="new-password" placeholder="Enter your password">
+          <div class="field-error" id="err-password">Password must be at least 8 characters.</div>
+
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" autocomplete="new-password" placeholder="Confirm your password">
+          <div class="field-error" id="err-confirmPassword">Passwords do not match.</div>
+
+          <button type="submit" class="btn" id="submitBtn">Create Account</button>
+        </form>
+
+        <div class="form-footer">
+          Already have an account? <a href="login.html">Log in</a>
+        </div>
+
+      </div>
+    </main>
+
   </div>
 
 <script src="auth.js"></script>

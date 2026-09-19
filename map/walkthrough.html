@@ -5,296 +5,332 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>EduTrack — Walkthrough</title>
+  <meta name="description" content="Walk to your room through real 360° photos of the ACLC College Mandaue Admin Building.">
+  <!-- Dark, not brand blue: this is the one full-bleed surface, and the
+       browser chrome should recede into the panorama rather than announce
+       a colour the screen does not contain. -->
+  <meta name="theme-color" content="#1A1A1A">
+  <link rel="icon" href="../assets/img/aclc-logo.jpg">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@500;600&family=IBM+Plex+Mono:wght@500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
   <style>
+    /*
+      The one screen in the product that is not a light document: a 360° photo
+      fills the viewport and the UI floats over it. Legibility over an unknown
+      photograph is the whole problem here, and it is solved with solid bars —
+      never backdrop-filter, which composites every frame the panorama moves.
+
+      Worst case for the bars is a white-walled corridor: at 88% the bar still
+      resolves to roughly #383838, where white text measures 11:1.
+    */
     :root {
-      --ink: #15181d;
-      --paper: #f6f4ee;
-      --signal: #e8552a;
-      --signal-dim: #b3431f;
-      --signal-deep: #9e3a1a;
-      --muted: #9aa0ab;
-      --line: rgba(246, 244, 238, 0.16);
+      --bar: rgba(26, 26, 26, .88);   /* Text Main, held at 88% */
+      --on-bar: #FFFFFF;
+      --on-bar-dim: rgba(255, 255, 255, .75);
+      --hairline: rgba(255, 255, 255, .38);
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       height: 100%;
       background: #000;
-      font-family: 'Barlow', 'Segoe UI', sans-serif;
+      font-family: var(--font);
       overflow: hidden;
     }
 
-    #panorama {
-      width: 100%;
-      height: 100%;
-    }
+    #panorama { width: 100%; height: 100%; }
 
-    /* ---- top directory strip ---- */
+    /* Pannellum ships its own title box — location lives in #topBar instead,
+       so suppress theirs rather than show the same thing twice. */
+    .pnlm-title-box { display: none !important; }
+
+    /* ------------------------------------------------------------- top bar */
+
     #topBar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       z-index: 10;
       display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 4px 12px;
-      padding: calc(16px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right)) 0 calc(18px + env(safe-area-inset-left));
-      background: linear-gradient(to bottom, rgba(10, 11, 13, 0.85), transparent);
-      color: var(--paper);
-      box-sizing: border-box;
-      pointer-events: none;
-    }
-
-    #topBar * {
-      pointer-events: auto;
+      flex-direction: column;
+      gap: var(--s2);
+      padding:
+        calc(var(--s3) + var(--s2) + env(safe-area-inset-top))
+        calc(var(--s4) + env(safe-area-inset-right))
+        var(--s3)
+        calc(var(--s4) + env(safe-area-inset-left));
+      background: var(--bar);
+      color: var(--on-bar);
     }
 
     #backLink {
-      flex-shrink: 0;
-      color: var(--paper);
-      text-decoration: none;
-      font-size: 0.92rem;
-      font-weight: 600;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      align-self: flex-start;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--s2);
+      min-height: 44px;      /* the target, even though the text is small */
+      color: var(--on-bar);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      text-decoration: none;
     }
 
-    #backLink:hover {
-      color: var(--signal);
+    #backLink svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      transition: transform .15s var(--ease);
     }
 
-    /* min-width:0 lets this block actually wrap/shrink inside the flex row
-       instead of overflowing past the viewport edge — long room labels like
-       "Student Affairs Office" or "Property Custodian" are real data here. */
+    @media (hover: hover) and (pointer: fine) {
+      #backLink:hover svg { transform: translateX(-3px); }
+    }
+
+    #backLink:focus-visible {
+      outline: 2px solid var(--on-bar);
+      outline-offset: 2px;
+      border-radius: var(--r-input);
+    }
+
+    /* Label and counter share a baseline. min-width:0 lets the label wrap
+       instead of pushing the counter off-screen — "Student Affairs Office" and
+       "Property Custodian" are real labels in this data. */
     #stepInfo {
-      min-width: 0;
-      max-width: 62%;
-      flex: 0 1 auto;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--s3);
     }
 
     #stepLabel {
-      font-family: 'Barlow Condensed', sans-serif;
+      min-width: 0;
+      font-size: var(--fs-h2);
       font-weight: 700;
-      font-size: 1.15rem;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      line-height: 1.15;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      line-height: 1.2;
+      letter-spacing: -.01em;
       overflow-wrap: break-word;
     }
 
     #stepCount {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.82rem;
-      color: var(--paper);
-      letter-spacing: 0.04em;
-      margin-top: 2px;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      flex-shrink: 0;
+      color: var(--on-bar-dim);
+      font-size: var(--fs-sm);
+      font-variant-numeric: tabular-nums;   /* the counter stops twitching as it climbs */
     }
 
-    /* ---- route progress strip: the signature element ---- */
+    /* --------------------------------------------------------- route strip */
+
     #routeStrip {
       position: fixed;
       top: env(safe-area-inset-top);
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       z-index: 11;
       display: flex;
       gap: 3px;
-      padding: 0 calc(18px + env(safe-area-inset-right)) 0 calc(18px + env(safe-area-inset-left));
-      box-sizing: border-box;
-      height: 3px;
+      height: 4px;
+      padding: 0 calc(var(--s4) + env(safe-area-inset-right)) 0 calc(var(--s4) + env(safe-area-inset-left));
       pointer-events: none;
     }
 
     #routeStrip .tick {
       flex: 1;
       height: 100%;
-      background: rgba(246, 244, 238, 0.18);
-      transition: background 0.2s ease;
+      background: rgba(255, 255, 255, .28);
+      transition: background .2s var(--ease);
     }
 
-    #routeStrip .tick.done {
-      background: var(--muted);
-    }
+    #routeStrip .tick.done { background: rgba(255, 255, 255, .7); }
 
-    #routeStrip .tick.current {
-      background: var(--signal);
-    }
+    /* "You are here" — wayfinding's own use of red, and the only red on the
+       screen. Never the sole signal: #stepCount states the position in words. */
+    #routeStrip .tick.current { background: var(--red); }
 
-    /* Pannellum ships its own title box — we render location info in #topBar
-     instead, so suppress theirs to avoid showing the same thing twice. */
-    .pnlm-title-box {
-      display: none !important;
-    }
+    /* --------------------------------------------------------- controls */
 
-    /* ---- controls ---- */
     #controls {
       position: fixed;
-      bottom: calc(22px + env(safe-area-inset-bottom));
+      bottom: calc(var(--s5) + env(safe-area-inset-bottom));
       left: env(safe-area-inset-left);
       right: env(safe-area-inset-right);
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: var(--s3);
+      padding: 0 var(--s4);
     }
 
     .navBtn {
-      background: var(--ink);
-      border: 1px solid var(--line);
-      color: var(--paper);
-      padding: 13px 26px;
-      min-height: 44px;
-      border-radius: 6px;
-      font-family: 'Barlow', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s2);
+      min-height: 48px;
+      padding: var(--s3) var(--s5);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-btn);
+      background: var(--bar);
+      color: var(--on-bar);
+      font-family: var(--font);
+      font-size: var(--fs-body);
       font-weight: 600;
-      font-size: 0.92rem;
-      letter-spacing: 0.01em;
       cursor: pointer;
-      box-sizing: border-box;
-      box-shadow: inset 0 1px 0 rgba(246, 244, 238, 0.06);
-      transition: border-color 0.15s ease, background 0.15s ease, transform 0.08s ease;
+      transition: opacity .15s var(--ease), transform .12s var(--ease);
     }
 
-    .navBtn:hover:not(:disabled) {
-      border-color: var(--muted);
+    .navBtn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .navBtn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--white);
     }
 
-    .navBtn:active:not(:disabled) {
-      transform: scale(0.97);
+    @media (hover: hover) and (pointer: fine) {
+      .navBtn:hover:not(:disabled) { opacity: .9; }
     }
+
+    .navBtn:active:not(:disabled) { transform: scale(.97); }
 
     .navBtn:focus-visible {
-      outline: 2px solid var(--signal);
+      outline: 2px solid var(--on-bar);
       outline-offset: 2px;
     }
 
-    .navBtn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
+    .navBtn:disabled { opacity: .4; cursor: not-allowed; }
 
-    .navBtn.primary {
-      background: var(--signal-dim);
-      border-color: var(--signal-dim);
-      color: #fff;
-    }
+    /* ---------------------------------------------------- arrived banner */
 
-    .navBtn.primary:hover:not(:disabled) {
-      background: var(--signal-deep);
-      border-color: var(--signal-deep);
-    }
-
-    /* ---- arrived plate ---- */
+    /*
+      A plain white card, the same surface as every other page in the product.
+      It replaces a frosted panel: over an unknown photograph, opaque is both
+      more legible and far cheaper than a blur.
+    */
     #arrivedBanner {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.96);
-      background: rgba(21, 24, 29, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 36px 38px 30px;
-      color: var(--paper);
-      text-align: center;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(.96);
       z-index: 20;
       display: none;
-      width: 280px;
+      width: min(320px, calc(100vw - 48px));
+      padding: var(--s5);
+      background: var(--surface);
+      border-radius: var(--r-card);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .38);
+      color: var(--text);
+      text-align: center;
       opacity: 0;
-      animation: arrive 0.28s ease-out forwards;
+      animation: arrive .28s ease-out forwards;
     }
 
     @keyframes arrive {
-      to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
 
-    #arrivedBanner.hiding {
-      animation: arrive-out 0.25s ease-in forwards;
-    }
+    /* walkthrough.js removes the banner 250ms after adding .hiding, so this
+       must not outrun that. Exit is also shorter than entry, which is what
+       "responsive" feels like. */
+    #arrivedBanner.hiding { animation: arrive-out .25s ease-out forwards; }
 
     @keyframes arrive-out {
-      to {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.96);
-      }
+      to { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
     }
 
     #arrivedBanner .check {
-      width: 44px;
-      height: 44px;
-      margin: 0 auto 16px;
+      width: 44px; height: 44px;
+      margin: 0 auto var(--s4);
       border-radius: 50%;
-      background: var(--signal-dim);
+      background: var(--blue);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     #arrivedBanner .eyebrow {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin: 0 0 8px;
+      margin: 0 0 var(--s1);
+      color: var(--text-muted);
+      font-size: var(--fs-sm);
     }
 
     #arrivedBanner h2 {
-      font-family: 'Barlow Condensed', sans-serif;
+      margin: 0 0 var(--s5);
+      font-size: var(--fs-h1);
       font-weight: 700;
-      font-size: 2rem;
-      text-transform: uppercase;
-      letter-spacing: 0.01em;
-      margin: 0 0 22px;
-      line-height: 1;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      overflow-wrap: break-word;
     }
 
     #arrivedBanner a {
       display: block;
-      background: var(--signal-dim);
-      color: #fff;
-      text-decoration: none;
+      min-height: 48px;
+      padding: var(--s3) var(--s4);
+      border-radius: var(--r-btn);
+      background: var(--blue);
+      color: var(--white);
+      font-size: var(--fs-body);
       font-weight: 600;
-      font-size: 0.88rem;
-      padding: 12px 20px;
-      border-radius: 6px;
-      min-height: 44px;
-      box-sizing: border-box;
-      line-height: 20px;
-      transition: background 0.15s ease, transform 0.08s ease;
+      line-height: 1.5;
+      text-decoration: none;
+      transition: opacity .15s var(--ease), transform .12s var(--ease);
     }
 
-    #arrivedBanner a:hover {
-      background: var(--signal-deep);
+    @media (hover: hover) and (pointer: fine) {
+      #arrivedBanner a:hover { opacity: .92; }
     }
 
-    #arrivedBanner a:active {
-      transform: scale(0.97);
-    }
+    #arrivedBanner a:active { transform: scale(.98); }
 
     #arrivedBanner a:focus-visible {
-      outline: 2px solid var(--signal);
+      outline: 2px solid var(--blue);
       outline-offset: 2px;
+    }
+
+    /* ------------------------------------------------- in-scene waypoint */
+
+    /*
+      A solid marker, no pulse. The previous version ran a 2.2s scale/opacity
+      keyframe forever on a pseudo-element — continuous motion on exactly the
+      hardware this product targets. The white ring does the work the animation
+      was doing: it separates the marker from whatever is behind it.
+    */
+    .hotspot-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px; height: 44px;
+      box-sizing: border-box;
+      background: var(--blue);
+      border: 2px solid var(--white);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+      color: var(--white);
+      cursor: pointer;
+      transition: transform .12s var(--ease);
+    }
+
+    .hotspot-arrow svg { width: 18px; height: 18px; }
+
+    .hotspot-arrow:active { transform: scale(.94); }
+
+    .hotspot-arrow:focus-visible {
+      outline: 2px solid var(--white);
+      outline-offset: 3px;
+    }
+
+    /* ------------------------------------------------------ short viewports
+       A phone turned landscape for a wider panorama: top chrome, bottom
+       controls and the centred banner all get tight together on a ~360-420px
+       tall viewport, so trim all three. */
+    @media (max-height: 480px) {
+      #topBar { padding-top: calc(var(--s2) + env(safe-area-inset-top)); padding-bottom: var(--s2); }
+      #backLink { min-height: 36px; }
+      #stepLabel { font-size: var(--fs-body); }
+      #controls { bottom: calc(var(--s3) + env(safe-area-inset-bottom)); }
+      .navBtn { min-height: 44px; padding: var(--s2) var(--s4); }
+      #arrivedBanner { width: min(280px, calc(100vw - 48px)); padding: var(--s4); }
+      #arrivedBanner .check { width: 36px; height: 36px; margin-bottom: var(--s3); }
+      #arrivedBanner h2 { font-size: var(--fs-h2); margin-bottom: var(--s4); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -303,105 +339,10 @@
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
       }
-    }
-
-    /* ---- in-scene directional marker: minimal pulsing waypoint ---- */
-    .hotspot-arrow {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      box-sizing: border-box;
-      background: var(--signal-dim);
-      color: #fff;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background 0.15s ease, transform 0.08s ease;
-    }
-
-    .hotspot-arrow::before {
-      content: '';
-      position: absolute;
-      inset: -8px;
-      border-radius: 50%;
-      border: 1.5px solid var(--signal-dim);
-      opacity: 0;
-      animation: waypoint-pulse 2.2s ease-out infinite;
-    }
-
-    @keyframes waypoint-pulse {
-      0% {
-        transform: scale(0.85);
-        opacity: 0.7;
-      }
-
-      100% {
-        transform: scale(1.35);
-        opacity: 0;
-      }
-    }
-
-    .hotspot-arrow svg {
-      width: 18px;
-      height: 18px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hotspot-arrow:hover {
-      background: var(--signal-deep);
-    }
-
-    .hotspot-arrow:active {
-      transform: scale(0.94);
-    }
-
-    .hotspot-arrow:focus-visible {
-      outline: 2px solid var(--paper);
-      outline-offset: 3px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .hotspot-arrow::before {
-        animation: none;
-        opacity: 0;
-      }
-    }
-
-    /* ---- short/landscape viewports: phone rotated for a wider panorama
-       view. Top and bottom chrome plus the centered arrived banner can get
-       tight together on a ~360-420px-tall viewport, so trim all three. ---- */
-    @media (max-height: 480px) {
-      #topBar {
-        padding-top: calc(10px + env(safe-area-inset-top));
-      }
-
-      #controls {
-        bottom: calc(12px + env(safe-area-inset-bottom));
-      }
-
-      .navBtn {
-        padding: 10px 22px;
-        min-height: 40px;
-      }
-
-      #arrivedBanner {
-        width: 240px;
-        padding: 22px 26px 18px;
-      }
-
-      #arrivedBanner .check {
-        width: 36px;
-        height: 36px;
-        margin-bottom: 10px;
-      }
-
-      #arrivedBanner h2 {
-        font-size: 1.5rem;
-        margin-bottom: 14px;
-      }
+      .navBtn:active:not(:disabled),
+      .hotspot-arrow:active,
+      #arrivedBanner a:active { transform: none; }
+      #backLink:hover svg { transform: none; }
     }
   </style>
 </head>
@@ -411,18 +352,27 @@
   <div id="routeStrip"></div>
 
   <div id="topBar">
-    <a id="backLink" href="select-room.html">&larr; Choose different room</a>
-    <div id="stepInfo" style="text-align:right">
-      <div id="stepLabel">Loading…</div>
-      <div id="stepCount"></div>
+    <a id="backLink" href="select-room.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Choose different room
+    </a>
+    <div id="stepInfo">
+      <span id="stepLabel">Loading…</span>
+      <span id="stepCount"></span>
     </div>
   </div>
 
   <div id="panorama"></div>
 
   <div id="controls">
-    <button class="navBtn" id="prevBtn">&larr; Back</button>
-    <button class="navBtn primary" id="nextBtn">Next &rarr;</button>
+    <button class="navBtn" id="prevBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      Back
+    </button>
+    <button class="navBtn primary" id="nextBtn">
+      Next
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
   </div>
 
   <div id="arrivedBanner">

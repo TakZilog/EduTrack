@@ -8,10 +8,11 @@ web
 
 ## Users
 
-- **Guest / enrolling visitor** — arrives at the Admin Building gate, needs to find their enrollment room without an account. No login required.
-- **Registered student** — has a verified account (email OTP), gets full walkthrough access beyond the guest map.
-- **Guard** — staffed at the Admin Building ground-floor desk, issues one-time passphrase-gated registration codes to students who need to create an account.
-- **Admin / faculty** (planned, not yet built) — a management role is planned in addition to the three above. Scope and permissions are not yet defined; do not invent a UI or workflow for it until confirmed.
+- **Guest / enrolling visitor** — arrives at the Admin Building gate, needs to find their enrollment room without an account. No login required, and this path must stay open.
+- **Registered student** — has a verified account (email + 6-digit OTP), gets full walkthrough access beyond the guest map.
+- **Staff / registrar (prototype)** — a staff panel exists at `admin/*` as scaffolding. It is **not** considered shipped. Seven pages and a dedicated stylesheet are present; treat them as a prototype, not a contract. Scope and permissions remain undecided, and whether faculty is distinct from registrar is undecided. Do not invent a permission model.
+
+A **Guard** role previously existed — an in-person desk that issued one-time registration codes. It has been removed from the product. Do not reinstate it, do not recreate `Guard/*`, `guard_codes`, a `guard_login` scope, or an issue-code flow, and do not treat surviving references to it as a feature to restore.
 
 ## Product Purpose
 
@@ -24,36 +25,35 @@ The mechanism a static campus map or directory can't copy: a real photographic w
 ## Operating Context
 
 - Primary real-world use is a guest/enrollee standing at or near the Admin Building gate, on their own phone, about to walk the building for the first time (enrollment day foot traffic).
-- Guard desk issues short-lived, single-use registration codes in person, gating student account creation.
-- Student flow: guard-issued code → register → email OTP verification → login → full access.
-- Currently scoped to one building (ACLC College, Mandaue Campus — Admin Building). Expansion to additional buildings or other ACLC campuses is a known future direction; data model and navigation should not assume the graph will always stay single-building.
+- **Account creation is open.** Anyone with a working email address can register: full name, email, password, then a 6-digit OTP sent to that address, then login. There is no in-person step and no registration code. This is the confirmed permanent model, not a temporary state.
+- Currently scoped to one building (ACLC College, Mandaue Campus — Admin Building), covering 41 rooms across three floors. Expansion to additional buildings or other ACLC campuses is a known future direction; the data model and navigation should not assume the graph will always stay single-building.
 
 ## Capabilities and Constraints
 
 - Stack: plain HTML/CSS/JS frontend (no build tooling), PHP + MySQL backend (PDO — standardize all `api/*.php` on PDO per HANDOFF.md), running under XAMPP locally.
-- Campus map currently runs off a flat file (`assets/nodes/nodes-edges.json`, ~90 deduplicated 360° images), not the database; a DB-backed node graph is a known future phase, not yet started.
+- Campus map runs off a flat file (`assets/nodes/nodes-edges.json`, ~90 deduplicated 360° images, 41 rooms), not the database; a DB-backed node graph is a known future phase, not yet started.
 - OTP codes are session-based (`$_SESSION['otp']`), not a DB table — accepted tradeoff, not a gap to silently fix.
-- Guard codes are stored in plain text (short-lived, single-use — accepted tradeoff per HANDOFF.md, not to be "fixed" without being asked).
-- Admin/faculty role: existence confirmed, scope undecided (see Users).
+- Staff panel scope and permissions: undecided (see Users).
 - Multi-building/multi-campus expansion: direction confirmed, timeline and design not yet started.
+- **Known dead files left by the Guard removal**, confirmed as leftovers rather than features. They are not in use and should be removed when someone is working in those directories: `admin/codes.html`, `api/guard-login.php`, and stale comments in `api/register.php` that refer to "the guard" and to guessing registration codes. The six-digit `code` in `api/register.php` is the email OTP, not a registration code.
 
 ## Brand Commitments
 
 - Product name: **EduTrack**. Institution: **ACLC College — Mandaue Campus**.
-- An incumbent visual world already exists in `index.html` (dark industrial/editorial: ink/paper/signal-orange palette, Barlow Condensed + Barlow + IBM Plex Mono, rivet/plate motifs, directory-style nav). Treat this as binding incumbent identity for refinement work, not a blank slate.
+- The institutional seal is a binding identity asset: `assets/img/aclc-logo.jpg` (192×192, derived from the school's official circular seal). It is blue and red on white and requires a white backing when placed on a coloured field.
+- The visual system is owned by `DESIGN.md`, not by this file. Note that the student-facing surfaces and the staff panel currently run **two deliberately divergent visual worlds**; `DESIGN.md` documents both and says which applies where.
 
 ## Evidence on Hand
 
-No testimonials, case studies, press, or usage data on hand. Do not fabricate any.
+No testimonials, case studies, press, or usage data on hand. Do not fabricate any. The real assets are the 360° node photography in `assets/nodes/` and the institutional seal in `assets/img/`.
 
 ## Product Principles
 
 1. Wayfinding by simulated walking (real photos + path), not map-reading — this is the product's core bet and shouldn't be diluted into a generic static map.
 2. Guest path stays zero-friction: no account required to find an enrollment room.
-3. Physical-world gating (guard-issued codes) is a deliberate trust boundary for account creation — preserve it, don't route around it in UI shortcuts.
-4. Design and build for low-end phones on weak/shared campus wifi first; this is real day-one usage, not an edge case.
-5. Treat unfinished backend areas (admin role, DB-backed graph, multi-building) as explicitly open, not silently decided.
+3. Design and build for low-end phones on weak/shared campus wifi first; this is real day-one usage, not an edge case.
+4. Treat unfinished areas (staff panel scope, DB-backed graph, multi-building) as explicitly open, not silently decided.
 
 ## Accessibility & Inclusion
 
-Low-end mobile / weak-network use confirmed as a real, primary constraint (kiosk-style use on phones at the gate). No formal accessibility standard (e.g. WCAG level) confirmed yet — do not invent one.
+Low-end mobile / weak-network use is confirmed as a real, primary constraint (kiosk-style use on phones at the gate, outdoors, in daylight). **WCAG AA is a confirmed requirement** for the student-facing surfaces: all text must meet AA contrast, and interactive controls must meet the 3:1 non-text contrast rule (WCAG 1.4.11) for their visible boundary. Touch targets are 44px minimum throughout. The staff panel deliberately exceeds this — it targets AAA contrast on secondary text and larger controls, because it is operated for long stretches by older staff rather than glanced at in a queue.

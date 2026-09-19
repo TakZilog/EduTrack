@@ -1,71 +1,179 @@
-/* EduTrack — shared base styles */
+/* =========================================================================
+   EduTrack — shared student-facing stylesheet
+   ACLC College — Mandaue Campus
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+   Palette is fixed and closed: blue anchors anything you can act on, red is a
+   scalpel for errors and "you are here", everything else is neutral. No photo
+   backgrounds, no blur, no gradients — the target is a low-end phone on weak
+   campus Wi-Fi, held at arm's length in daylight.
+
+   Read by: index.html, guest-map.html, Auth/login.html, Auth/register.html,
+   Auth/verify-otp.html, map/select-room.html, map/walkthrough.html.
+   The staff panel has its own stylesheet (assets/css/admin.css) and does not
+   read this file, so nothing here can reach it.
+
+   Fonts are loaded per page with <link rel="preconnect"> + <link>, not with
+   @import. @import chains two round trips (style.css must arrive before the
+   font CSS is even requested); parallel <link> tags do not.
+   ========================================================================= */
 
 :root {
-  --bg: #15181d;
-  --panel: #1b1e25;
-  --border: rgba(246,244,238,0.14);
-  --text: #f6f4ee;
-  --text-dim: #9aa0ab;
-  --accent: #b3431f;
-  --accent-hover: #9e3a1a;
-  --danger: #e35d5d;
-  --success: #4caf7d;
-  --radius: 6px;
+  /* Brand */
+  --blue:   #0044d6;
+  --brand-gradient: linear-gradient(135deg, #001253 0%, #0033a0 50%, #0072ff 100%);
+  --red:    #D3112A;
+  --white:  #FFFFFF;
+
+  /* Neutral */
+  --bg:          #F8F9FA;
+  --surface:     #FFFFFF;
+  --text:        #1A1A1A;
+  --text-muted:  #6B7280;
+  --border:      #E5E7EB;
+
+  /* Hairline --border carries dividers and card edges, which are decorative.
+     The visible boundary of an *interactive* control has to clear 3:1 against
+     its background (WCAG 1.4.11), and #E5E7EB manages 1.24:1 on white — so
+     inputs and outline buttons take the muted grey instead. Same palette, no
+     invented hue. */
+  --border-control: #6B7280;
+
+  /* auth.js does input.style.borderColor = 'var(--danger)' on a failed field.
+     Removing or renaming this token silently kills every form error border. */
+  --danger: #D3112A;
+
+  /* Space — 4 8 12 16 24 32 */
+  --s1: 4px;  --s2: 8px;  --s3: 12px;
+  --s4: 16px; --s5: 24px; --s6: 32px;
+
+  /* Radius */
+  /* These match what actually ships. They previously read 12/10/8 while every
+     component hardcoded 20/14/12, so the token layer was dead and there were
+     three competing sources of truth. */
+  --r-panel: 20px;  --r-card: 20px;  --r-btn: 14px;  --r-input: 12px;  --r-chip: 10px;
+
+  /* Type — five sizes, nothing below 12px */
+  --fs-h1: 1.75rem;   /* 28 */
+  --fs-h2: 1.25rem;   /* 20 */
+  --fs-body: 1rem;    /* 16 */
+  --fs-sm: 0.875rem;  /* 14 */
+  /* Display is set per page as a clamp, so the ramp stays at five steps. */
+
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  /* Neutral black only. Brand colours never appear in a shadow. */
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.05);
+
+  --ease: cubic-bezier(.32,.72,0,1);
 }
 
 * { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Barlow', system-ui, sans-serif;
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--text); }
-a:hover { color: var(--accent); }
+a { color: var(--blue); }
+
+/* Opacity only, under 200ms, and never for someone who asked for less motion.
+   Applied per page with class="fade-in" so it is opt-in, not a global tax. */
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in { animation: fade .15s ease-out both; }
+}
+@keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+
+/* Off-screen until focused. The identity band puts four spoken elements ahead
+   of the first link, which is a long way in for a keyboard or screen-reader
+   user to reach the only thing on the page they came for. */
+.skip-link {
+  position: absolute;
+  top: var(--s2);
+  left: var(--s2);
+  z-index: 100;
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r-chip);
+  background: var(--surface);
+  color: var(--blue);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ layout */
 
 .page-center {
   min-height: 100vh;
+  min-height: 100dvh;   /* dvh keeps the card off the mobile URL bar */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: var(--s5) var(--s4);
 }
 
 .card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 34px 32px;
   width: 100%;
   max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow);
+  padding: var(--s6) var(--s5);
 }
 
 .card h1 {
-  font-family: 'Barlow Condensed', sans-serif;
+  margin: 0 0 var(--s2);
+  font-size: var(--fs-h1);
   font-weight: 700;
-  font-size: 1.7rem;
-  letter-spacing: 0.01em;
-  margin: 0 0 6px;
+  line-height: 1.2;
+  letter-spacing: -.02em;
 }
 
 .card .subtitle {
-  color: var(--text-dim);
-  font-size: 0.9rem;
-  margin: 0 0 24px;
-  line-height: 1.4;
+  margin: 0 0 var(--s5);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
 }
+
+/* The card and its way out share one column, so the link stays where the eye
+   already is instead of drifting to a viewport corner on wider screens. */
+.auth-stack {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+/* ------------------------------------------------------------------- forms */
 
 label {
   display: block;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--text-dim);
-  margin: 16px 0 6px;
+  margin: var(--s3) 0 var(--s1);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
 }
 
 label:first-of-type { margin-top: 0; }
@@ -75,119 +183,438 @@ input[type="password"],
 input[type="email"],
 input[type="tel"] {
   width: 100%;
-  padding: 11px 12px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg);
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #f3f4f6;
   color: var(--text);
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.95rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  transition: background-color .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease);
 }
 
-input::placeholder { color: var(--text-dim); opacity: 0.7; }
+input::placeholder { color: #9ca3af; font-weight: 400; }
 
+/* No transform here. A field that lifts 2px on focus walks away from its own
+   label, and tabbing through a form makes the whole column twitch line by
+   line. The ring and the fill already say "this one is live". */
 input:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(179,67,31,0.2);
+  background: var(--white);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(0, 68, 214, 0.15);
 }
-
-.btn {
-  width: 100%;
-  padding: 13px;
-  min-height: 44px;
-  border-radius: var(--radius);
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: #fff;
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  margin-top: 22px;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
-}
-
-.btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-.btn:active:not(:disabled) { transform: scale(0.98); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.btn-secondary:hover { background: rgba(246,244,238,0.04); border-color: var(--text-dim); }
 
 .field-error {
-  color: var(--danger);
-  font-size: 0.8rem;
-  margin-top: 6px;
   display: none;
+  margin-top: var(--s2);
+  color: var(--red);
+  font-size: var(--fs-sm);
 }
 
 .field-error.visible { display: block; }
 
 .form-footer {
+  margin-top: var(--s5);
   text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  margin-top: 20px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
 }
 
+.form-footer a { font-weight: 600; }
+
+/* ----------------------------------------------------------------- buttons */
+
+.btn {
+  /* flex, not a 52px line-height: a label that wraps on a narrow phone used to
+     spill straight out of the button. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--s4);
+  padding: var(--s3) var(--s4);
+  border: none;
+  border-radius: 14px;
+  background: var(--brand-gradient);
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .16s var(--ease), box-shadow .2s var(--ease);
+  box-shadow: 0 4px 12px rgba(0, 68, 214, 0.15), 0 2px 4px rgba(0, 68, 214, 0.1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) {
+    box-shadow: 0 8px 24px rgba(0, 68, 214, 0.25), 0 4px 8px rgba(0, 68, 214, 0.15);
+    /* Lift only. scale(1.01) re-rasterised the label at a fractional size and
+       left the text visibly soft for the whole hover. */
+    transform: translateY(-2px);
+  }
+}
+
+.btn:active:not(:disabled) { 
+  transform: scale(0.98) translateY(1px); 
+  box-shadow: 0 2px 6px rgba(0, 68, 214, 0.15);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  background: var(--border-control);
+  box-shadow: none;
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--border-control);
+  color: var(--text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-secondary:hover:not(:disabled) {
+    opacity: 1;
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+}
+
+/* Back link, shared by the two auth pages. Sized and shaped like the outline
+   button so the whole column speaks one language. */
+.back-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 44px;
+  padding: 0 var(--s4);
+  border: 1px solid var(--border-control);
+  border-radius: var(--r-btn);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color .15s var(--ease), color .15s var(--ease), transform .12s var(--ease);
+}
+
+.back-btn svg {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  transition: transform .15s var(--ease);
+}
+
+/* Gated: an ungated :hover sticks after a tap on a touch screen, leaving the
+   control looking permanently hovered. */
+@media (hover: hover) and (pointer: fine) {
+  .back-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .back-btn:hover svg { transform: translateX(-3px); }
+}
+
+.back-btn:active { transform: scale(.98); }
+
+.back-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ alerts */
+
+/* The palette allows no tinted fill, so the semantic colour is carried by the
+   whole border and the text rather than by a thick tab down one side. */
 .alert {
-  padding: 12px 14px;
-  border-radius: var(--radius);
-  font-size: 0.85rem;
-  margin-bottom: 18px;
   display: none;
+  margin-bottom: var(--s4);
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--border-control);
+  border-radius: var(--r-input);
+  background: var(--surface);
+  font-size: var(--fs-sm);
 }
 
 .alert.visible { display: block; }
-.alert.success { background: rgba(76,175,125,0.1); color: var(--success); border: 1px solid rgba(76,175,125,0.3); }
-.alert.error { background: rgba(227,93,93,0.1); color: var(--danger); border: 1px solid rgba(227,93,93,0.3); }
+
+/* auth.js still calls showAlert(msg, 'success'). Green is out of the palette,
+   so success speaks in the anchor colour rather than a new hue. */
+.alert.success { border-color: var(--blue); color: var(--blue); }
+.alert.error   { border-color: var(--red);  color: var(--red); }
+
+/* --------------------------------------------------------------------- otp */
 
 .otp-inputs {
   display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin: 20px 0;
+  gap: var(--s2);
+  margin: var(--s5) 0 0;
 }
 
+/* Flexible rather than fixed-width: six 44px boxes plus gaps overflow a 360px
+   screen. These divide whatever room the card has and never overflow. */
 .otp-inputs input {
-  width: 44px;
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
   height: 52px;
-  text-align: center;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.2rem;
   padding: 0;
-}
-
-.code-display {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 18px;
   text-align: center;
-  margin-top: 18px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-.code-display .code {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.7rem;
-  font-weight: 500;
-  letter-spacing: 5px;
-  color: var(--accent);
+/* ------------------------------------------------- reduced motion, globally */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled),
+  .back-btn:active { transform: none; }
+  .back-btn:hover svg { transform: none; }
 }
 
-.code-display .code-note {
-  font-size: 0.78rem;
-  color: var(--text-dim);
-  margin-top: 8px;
-  line-height: 1.4;
+/* ------------------------------------------------------------------- shell
+
+   The product's one full-page layout: a blue identity field beside a white
+   working surface. On a phone the field is a header band and the surface runs
+   beneath it; from 900px up they are two full-height columns. Nothing is ever
+   a small card stranded in empty grey, which is what a centred max-width card
+   becomes on a desktop monitor.
+*/
+
+.shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+@media (min-width: 900px) {
+  .shell {
+    grid-template-rows: none;
+    /* 40% rather than 36%: at 1900px the old split left the working column
+       1235px wide around 600px of content, which read as a void. */
+    grid-template-columns: minmax(360px, 40%) 1fr;
+  }
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding: clamp(24px, 5vw, 48px);
+  background: var(--brand-gradient);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+/* No decorative orbs. The field's authority comes from its area and its type,
+   and a pair of radial glows is the default look of every SaaS hero — it was
+   the main reason this page read as interchangeable. The lower-right glow also
+   brightened the gradient exactly where .locality sits, which is where the
+   contrast risk was measured. */
+
+.identity-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.identity-logo {
+  display: block;
+  width: 100px; height: 100px;
+  margin: 0 auto var(--s4);
+  border-radius: 50%;
+  background: var(--white);
+  padding: 4px;
+  /* No shadow. The seal sits flat on the field — the white disc already
+     separates it, and a drop shadow on a flat plane of colour is the same
+     decorative instinct the orbs were. */
+}
+
+.identity-mark {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 800;
+  line-height: .92;
+  letter-spacing: -.045em;   /* tight tracking is what stops a grotesk reading as a default */
+}
+
+.identity-tagline {
+  margin: var(--s4) 0 0;
+  max-width: 28ch;
+  color: var(--white);
+  font-size: var(--fs-h2);
+  line-height: 1.35;
+}
+
+/* CSS treats the hyphens in "room-to-room" as break opportunities, which
+   stranded "room" at the head of the second line. Holding the compound
+   together makes the line break fall at a real word space instead. */
+.nowrap { white-space: nowrap; }
+
+/* Palette rule 4: red never sits on blue. The pin is white here, and red is
+   kept for the two places it carries meaning — a field you got wrong, and the
+   step you are standing on in the walkthrough. */
+.locality {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--s2);
+  margin: 0;
+  color: var(--white);
+  /* 16px/600, not 14px/400. This line sits over the gradient's bright end,
+     where white measures ~4.3:1 at the terminal stop — the smallest type on
+     the page was in the one place with the least contrast headroom. */
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.locality svg {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/*
+  Below the shell split the identity is a band above the working surface, not a
+  column beside it, and it must behave like one. At 308px it ate 48% of a 640px
+  phone and pushed every destination below the fold — the visitor's first act in
+  an enrolment queue was a blind scroll past a logo of a building they are
+  standing inside. Seal and wordmark share a line, the tagline wraps beneath,
+  and the band lands near 100px.
+*/
+@media (max-width: 899px) {
+  .identity { gap: 0; padding: var(--s4); }
+
+  .identity-main {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 0 var(--s3);
+  }
+
+  .identity-logo { width: 44px; height: 44px; margin: 0; flex-shrink: 0; }
+  .identity-mark { font-size: 1.75rem; }
+
+  .identity-tagline {
+    flex-basis: 100%;
+    margin: var(--s1) 0 0;
+    max-width: none;
+    font-size: var(--fs-sm);
+  }
+
+  /* The campus name moves into the working surface on small screens, where it
+     now carries the building and the room count rather than repeating the
+     institution a second time. */
+  .identity > .locality { display: none; }
+}
+
+.surface {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(24px, 5vw, 48px);
+  /* One background, not a third off-white. #f8fafc sat 1.05:1 from the white
+     cards on it, which erased their only fill boundary. */
+  background: var(--surface);
+  position: relative;
+  z-index: 10;
+}
+
+/* Instead of scallops, let's use a sleek overlapping floating card look on desktop */
+@media (min-width: 900px) {
+  .surface {
+    border-top-left-radius: 32px;
+    border-bottom-left-radius: 32px;
+    box-shadow: -12px 0 40px rgba(0,0,0,0.08);
+    margin-left: -20px; /* overlaps the blue */
+    padding-left: clamp(40px, 6vw, 80px);
+  }
+}
+
+@media (min-width: 900px) {
+  .surface { justify-content: center; }
+}
+
+.surface-inner { width: 100%; max-width: 680px; }
+
+/* Forms read badly at full measure — this keeps label, field and error in one
+   glance without the column looking abandoned. */
+.surface-inner.is-narrow { max-width: 480px; }
+
+.surface-title {
+  margin: var(--s5) 0 var(--s2);
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+
+/* No bottom margin: whatever follows brings its own top margin, so the two
+   never stack into a 48px gap. */
+.surface-lede {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--text-muted);
+}
+
+.surface-form { margin-top: var(--s5); }
+
+/* A shell whose surface scrolls internally instead of the page — the room
+   picker, where the search field and the session footer must stay put. */
+.shell-fixed { height: 100dvh; overflow: hidden; }
+
+/*
+  That page needs its vertical space for the list, so on a phone the identity
+  collapses to a single row: seal and wordmark side by side, nothing else.
+  From 900px it is a full-height column again like every other page.
+*/
+.identity-slim { gap: 0; padding: var(--s3) var(--s4); }
+
+.identity-slim .identity-main {
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;   /* reads as an app bar at this size */
+  gap: var(--s3);
+}
+
+.identity-slim .identity-logo { width: 40px; height: 40px; margin: 0; }
+.identity-slim .identity-mark { font-size: var(--fs-h1); }
+.identity-slim .identity-tagline,
+.identity-slim .locality { display: none; }
+
+@media (min-width: 900px) {
+  .identity-slim { gap: var(--s5); padding: clamp(24px, 5vw, 48px); }
+
+  .identity-slim .identity-main {
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .identity-slim .identity-logo { width: 72px; height: 72px; margin-bottom: var(--s5); }
+  .identity-slim .identity-mark { font-size: clamp(2.5rem, 7vw, 5rem); }
+  .identity-slim .identity-tagline { display: block; }
+  .identity-slim .locality { display: flex; }
 }

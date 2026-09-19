@@ -3,177 +3,207 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack</title>
+<title>EduTrack — Find your room at ACLC Mandaue</title>
+<meta name="description" content="Find any room in the ACLC College Mandaue Admin Building. EduTrack walks you there from the gate through real photos of the building. No account needed.">
+<meta name="theme-color" content="#0033a0">
+<!-- Without this the browser falls back to the XAMPP root favicon — a 31KB
+     request that was the second-largest payload on the page. The seal is
+     already loaded and cached. -->
+<link rel="icon" href="assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
 <style>
-  :root {
-    --ink: #15181d;
-    --plate: #1b1e25;
-    --paper: #f6f4ee;
-    --paper-dim: rgba(246,244,238,0.58);
-    --signal: #e8552a;
-    --muted: #9aa0ab;
-    --line: rgba(246,244,238,0.14);
+  /*
+    The destinations are a directory board, not a stack of cards: full-width
+    rows divided by hairlines, ranked by type size. The guest map is twice the
+    size of the other two and carries the only filled control on the surface,
+    so the entry that needs no account is unmistakable without being a slab.
+  */
+  .destinations {
+    margin-top: var(--s5);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0; min-height: 100%; width: 100%; max-width: 100%; overflow-x: hidden;
-    background: var(--ink); color: var(--paper);
-    font-family: 'Barlow', system-ui, sans-serif;
+  .dest {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    /* Base is the quiet row. The lead overrides to s6 vertical, which is what
+       actually delivers the size step — it measured 1.27x before, against a
+       comment claiming twice the size. */
+    padding: var(--s4) var(--s5);
+    background: #ffffff;
+    /* A real boundary. #edf2f7 measured 1.08:1 against the surface — lighter
+       than the #E5E7EB the system already banned for exactly this failure, and
+       three times short of WCAG 1.4.11. These are the only controls on the
+       page; they cannot rely on a 4%-opacity shadow to exist. */
+    border: 1px solid var(--border-control);
+    border-radius: var(--r-card);
+    color: var(--text);
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    /* Named properties, and no overshoot. cubic-bezier(…, 1.275) springs past
+       its endpoint and settles back — fine for something you see once, wrong
+       for a row you sweep the cursor across every visit. */
+    transition: transform .18s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
   }
 
-  body {
-    min-height: 100vh; padding: 32px 20px;
-    display: flex; flex-direction: column; justify-content: center;
-    background-image: linear-gradient(rgba(21,24,29,0.62), rgba(21,24,29,0.62)), url('assets/img/campus-bg.webp');
-    background-size: cover; background-position: center; background-repeat: no-repeat;
-  }
+  .dest-body { flex: 1; min-width: 0; }
 
-  .plate {
-    position: relative;
-    width: 100%; max-width: 600px; margin: 0 auto;
-    background: rgba(27,30,37,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 44px 40px 30px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  }
-
-  .rivet {
-    position: absolute; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--line);
-  }
-  .rivet.tl { top: 16px; left: 16px; }
-  .rivet.tr { top: 16px; right: 16px; }
-  .rivet.bl { bottom: 16px; left: 16px; }
-  .rivet.br { bottom: 16px; right: 16px; }
-
-  .eyebrow {
-    font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--signal);
-    margin: 0 0 10px; text-align: center;
-  }
-
-  .wordmark {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: clamp(2.4rem, 8vw, 3.2rem); letter-spacing: 0.01em;
-    text-transform: uppercase; text-align: center; margin: 0; line-height: 1;
-  }
-
-  .tagline {
-    text-align: center; color: var(--paper-dim); font-size: 0.92rem;
-    margin: 10px 0 32px; font-weight: 400;
-  }
-
-  .directory { border-top: 1px solid var(--line); }
-
-  .entry {
-    display: flex; align-items: center; gap: 18px;
-    padding: 20px 4px; text-decoration: none; color: var(--paper);
-    border-bottom: 1px solid var(--line);
-    opacity: 0; transform: translateY(6px);
-    animation: rise 0.5s ease forwards;
-  }
-  .entry:nth-child(1) { animation-delay: 0.05s; }
-  .entry:nth-child(2) { animation-delay: 0.14s; }
-  .entry:nth-child(3) { animation-delay: 0.23s; }
-
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-
-  .entry .code {
-    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500;
-    color: var(--muted); border: 1px solid var(--line); border-radius: 3px;
-    padding: 4px 7px; flex-shrink: 0; transition: color 0.15s ease, border-color 0.15s ease;
-  }
-
-  .entry .body { flex: 1; min-width: 0; }
-
-  .entry .title {
+  .dest-title {
     display: block;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.2rem;
-    text-transform: uppercase; letter-spacing: 0.01em; line-height: 1.2;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    transition: color .15s var(--ease);
   }
 
-  .entry .desc {
+  .dest-desc {
     display: block;
-    color: var(--paper-dim); font-size: 0.84rem; margin-top: 3px; line-height: 1.4;
+    margin-top: var(--s2);
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
   }
 
-  .entry .arrow {
-    font-size: 1.1rem; color: var(--muted); flex-shrink: 0;
-    transition: transform 0.15s ease, color 0.15s ease;
+  /* Primary: the one destination that needs no account. */
+  .dest-lead { padding-top: var(--s6); padding-bottom: var(--s6); }
+  .dest-lead .dest-title { font-size: var(--fs-h1); }
+  .dest-lead .dest-desc { color: var(--text); font-size: var(--fs-body); }
+
+  .dest-go {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: var(--white);
+    transition: transform .15s var(--ease);
   }
 
-  .entry:hover, .entry:focus-visible {
-    background: rgba(246,244,238,0.03);
-  }
-  .entry:hover .code, .entry:focus-visible .code {
-    color: var(--signal); border-color: var(--signal);
-  }
-  .entry:hover .arrow, .entry:focus-visible .arrow {
-    color: var(--signal); transform: translateX(3px);
-  }
-  .entry:focus-visible {
-    outline: 2px solid var(--signal); outline-offset: -2px;
+  .dest-go svg { width: 22px; height: 22px; }
+
+  /* Secondary: same row, quieter voice. */
+  .dest-sub .dest-title { font-size: var(--fs-h2); font-weight: 600; }
+
+  .dest-chev {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    color: var(--text-muted);
+    transition: color .15s var(--ease), transform .15s var(--ease);
   }
 
-  .footnote {
-    text-align: center; font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.7rem; color: var(--muted); letter-spacing: 0.02em;
-    margin-top: 26px;
+  @media (hover: hover) and (pointer: fine) {
+    .dest:hover {
+      /* Lift only, and half the previous distance. scale(1.01) blurred the
+         row's own text, and a 4px jump under the cursor reads as the row
+         flinching away from the pointer. */
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      border-color: var(--blue);
+    }
+    .dest:hover .dest-title { color: var(--blue); }
+    .dest:hover .dest-go { transform: translateX(3px) scale(1.05); }
+    .dest:hover .dest-chev { color: var(--blue); transform: translateX(3px); }
   }
 
-  @media (max-width: 480px) {
-    .plate { padding: 36px 22px 24px; }
-    .entry { gap: 12px; padding: 16px 2px; }
-    .entry .code { font-size: 0.7rem; padding: 3px 6px; }
+  /* Press settles the row back onto the surface it lifted off, which is the
+     one moment the movement is answering something the user did. */
+  .dest:active {
+    background: var(--bg);
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  .dest:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
+  }
+
+  /* The lead row carries the longest copy on the page, and at 360px its title
+     wraps to two lines and its description to four. Left at desktop padding it
+     grew to 267px and pushed the second destination back below the fold — the
+     exact problem the identity band was collapsed to solve. */
+  @media (max-width: 899px) {
+    .dest-lead { padding-top: var(--s5); padding-bottom: var(--s5); }
+    .dest-lead .dest-title { font-size: 1.5rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .entry { animation: none; opacity: 1; transform: none; }
+    /* The resting value, not `none`. Because .dest:hover outranks .dest, a
+       bare `box-shadow: none` here DELETED the row's only remaining separation
+       at the exact moment a reduced-motion user hovered it. */
+    .dest:hover { transform: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
+    .dest:hover .dest-go,
+    .dest:hover .dest-chev { transform: none; }
   }
 </style>
 </head>
 <body>
 
-  <div class="plate">
-    <span class="rivet tl"></span><span class="rivet tr"></span>
-    <span class="rivet bl"></span><span class="rivet br"></span>
+  <a class="skip-link" href="#start">Skip to destinations</a>
 
-    <p class="eyebrow">ACLC College &mdash; Mandaue Campus</p>
-    <h1 class="wordmark">EduTrack</h1>
-    <p class="tagline">Campus map &amp; room-to-room walkthrough</p>
+  <div class="shell">
 
-    <nav class="directory">
-      <a class="entry" href="guest-map.html">
-        <span class="code">GST</span>
-        <span class="body">
-          <span class="title">Enrollment Room Map</span>
-          <span class="desc">Find your enrollment room — no account needed</span>
-        </span>
-        <span class="arrow">&rarr;</span>
-      </a>
-      <a class="entry" href="Auth/login.html">
-        <span class="code">LOG</span>
-        <span class="body">
-          <span class="title">Student Login</span>
-          <span class="desc">Log in with your account for full access</span>
-        </span>
-        <span class="arrow">&rarr;</span>
-      </a>
-      <a class="entry" href="Auth/register.html">
-        <span class="code">REG</span>
-        <span class="body">
-          <span class="title">Create Student Account</span>
-          <span class="desc">Register to view full student details</span>
-        </span>
-        <span class="arrow">&rarr;</span>
-      </a>
-    </nav>
+    <header class="identity" aria-label="EduTrack, ACLC College Mandaue Campus">
+      <div class="identity-main">
+        <img class="identity-logo" src="assets/img/aclc-logo.jpg" width="192" height="192" alt="ACLC College &mdash; Mandaue Campus">
+        <h1 class="identity-mark">EduTrack</h1>
+        <p class="identity-tagline">Campus map &amp; <span class="nowrap">room-to-room</span> walkthrough</p>
+      </div>
+      <p class="locality">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        ACLC College &mdash; Mandaue Campus
+      </p>
+    </header>
+
+    <main class="surface" aria-label="Main content">
+      <div class="surface-inner fade-in">
+
+      <h2 class="surface-title" id="start">Start here</h2>
+      <p class="surface-lede">Admin Building &mdash; 41 rooms across three floors.</p>
+
+      <nav class="destinations" aria-label="Destinations">
+
+        <!-- Straight to the room list. This used to route through
+             guest-map.html, a screen whose entire content was the same identity
+             band, a heading, a hedge and one button onward — an interstitial at
+             the exact moment of commitment, on weak Wi-Fi, in a queue. -->
+        <a class="dest dest-lead" href="map/select-room.html">
+          <span class="dest-body">
+            <span class="dest-title">Find your enrollment room</span>
+            <span class="dest-desc">Walk there from the gate, through real photos of the building. No account needed.</span>
+          </span>
+          <span class="dest-go" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+
+        <a class="dest dest-sub" href="Auth/login.html">
+          <span class="dest-body">
+            <span class="dest-title">Student Login</span>
+            <span class="dest-desc">Log in with your account for full access</span>
+          </span>
+          <svg class="dest-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+
+        <a class="dest dest-sub" href="Auth/register.html">
+          <span class="dest-body">
+            <span class="dest-title">Create Student Account</span>
+            <span class="dest-desc">Register to view full student details</span>
+          </span>
+          <svg class="dest-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+
+      </nav>
+
+      </div>
+    </main>
 
   </div>
 

@@ -4,34 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EduTrack — Verify Code</title>
+<meta name="description" content="Enter the 6-digit code sent to your email to verify your EduTrack account.">
+<meta name="theme-color" content="#0033a0">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  /* A long address should wrap inside the lede rather than widen it. */
+  #subtitleText { overflow-wrap: anywhere; }
+
+  /* Centred under a centred row of boxes, rather than left-aligned under the
+     first one. */
+  #err-otp { text-align: center; }
+</style>
 </head>
 <body>
-  <div class="page-center">
-    <div class="card">
-      <h1>Verify your email</h1>
-      <p class="subtitle" id="subtitleText">Enter the 6-digit code we sent you.</p>
 
-      <div id="alertBox" class="alert"></div>
+  <a class="skip-link" href="#main">Skip to the form</a>
 
-      <form id="otpForm" novalidate>
-        <div class="otp-inputs">
-          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit">
-          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit">
-          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit">
-          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit">
-          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit">
-          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit">
-        </div>
-        <div class="field-error" id="err-otp" style="text-align:center;">That code doesn't look right.</div>
+  <div class="shell">
 
-        <button type="submit" class="btn" id="submitBtn">Verify</button>
-      </form>
-
-      <div class="form-footer">
-        Didn't get a code? <a href="#" id="resendLink">Resend</a>
+    <header class="identity" aria-label="EduTrack, ACLC College Mandaue Campus">
+      <div class="identity-main">
+        <img class="identity-logo" src="../assets/img/aclc-logo.jpg" width="192" height="192" alt="ACLC College &mdash; Mandaue Campus">
+        <h1 class="identity-mark">EduTrack</h1>
+        <p class="identity-tagline">Campus map &amp; <span class="nowrap">room-to-room</span> walkthrough</p>
       </div>
-    </div>
+      <p class="locality">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        ACLC College &mdash; Mandaue Campus
+      </p>
+    </header>
+
+    <main class="surface" id="main" aria-label="Main content">
+      <div class="surface-inner is-narrow fade-in">
+
+        <a href="register.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </a>
+
+        <h2 class="surface-title">Verify your email</h2>
+        <p class="surface-lede" id="subtitleText">Enter the 6-digit code we sent you.</p>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="otpForm" class="surface-form" novalidate>
+          <div class="otp-inputs">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" aria-label="Digit 1">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" aria-label="Digit 2">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" aria-label="Digit 3">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" aria-label="Digit 4">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" aria-label="Digit 5">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" aria-label="Digit 6">
+          </div>
+          <div class="field-error" id="err-otp">That code doesn't look right.</div>
+
+          <button type="submit" class="btn" id="submitBtn">Verify</button>
+        </form>
+
+        <div class="form-footer">
+          Didn't get a code? <a href="#" id="resendLink">Resend</a>
+        </div>
+
+      </div>
+    </main>
+
   </div>
 
 <script src="auth.js"></script>
