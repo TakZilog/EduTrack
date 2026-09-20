@@ -18,20 +18,30 @@
 
 :root {
   /* Brand */
-  --blue:       #0044d6;   /* 7.5:1 with white, both directions */
-  --blue-deep:  #00339f;   /* pressed state of anything blue */
-  --blue-wash:  #e6edfc;   /* selected / hovered row; blue text on it is 6.4:1 */
-  --red:        #D3112A;   /* 5.4:1 on white */
-  --red-deep:   #8f0b1d;   /* red text on light fields; 8.7:1 on --red-wash */
-  --red-wash:   #fbe7ea;   /* the one pale red field, used for route-start notes */
-  --white:      #FFFFFF;
+  --blue: #0044d6;
+  /* 7.5:1 with white, both directions */
+  --blue-deep: #00339f;
+  /* pressed state of anything blue */
+  --blue-wash: #e6edfc;
+  /* selected / hovered row; blue text on it is 6.4:1 */
+  --red: #D3112A;
+  /* 5.4:1 on white */
+  --red-deep: #8f0b1d;
+  /* red text on light fields; 8.7:1 on --red-wash */
+  --red-wash: #fbe7ea;
+  /* the one pale red field, used for route-start notes */
+  --white: #FFFFFF;
 
   /* Neutrals, all leaning toward the blue so the page reads as one sign */
-  --bg:          #eef2f8;  /* the wall the signs hang on */
-  --surface:     #FFFFFF;
-  --text:        #10172a;  /* 17:1 on white */
-  --text-muted:  #5b6474;  /* 6.0:1 on white, 5.3:1 on --bg */
-  --border:      #d8dfeb;  /* decorative dividers only */
+  --bg: #eef2f8;
+  /* the wall the signs hang on */
+  --surface: #FFFFFF;
+  --text: #10172a;
+  /* 17:1 on white */
+  --text-muted: #5b6474;
+  /* 6.0:1 on white, 5.3:1 on --bg */
+  --border: #d8dfeb;
+  /* decorative dividers only */
   --border-strong: #b6c0d1;
   /* Anything a finger or keyboard can land on draws its edge in this, which
      clears the 3:1 that WCAG 1.4.11 asks of a control boundary (6.0:1). */
@@ -42,39 +52,59 @@
   --danger: #D3112A;
 
   /* Space: 4 8 12 16 24 32, then 48 and 64 for page rhythm */
-  --s1: 4px;  --s2: 8px;  --s3: 12px;
-  --s4: 16px; --s5: 24px; --s6: 32px;
-  --s7: 48px; --s8: 64px;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
 
   /* Radius. Signs, not pillows: one small radius for every panel and control,
      circles only for the seal. The walkthrough reads these names too. */
-  --r-panel: 6px; --r-card: 6px; --r-btn: 6px; --r-input: 6px; --r-chip: 6px;
+  --r-panel: 6px;
+  --r-card: 6px;
+  --r-btn: 6px;
+  --r-input: 6px;
+  --r-chip: 6px;
 
   /* Type. Barlow was drawn from California highway signage; the condensed cut
      carries headings and floor numerals, the regular cut carries reading. */
-  --font:         'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font: 'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --font-display: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
 
-  --fs-h1: 2.25rem;     /* 36, page titles, condensed */
-  --fs-h2: 1.375rem;    /* 22, section and floor titles, condensed */
-  --fs-h3: 1.125rem;    /* 18, floor labels in the rail and list headers */
-  --fs-body: 1.0625rem; /* 17, Barlow runs small; this reads like 16 elsewhere */
-  --fs-sm: 0.9375rem;   /* 15, the floor of the scale; nothing goes below it */
-  --fs-numeral: 1.875rem; /* 30, floor numerals, the wordmark and the code boxes */
+  --fs-h1: 2.25rem;
+  /* 36, page titles, condensed */
+  --fs-h2: 1.375rem;
+  /* 22, section and floor titles, condensed */
+  --fs-h3: 1.125rem;
+  /* 18, floor labels in the rail and list headers */
+  --fs-body: 1.0625rem;
+  /* 17, Barlow runs small; this reads like 16 elsewhere */
+  --fs-sm: 0.9375rem;
+  /* 15, the floor of the scale; nothing goes below it */
+  --fs-numeral: 1.875rem;
+  /* 30, floor numerals, the wordmark and the code boxes */
 
-  --shadow: 0 1px 2px rgba(16,23,42,.06);
-  --ease: cubic-bezier(.32,.72,0,1);
+  --shadow: 0 1px 2px rgba(16, 23, 42, .06);
+  --ease: cubic-bezier(.32, .72, 0, 1);
 
   --signbar-h: 56px;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 /* Always reserve the scrollbar's space, on both edges so centred content
    stays centred. Without it a tall page (register) shows a scrollbar and a
    short one (login) does not, and the crest and every centred block jump
    sideways by the scrollbar's width when moving between them. */
-html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable both-edges; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable both-edges;
+}
 
 body {
   margin: 0;
@@ -86,17 +116,39 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--blue); text-underline-offset: 3px; }
+a {
+  color: var(--blue);
+  text-underline-offset: 3px;
+}
 
-h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
 
-:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
 
 /* Opacity only, under 200ms, and never for someone who asked for less motion. */
 @media (prefers-reduced-motion: no-preference) {
-  .fade-in { animation: fade .15s ease-out both; }
+  .fade-in {
+    animation: fade .15s ease-out both;
+  }
 }
-@keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+
+@keyframes fade {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
 
 .skip-link {
   position: absolute;
@@ -111,16 +163,27 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   text-decoration: none;
   transform: translateY(-200%);
 }
-.skip-link:focus-visible { transform: translateY(0); }
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
 
 .visually-hidden {
-  position: absolute; width: 1px; height: 1px;
-  margin: -1px; padding: 0; border: 0;
-  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
   white-space: nowrap;
 }
 
-.nowrap { white-space: nowrap; }
+.nowrap {
+  white-space: nowrap;
+}
 
 /* -------------------------------------------------------------- sign strip */
 
@@ -153,12 +216,15 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   text-decoration: none;
 }
 
-.signbar-home:focus-visible { outline-color: var(--white); }
+.signbar-home:focus-visible {
+  outline-color: var(--white);
+}
 
 /* The seal needs a white backing on a coloured field (PRODUCT.md). */
 .signbar-seal {
   display: block;
-  width: 34px; height: 34px;
+  width: 34px;
+  height: 34px;
   padding: 1px;
   border-radius: 50%;
   background: var(--white);
@@ -166,7 +232,10 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
 
 /* One lock-up: name over campus, beside the seal. Nothing sits on the right,
    so the bar reads as a single label and the campus stays visible on phones. */
-.signbar-lockup { display: grid; gap: 1px; }
+.signbar-lockup {
+  display: grid;
+  gap: 1px;
+}
 
 .signbar-mark {
   font-family: var(--font-display);
@@ -187,7 +256,12 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
 
 /* The pages without a sign strip carry the seal and name on the page itself
    as one short centred row, a link home. */
-.brand { max-width: 1160px; margin: 0 auto; padding: var(--s5) clamp(16px, 4vw, 40px) 0; }
+.brand {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: var(--s5) clamp(16px, 4vw, 40px) 0;
+}
+
 /* Fixed box, so the seal lands on the same pixel on every page: its size
    does not depend on font loading or on anything else on the page. */
 .brand-link {
@@ -202,18 +276,27 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   color: inherit;
   text-decoration: none;
 }
+
 /* White disc behind the seal (PRODUCT.md), ringed in Directory Blue. */
 .brand-seal {
   display: block;
-  width: 56px; height: 56px;
+  width: 56px;
+  height: 56px;
   padding: 2px;
   border-radius: 50%;
   background: var(--white);
-  box-shadow: 0 0 0 2px var(--blue), 0 6px 16px rgba(0,68,214,.16);
+  box-shadow: 0 0 0 2px var(--blue), 0 6px 16px rgba(0, 68, 214, .16);
 }
+
 /* A set width, wide enough for the campus line in Barlow, so a fallback
    font on first paint cannot change the crest's width and nudge the seal. */
-.brand-text { display: grid; gap: 2px; width: 14rem; white-space: nowrap; }
+.brand-text {
+  display: grid;
+  gap: 2px;
+  width: 14rem;
+  white-space: nowrap;
+}
+
 .brand-mark {
   color: var(--blue);
   font-family: var(--font-display);
@@ -221,10 +304,17 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   font-weight: 700;
   line-height: 1;
 }
-.brand-sub { color: var(--text-muted); font-size: var(--fs-sm); font-weight: 600; }
+
+.brand-sub {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
 
 /* Under a crest the page starts close, so the two read as one block. */
-.brand + .page { padding-top: var(--s5); }
+.brand+.page {
+  padding-top: var(--s5);
+}
 
 /* --------------------------------------------------------------------- page */
 
@@ -234,7 +324,9 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   padding: clamp(32px, 6vw, 64px) clamp(16px, 4vw, 40px) var(--s8);
 }
 
-.page-narrow { max-width: 460px; }
+.page-narrow {
+  max-width: 460px;
+}
 
 .page-title {
   margin: 0;
@@ -248,7 +340,8 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   margin: var(--s3) 0 0;
   max-width: 44ch;
   color: var(--text-muted);
-  text-wrap: pretty;   /* no single word stranded on the last line */
+  text-wrap: pretty;
+  /* no single word stranded on the last line */
 }
 
 /* A plain text link with an arrow, not a chip: it is the least important
@@ -263,10 +356,21 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   font-weight: 600;
   text-decoration: none;
 }
-.back-link svg { width: 18px; height: 18px; transition: transform .15s var(--ease); }
+
+.back-link svg {
+  width: 18px;
+  height: 18px;
+  transition: transform .15s var(--ease);
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .back-link:hover { color: var(--blue); }
-  .back-link:hover svg { transform: translateX(-3px); }
+  .back-link:hover {
+    color: var(--blue);
+  }
+
+  .back-link:hover svg {
+    transform: translateX(-3px);
+  }
 }
 
 /* ------------------------------------------------------------ floor numeral */
@@ -277,7 +381,8 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   flex-shrink: 0;
   display: inline-grid;
   place-items: center;
-  width: 52px; height: 52px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--r-chip);
   background: var(--blue);
   color: var(--white);
@@ -286,7 +391,12 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   font-weight: 700;
   line-height: 1;
 }
-.floor-num.is-small { width: 32px; height: 32px; font-size: var(--fs-h3); }
+
+.floor-num.is-small {
+  width: 32px;
+  height: 32px;
+  font-size: var(--fs-h3);
+}
 
 /* -------------------------------------------------------------------- steps */
 
@@ -303,13 +413,26 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   font-weight: 600;
   color: var(--text-muted);
 }
-.steps li { padding-top: var(--s2); border-top: 4px solid var(--border-strong); }
-.steps li.is-done { border-top-color: var(--blue); }
-.steps li[aria-current="step"] { border-top-color: var(--blue); color: var(--text); }
+
+.steps li {
+  padding-top: var(--s2);
+  border-top: 4px solid var(--border-strong);
+}
+
+.steps li.is-done {
+  border-top-color: var(--blue);
+}
+
+.steps li[aria-current="step"] {
+  border-top-color: var(--blue);
+  color: var(--text);
+}
 
 /* -------------------------------------------------------------------- forms */
 
-.form { margin-top: var(--s5); }
+.form {
+  margin-top: var(--s5);
+}
 
 label {
   display: block;
@@ -318,7 +441,10 @@ label {
   font-weight: 600;
   color: var(--text);
 }
-label:first-of-type { margin-top: 0; }
+
+label:first-of-type {
+  margin-top: 0;
+}
 
 input[type="text"],
 input[type="password"],
@@ -335,12 +461,16 @@ input[type="search"] {
   background: var(--surface);
   color: var(--text);
   font-family: var(--font);
-  font-size: var(--fs-body);   /* never below 16px, or iOS zooms on focus */
+  font-size: var(--fs-body);
+  /* never below 16px, or iOS zooms on focus */
   transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
 }
 
 /* 4.83:1 on white, and still clearly lighter than typed text. */
-input::placeholder { color: #6B7280; opacity: 1; }
+input::placeholder {
+  color: #6B7280;
+  opacity: 1;
+}
 
 input:focus {
   outline: none;
@@ -353,7 +483,10 @@ input:focus {
   color: var(--text-muted);
   font-size: var(--fs-sm);
 }
-.field-hint:has(+ .field-error.visible) { display: none; }
+
+.field-hint:has(+ .field-error.visible) {
+  display: none;
+}
 
 .field-error {
   display: none;
@@ -362,7 +495,10 @@ input:focus {
   font-size: var(--fs-sm);
   font-weight: 600;
 }
-.field-error.visible { display: block; }
+
+.field-error.visible {
+  display: block;
+}
 
 .form-footer {
   margin-top: var(--s5);
@@ -370,7 +506,10 @@ input:focus {
   border-top: 1px solid var(--border);
   color: var(--text-muted);
 }
-.form-footer a { font-weight: 600; }
+
+.form-footer a {
+  font-weight: 600;
+}
 
 /* ------------------------------------------------------------------ buttons */
 
@@ -395,15 +534,38 @@ input:focus {
   cursor: pointer;
   transition: background-color .15s var(--ease), transform .12s var(--ease);
 }
-.btn svg { width: 20px; height: 20px; transition: transform .15s var(--ease); }
+
+.btn svg {
+  width: 20px;
+  height: 20px;
+  transition: transform .15s var(--ease);
+}
 
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover:not(:disabled) { background: var(--blue-deep); }
-  .btn:hover:not(:disabled) svg { transform: translateX(3px); }
+  .btn:hover:not(:disabled) {
+    background: var(--blue-deep);
+  }
+
+  .btn:hover:not(:disabled) svg {
+    transform: translateX(3px);
+  }
 }
-.btn:active:not(:disabled) { background: var(--blue-deep); transform: scale(.98); }
-.btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
-.btn:disabled { background: var(--border-control); opacity: .5; cursor: not-allowed; }
+
+.btn:active:not(:disabled) {
+  background: var(--blue-deep);
+  transform: scale(.98);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.btn:disabled {
+  background: var(--border-control);
+  opacity: .5;
+  cursor: not-allowed;
+}
 
 /* ------------------------------------------------------------------- alerts */
 
@@ -418,9 +580,20 @@ input:focus {
   background: var(--surface);
   font-weight: 600;
 }
-.alert.visible { display: block; }
-.alert.success { border-color: var(--blue); color: var(--blue); }
-.alert.error   { border-color: var(--red);  color: var(--red); }
+
+.alert.visible {
+  display: block;
+}
+
+.alert.success {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.alert.error {
+  border-color: var(--red);
+  color: var(--red);
+}
 
 /* ---------------------------------------------------------------------- otp */
 
@@ -450,7 +623,12 @@ input:focus {
    it carries one useful fact instead of sitting empty: a room needs no account. */
 /* Same build as the two cards on the home page: white, a 1px Directory
    Blue edge, the pair centred in the page. */
-.auth { display: grid; gap: var(--s5); justify-content: center; }
+.auth {
+  display: grid;
+  gap: var(--s5);
+  justify-content: center;
+}
+
 .auth-form {
   width: 100%;
   max-width: 480px;
@@ -461,7 +639,17 @@ input:focus {
 }
 
 @media (min-width: 960px) {
-  .auth { grid-template-columns: minmax(0, 480px) minmax(0, 320px); gap: var(--s6); align-items: start; }
+  .auth {
+    grid-template-columns: minmax(0, 480px) minmax(0, 320px);
+    gap: var(--s6);
+    align-items: start;
+  }
+
+  /* Login carries no side panel, so its form is the whole grid and stays
+     centred instead of sitting in the left column of two. */
+  .auth-solo {
+    grid-template-columns: minmax(0, 480px);
+  }
 }
 
 .auth-aside {
@@ -470,8 +658,19 @@ input:focus {
   border: 1px solid var(--blue);
   border-radius: var(--r-panel);
 }
-.auth-aside h2 { margin: 0; color: var(--blue); font-size: var(--fs-h2); font-weight: 700; line-height: 1.15; }
-.auth-aside p { margin: var(--s2) 0 0; color: var(--text-muted); }
+
+.auth-aside h2 {
+  margin: 0;
+  color: var(--blue);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.auth-aside p {
+  margin: var(--s2) 0 0;
+  color: var(--text-muted);
+}
 
 .aside-link {
   display: inline-flex;
@@ -482,10 +681,21 @@ input:focus {
   font-weight: 600;
   text-decoration: none;
 }
-.aside-link svg { width: 18px; height: 18px; transition: transform .15s var(--ease); }
+
+.aside-link svg {
+  width: 18px;
+  height: 18px;
+  transition: transform .15s var(--ease);
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .aside-link:hover { text-decoration: underline; }
-  .aside-link:hover svg { transform: translateX(3px); }
+  .aside-link:hover {
+    text-decoration: underline;
+  }
+
+  .aside-link:hover svg {
+    transform: translateX(3px);
+  }
 }
 
 /* An action that reads as a link: it sends a request, so it is a button. */
@@ -505,7 +715,12 @@ input:focus {
 /* ----------------------------------------------------- reduced motion, all */
 
 @media (prefers-reduced-motion: reduce) {
-  .btn:active:not(:disabled) { transform: none; }
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+
   .btn:hover:not(:disabled) svg,
-  .back-link:hover svg { transform: none; }
+  .back-link:hover svg {
+    transform: none;
+  }
 }

@@ -82,6 +82,14 @@
     'access.denied': 'Was refused access'
   };
 
+  /* The log stores the role key. These are the same words the rest of the
+     panel uses for it. */
+  const ROLES = {
+    super_admin: 'Full access',
+    admin: 'Staff, day-to-day work',
+    faculty: 'View only'
+  };
+
   whoSelect.addEventListener('change', e => { state.who = e.target.value; state.page = 1; load(); });
   whatSelect.addEventListener('change', e => { state.action = e.target.value; state.page = 1; load(); });
 
@@ -168,7 +176,7 @@
       sub: relativeTime(entry.created_at),
       body: facts([
         ['Who', entry.admin_name],
-        ['Their access level', entry.role],
+        ['Their access level', ROLES[entry.role] || entry.role],
         ['Exactly when', formatDateTime(entry.created_at)],
         ['Details', entry.detail || 'None recorded'],
         ['From this address', ip]

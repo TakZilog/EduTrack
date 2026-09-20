@@ -365,8 +365,18 @@ html { scrollbar-gutter: auto; }
 
 /* ------------------------------------------------------------------ forms */
 
-/* style.css owns labels, inputs and .btn. These are the panel's own pieces. */
-select, textarea {
+/* style.css owns labels, text inputs and .btn. These are the panel's own
+   pieces: the controls that page never needed, and the panel's sizing. */
+
+/* Buttons here take their own width; the drawer, the rail and the sign-in
+   card set their own full-width rules and still win. */
+:where(.work, .dialog-foot) .btn { width: auto; margin-top: 0; }
+:where(.work) input[type="text"],
+:where(.work) input[type="password"],
+:where(.work) input[type="email"],
+:where(.work) input[type="search"] { min-height: var(--control-h); }
+
+input[type="number"], select, textarea {
   width: 100%;
   min-height: var(--control-h);
   padding: var(--s3) var(--s4);

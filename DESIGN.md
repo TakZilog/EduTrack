@@ -18,19 +18,11 @@ colors:
   control-edge: "#5b6474"
   placeholder: "#6B7280"
   danger: "#D3112A"
-  # Staff panel only (assets/css/admin.css). See "The Staff Panel" below.
-  on-signal: "#ffffff"
-  admin-ink: "#15181d"
-  admin-plate: "#1b1e25"
-  admin-plate-2: "#21252d"
-  admin-plate-3: "#272c35"
-  admin-paper: "#f6f4ee"
-  admin-secondary: "#b9bfc9"
-  admin-signal: "#b3431f"
-  admin-signal-deep: "#9e3a1a"
-  admin-success: "#5cc48d"
-  admin-danger: "#ef6b6b"
-  admin-warning: "#e0a33c"
+  # Staff panel (assets/css/admin.css) uses the palette above unchanged. Its
+  # one addition is a green for "this is fine", which the student pages never
+  # need. See "The Staff Panel" below.
+  admin-good: "#0f7a4a"
+  admin-good-wash: "#e3f4eb"
 typography:
   display:
     fontFamily: "'Barlow Condensed', 'Barlow', system-ui, sans-serif"
@@ -67,33 +59,26 @@ typography:
     fontSize: "0.9375rem"
     fontWeight: 600
     lineHeight: 1.4
-  # Staff panel ramp, deliberately larger. Nothing here goes below 0.9375rem.
+  # Staff panel ramp: the same faces, one step larger. Nothing goes below 1rem.
   admin-page:
-    fontFamily: "'Barlow Condensed', sans-serif"
-    fontSize: "2rem"
+    fontFamily: "'Barlow Condensed', 'Barlow', system-ui, sans-serif"
+    fontSize: "2.25rem"
     fontWeight: 700
     lineHeight: 1.05
-    letterSpacing: "0.01em"
   admin-section:
-    fontFamily: "'Barlow Condensed', sans-serif"
-    fontSize: "1.375rem"
+    fontFamily: "'Barlow Condensed', 'Barlow', system-ui, sans-serif"
+    fontSize: "1.5rem"
     fontWeight: 700
     lineHeight: 1.15
-    letterSpacing: "0.01em"
   admin-body:
-    fontFamily: "'Barlow', sans-serif"
-    fontSize: "1.0625rem"
+    fontFamily: "'Barlow', system-ui, sans-serif"
+    fontSize: "1.125rem"
     fontWeight: 400
-    lineHeight: 1.55
+    lineHeight: 1.5
   admin-label:
-    fontFamily: "'Barlow', sans-serif"
-    fontSize: "0.9375rem"
-    fontWeight: 600
-    lineHeight: 1.4
-  admin-data:
-    fontFamily: "'IBM Plex Mono', monospace"
+    fontFamily: "'Barlow', system-ui, sans-serif"
     fontSize: "1rem"
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1.4
 rounded:
   sign: "6px"
@@ -270,17 +255,35 @@ A strip of ticks across the top of the panorama, one per node on the path: upcom
 
 ## The Staff Panel
 
-A related system, not an identical one. It covers `admin/*.html` and `assets/css/admin.css`, which were not part of the student-side redesign and still run the product's earlier dark editorial world: ink and plate backgrounds, paper text, Signal orange, Barlow Condensed and Barlow, IBM Plex Mono for data. It now shares its type family with the student pages. Do not apply the rules above to `admin/`, and do not apply the rules below to anything else.
+The same world, seen from behind the counter. `admin/*.html` loads
+`assets/css/style.css` first and then `assets/css/admin.css`, so the palette,
+the faces and the controls are the student pages' own. The rules above apply
+here; the rules below are what the panel adds on top of them.
 
-**Who it is for.** Older members of staff at the registrar desk, working during enrolment. That inverts the usual instinct for admin screens: this one is deliberately *less* dense than the student pages.
+**Who it is for.** Older members of staff at the registrar desk, at an office
+PC, working during enrolment. That inverts the usual instinct for admin
+screens: this one is deliberately *less* dense than the student pages.
+
+**Desk and drawer.** Every list page is a list on the left and the open record
+on the right: choosing a student, a room, a log entry or a staff account fills
+the drawer beside it, and the actions for that record live in the drawer's
+foot, next to the facts they change. The list keeps its place, and the open row
+is marked with a blue edge. Below 1100px the drawer drops under the list. Only
+the questions that must be answered before anything else, such as deleting a
+student or limiting which computers may open the panel, still interrupt with a
+dialog.
 
 **What changes, and why:**
-- **Type is larger throughout.** Body is `1.0625rem`, and nothing goes below `0.9375rem`.
-- **Secondary text is lightened** to `#b9bfc9`, which clears AAA on Ink rather than AA.
-- **Semantic colours are brightened** (`#5cc48d`, `#ef6b6b`, `#e0a33c`), and a Warning tone exists here only. Status is never carried by colour alone; every pill contains its word.
-- **Targets are bigger.** Table rows 60px, buttons and inputs 52px, navigation items 56px.
-- **Layout uses a 264px left rail.** Below 900px it becomes a horizontal strip.
-- **No frosted glass.** Every surface is a flat plate with a hairline.
+- **Type is one step larger.** Body is `1.125rem`, and nothing goes below `1rem`.
+- **Targets are bigger.** List rows 64px, buttons and inputs 56px.
+- **A numbered rail.** The five sections carry floor numerals in the lobby
+  directory's own style, with the crest above them. Below 1000px the rail
+  becomes a scrolling strip across the top.
+- **One green added.** `#0f7a4a` says "this is fine" (a verified student, a
+  healthy map). Status is never carried by colour alone; every pill contains
+  its word.
+- **Red stays rare.** A room visitors cannot reach, a refused sign-in, a
+  delete. Nothing else.
 
 ### Named Rules
 
