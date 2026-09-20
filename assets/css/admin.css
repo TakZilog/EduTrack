@@ -105,14 +105,15 @@ html { scrollbar-gutter: auto; }
 .rail-sub { display: block; color: var(--text-muted); font-size: var(--fs-sm); font-weight: 600; }
 
 .rail-nav { flex: 1; min-height: 0; overflow-y: auto; padding: var(--s3); display: grid; gap: var(--s1); align-content: start; }
+.nav-group { display: grid; gap: var(--s1); }
+.nav-group + .nav-group { margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--border); }
 
-/* Sections are numbered like the floors on the lobby directory, so the menu
-   reads as one list of places rather than five separate links. */
+/* One glyph per section instead of a number, so the rail is read by shape. */
 .nav-item {
   display: flex;
   align-items: center;
   gap: var(--s3);
-  min-height: var(--control-h);
+  min-height: var(--row-h);
   padding: 0 var(--s3);
   border: 1px solid transparent;
   border-radius: var(--r-panel);
@@ -122,7 +123,7 @@ html { scrollbar-gutter: auto; }
   text-decoration: none;
   transition: background-color .15s var(--ease), border-color .15s var(--ease);
 }
-.nav-num {
+.nav-icon {
   flex-shrink: 0;
   display: inline-grid;
   place-items: center;
@@ -130,11 +131,9 @@ html { scrollbar-gutter: auto; }
   border-radius: var(--r-chip);
   background: var(--blue-wash);
   color: var(--blue);
-  font-family: var(--font-display);
-  font-size: var(--fs-h3);
-  font-weight: 700;
-  line-height: 1;
+  transition: background-color .15s var(--ease), color .15s var(--ease);
 }
+.nav-icon svg { width: 19px; height: 19px; }
 @media (hover: hover) and (pointer: fine) {
   .nav-item:hover { background: var(--blue-wash); }
 }
@@ -143,7 +142,7 @@ html { scrollbar-gutter: auto; }
   border-color: var(--blue);
   color: var(--blue);
 }
-.nav-item[aria-current="page"] .nav-num { background: var(--blue); color: var(--white); }
+.nav-item[aria-current="page"] .nav-icon { background: var(--blue); color: var(--white); }
 
 .rail-foot { padding: var(--s4); border-top: 1px solid var(--border); }
 .rail-who { font-weight: 600; overflow-wrap: anywhere; }

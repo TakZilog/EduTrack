@@ -276,9 +276,10 @@ dialog.
 **What changes, and why:**
 - **Type is one step larger.** Body is `1.125rem`, and nothing goes below `1rem`.
 - **Targets are bigger.** List rows 64px, buttons and inputs 56px.
-- **A numbered rail.** The five sections carry floor numerals in the lobby
-  directory's own style, with the crest above them. Below 1000px the rail
-  becomes a scrolling strip across the top.
+- **An icon rail.** The five sections each carry a small glyph in a Blue Wash
+  chip, with the crest above them; the active section fills its chip solid
+  Directory Blue. Settings sits below a divider, apart from the four working
+  sections. Below 1000px the rail becomes a scrolling strip across the top.
 - **One green added.** `#0f7a4a` says "this is fine" (a verified student, a
   healthy map). Status is never carried by colour alone; every pill contains
   its word.

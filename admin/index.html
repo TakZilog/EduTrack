@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=7">
-<link rel="stylesheet" href="../assets/css/admin.css?v=5">
+<link rel="stylesheet" href="../assets/css/admin.css?v=6">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -19,11 +19,11 @@
   seen from behind the counter. It refuses the dark dashboard with its own
   palette: one product, one blue, one crest.
   OWN-WORLD: white plates on the blue-grey wall, 1px borders, 6px corners,
-  Barlow Condensed headings over Barlow text, floor numerals beside each
-  section in the rail, red only for a real problem.
+  Barlow Condensed headings over Barlow text, an icon beside each section
+  in the rail, red only for a real problem.
   STORY: a member of staff signs in, sees what changed, opens a student or a
   room, and acts on it without losing the list.
-  FIRST VIEWPORT: numbered rail on the left with the crest above it; the page
+  FIRST VIEWPORT: icon rail on the left with the crest above it; the page
   title and one line of plain English; four counts that are links; below them
   the map's health and the latest activity.
   FORM: desk and drawer, index 4 of the seven structures listed; seed 40a3bc34.
@@ -62,7 +62,7 @@
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js?v=5"></script>
+<script src="../assets/js/admin/admin.js?v=6"></script>
 <script>
 (async function () {
   const s = await boot();
@@ -80,7 +80,7 @@
   /* Each figure links to the list it summarises, with the filter already
      applied, so a number is something you can act on rather than just read. */
   const counts = [
-    { n: data.students.verified, l: 'Students who can sign in', href: 'students.html?status=verified', tone: '' },
+    { n: data.students.verified, l: 'Total Registered Accounts', href: 'students.html?status=verified', tone: '' },
     { n: data.students.pending,  l: 'Waiting to verify email',  href: 'students.html?status=pending',  tone: '' },
     { n: data.rooms.total,       l: 'Rooms on the map',         href: 'rooms.html',                    tone: 'is-quiet' },
     { n: data.rooms.problems,    l: 'Map problems found',       href: 'rooms.html',                    tone: data.rooms.problems > 0 ? 'is-bad' : 'is-quiet' }
@@ -163,5 +163,8 @@
   }
 })();
 </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=039ccad4-fb5c-484e-9552-60ab45ba2e39"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

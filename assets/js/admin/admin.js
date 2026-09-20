@@ -72,15 +72,26 @@ function toSignIn() {
 
 /* ------------------------------------------------------------------ start */
 
-/* Numbered like the floors on the lobby directory, so the menu reads as one
-   list of places rather than five unrelated links. */
+/* One glyph per section, so the rail is scanned by shape rather than counted. */
 const MENU = [
-  { href: 'index.html',    label: 'Overview',  needs: 'student.view' },
-  { href: 'students.html', label: 'Students',  needs: 'student.view' },
-  { href: 'rooms.html',    label: 'Rooms',     needs: 'room.view' },
-  { href: 'activity.html', label: 'Activity',  needs: 'audit.view' },
-  { href: 'settings.html', label: 'Settings',  needs: 'settings.manage' }
+  { href: 'index.html',    label: 'Overview',  needs: 'student.view',
+    icon: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/>' },
+  { href: 'students.html', label: 'Students',  needs: 'student.view',
+    icon: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M14.8 13.3c2.2.4 3.7 2.1 3.7 4.4"/>' },
+  { href: 'rooms.html',    label: 'Rooms',     needs: 'room.view',
+    icon: '<rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="14.5" cy="12" r="1" fill="currentColor" stroke="none"/>' },
+  { href: 'activity.html', label: 'Activity',  needs: 'audit.view',
+    icon: '<path d="M3 12h4l2-7 4 14 2-7h6"/>' },
+  { href: 'settings.html', label: 'Settings',  needs: 'settings.manage',
+    icon: '<line x1="4" y1="6" x2="20" y2="6"/><circle cx="15" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="9" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="15" cy="18" r="2"/>' }
 ];
+
+/* Builds one of the rail's section icons from its path markup. */
+function navIcon(pathMarkup) {
+  const holder = document.createElement('span');
+  holder.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + pathMarkup + '</svg>';
+  return holder.firstChild;
+}
 
 async function boot() {
   const res = await fetch(API + 'session.php', { credentials: 'same-origin' });
@@ -133,24 +144,31 @@ function drawRail() {
   nav.className = 'rail-nav';
   nav.setAttribute('aria-label', 'Sections');
 
+  // Settings sits apart from the working sections, below a divider.
+  const work = document.createElement('div');
+  work.className = 'nav-group';
+  const account = document.createElement('div');
+  account.className = 'nav-group';
+
   MENU.filter(item => allowed(item.needs))
-    .forEach((item, index) => {
+    .forEach(item => {
       const a = document.createElement('a');
       a.className = 'nav-item';
       a.href = item.href;
 
-      const num = document.createElement('span');
-      num.className = 'nav-num';
-      num.setAttribute('aria-hidden', 'true');
-      num.textContent = String(index + 1);
+      const icon = document.createElement('span');
+      icon.className = 'nav-icon';
+      icon.appendChild(navIcon(item.icon));
 
       const label = document.createElement('span');
       label.textContent = item.label;
 
-      a.append(num, label);
+      a.append(icon, label);
       if (item.href === here) a.setAttribute('aria-current', 'page');
-      nav.appendChild(a);
+      (item.href === 'settings.html' ? account : work).appendChild(a);
     });
+
+  nav.append(work, account);
 
   const foot = document.createElement('div');
   foot.className = 'rail-foot';

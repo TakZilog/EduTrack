@@ -1,5 +1,5 @@
 {
-  "files": ["index.html", "Auth/*.html", "map/*.html"],
+  "files": ["index.html", "Auth/*.html", "map/*.html", "admin/*.html"],
   "exclude": ["guest-map.html"],
   "insertBefore": "</body>",
   "commentSyntax": "html",
