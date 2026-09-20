@@ -1,0 +1,16 @@
+# Block the EduTrack mobile app from loading any admin panel page.
+# The app sets its User-Agent to "EduTrackMobile/…", so this catches
+# both the HTML pages and any asset (CSS/JS/image) loaded in that context.
+#
+# A desktop browser's UA will never contain "EduTrackMobile", so staff
+# accessing the panel from a computer are unaffected.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_USER_AGENT} EduTrackMobile [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Also prevent search engines from indexing the admin panel.
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>

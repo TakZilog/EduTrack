@@ -13,6 +13,13 @@ require __DIR__ . '/_bootstrap.php';
 
 app_session_start();
 security_headers();
+
+// The admin session check is web-only. Refuse the mobile app immediately.
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+if (stripos($ua, 'EduTrackMobile') !== false) {
+    json_fail(403, 'The staff panel is not available from the mobile app.');
+}
+
 enforce_ip_allowlist();
 
 if (empty($_SESSION['admin_id'])) {

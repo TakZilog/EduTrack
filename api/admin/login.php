@@ -8,6 +8,12 @@ require __DIR__ . '/../rate-limit.php';
 app_session_start();
 security_headers();
 
+// The admin login is web-only. Refuse the mobile app immediately.
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+if (stripos($ua, 'EduTrackMobile') !== false) {
+    json_fail(403, 'The staff panel is not available from the mobile app.');
+}
+
 // Checked before the password is even looked at, so a computer that is not
 // allowed cannot use this endpoint to test whether an account exists.
 enforce_ip_allowlist();

@@ -27,6 +27,16 @@ function admin_boot(string|array $permission, string $method = 'GET'): array
     app_session_start();
     security_headers();
 
+    // ── Mobile app hard block ──────────────────────────────────────────
+    // The admin panel is web-only. The mobile app identifies itself with a
+    // custom User-Agent ("EduTrackMobile/…"). If that header is present the
+    // request is refused outright — before the IP check, before the session
+    // check, before anything that might leak whether an admin account exists.
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    if (stripos($ua, 'EduTrackMobile') !== false) {
+        json_fail(403, 'The staff panel is not available from the mobile app.');
+    }
+
     // Before anything else, including the session check: a computer that is
     // not allowed here should learn nothing about whether a session exists.
     enforce_ip_allowlist();

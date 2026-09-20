@@ -1,0 +1,8 @@
+# Block the EduTrack mobile app from all admin API endpoints.
+# The app sets its User-Agent to "EduTrackMobile/…". This catches every
+# PHP file under api/admin/ at the Apache layer, before PHP even runs.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_USER_AGENT} EduTrackMobile [NC]
+    RewriteRule .* - [F,L]
+</IfModule>

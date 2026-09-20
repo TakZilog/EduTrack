@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "com.example.mobile_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Removed ndkVersion to bypass sdkmanager crash
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

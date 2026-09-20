@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 /// Where the EduTrack website lives, as the phone sees it.
 ///
@@ -14,6 +16,26 @@ const String siteUrl = String.fromEnvironment(
   'SITE_URL',
   defaultValue: 'http://10.0.2.2/EduTrack/',
 );
+
+/// Path segments that the mobile app must never load. The admin panel is a
+/// web-only tool; exposing it in the app risks leaking staff credentials on
+/// a device that may be shared, screen-recorded, or shoulder-surfed.
+///
+/// Matching is case-insensitive and checks every segment of the URL path, so
+/// `…/admin/login.html`, `…/api/admin/settings.php` and any future sub-path
+/// are all caught regardless of how the URL is cased.
+const Set<String> _blockedSegments = {'admin'};
+
+/// Returns `true` when [url] points at a path the mobile app is not allowed
+/// to open (currently: anything containing an `/admin/` segment).
+bool _isBlockedPath(String url) {
+  final uri = Uri.tryParse(url);
+  if (uri == null) return true; // un-parseable → block to be safe
+
+  // Normalise: split, lower-case, drop empties.
+  final segments = uri.pathSegments.map((s) => s.toLowerCase());
+  return segments.any(_blockedSegments.contains);
+}
 
 /// The whole app: one WebView on the site. Login, the room picker, the 360°
 /// walkthrough and the enrollment map all run as web pages, so they share a
@@ -32,25 +54,48 @@ class _SiteScreenState extends State<SiteScreen> {
   int _progress = 0;
   bool _failed = false;
 
+  /// JavaScript injected after every page load to strip any element that
+  /// links to the admin panel. Belt-and-suspenders: even if a future page
+  /// accidentally includes an admin link, the mobile user never sees it.
+  static const String _stripAdminLinksJs = '''
+    (function() {
+      var links = document.querySelectorAll('a[href]');
+      for (var i = 0; i < links.length; i++) {
+        var href = links[i].getAttribute('href') || '';
+        if (/\\badmin\\b/i.test(href)) {
+          links[i].remove();
+        }
+      }
+    })();
+  ''';
+
   @override
   void initState() {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFFEEF2F8))
+      ..setUserAgent('EduTrackMobile/1.0')
       ..setNavigationDelegate(NavigationDelegate(
         onProgress: (p) => setState(() => _progress = p),
         onPageStarted: (_) => setState(() => _failed = false),
+        onPageFinished: (_) {
+          // Remove any admin-panel links from the rendered page.
+          _controller.runJavaScript(_stripAdminLinksJs);
+        },
         onWebResourceError: (error) {
           // Only a failed page counts; a missing font or image does not.
           if (error.isForMainFrame ?? true) setState(() => _failed = true);
         },
-        // Stay on the EduTrack site. Anything else (a stray external link)
-        // is refused rather than turning the app into a general browser.
+        // Two rules:
+        // 1. Stay on the EduTrack site (same host + port).
+        // 2. Never open an admin path — it is web-only.
         onNavigationRequest: (request) {
           final uri = Uri.tryParse(request.url);
           final sameSite = uri != null && uri.host == _home.host && uri.port == _home.port;
-          return sameSite ? NavigationDecision.navigate : NavigationDecision.prevent;
+          if (!sameSite) return NavigationDecision.prevent;
+          if (_isBlockedPath(request.url)) return NavigationDecision.prevent;
+          return NavigationDecision.navigate;
         },
       ))
       ..loadRequest(_home);

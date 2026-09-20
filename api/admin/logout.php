@@ -6,6 +6,13 @@ require __DIR__ . '/_bootstrap.php';
 
 app_session_start();
 security_headers();
+
+// Admin endpoints are web-only.
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+if (stripos($ua, 'EduTrackMobile') !== false) {
+    json_fail(403, 'The staff panel is not available from the mobile app.');
+}
+
 require_post();
 
 // Signing out is allowed from any role, so this checks the session directly
