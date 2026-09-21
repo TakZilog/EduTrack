@@ -15,7 +15,21 @@ const EDITABLE_SETTINGS = [
     'otp_lifetime_minutes'  => ['label' => 'How long an email code lasts', 'min' => 5, 'max' => 60,   'unit' => 'minutes'],
     'login_max_attempts'    => ['label' => 'Wrong password tries allowed', 'min' => 3, 'max' => 20,   'unit' => 'tries'],
     'login_lockout_minutes' => ['label' => 'Lock-out length',              'min' => 5, 'max' => 120,  'unit' => 'minutes'],
+    'session_timeout_minutes' => ['label' => 'Session timeout',            'min' => 5, 'max' => 480,  'unit' => 'minutes'],
 ];
+
+const STUDENT_VERIFICATION_SETTINGS = [
+    'student_id_verification_enabled'          => ['label' => 'Student ID verification'],
+    'require_active_study_load_enabled'        => ['label' => 'Require active Study Load'],
+    'verify_current_semester_enabled'          => ['label' => 'Verify current semester'],
+    'verify_current_school_year_enabled'       => ['label' => 'Verify current school year'],
+];
+
+function student_verification_bool(string $key, string $default = '1'): bool
+{
+    $value = strtolower(trim((string) setting($key, $default)));
+    return in_array($value, ['1', 'true', 'yes', 'on'], true);
+}
 
 $isWrite = $_SERVER['REQUEST_METHOD'] === 'POST';
 $input   = admin_boot('settings.manage', $isWrite ? 'POST' : 'GET');
@@ -24,7 +38,8 @@ $pdo     = get_db();
 if (!$isWrite) {
     $values = [];
     foreach (EDITABLE_SETTINGS as $key => $meta) {
-        $values[] = $meta + ['key' => $key, 'value' => setting($key)];
+        $default = $key === 'session_timeout_minutes' ? '30' : '';
+        $values[] = $meta + ['key' => $key, 'value' => setting($key, $default)];
     }
 
     $admins = $pdo->query(
@@ -33,9 +48,18 @@ if (!$isWrite) {
     )->fetchAll();
 
     $allowlist = parse_allowlist(setting(IP_ALLOWLIST_KEY, ''));
+    $studentVerification = [];
+    foreach (STUDENT_VERIFICATION_SETTINGS as $key => $meta) {
+        $studentVerification[] = [
+            'key' => $key,
+            'label' => $meta['label'],
+            'enabled' => student_verification_bool($key, '1'),
+        ];
+    }
 
     json_ok([
         'settings' => $values,
+        'studentVerification' => $studentVerification,
         'access'   => [
             'allowlist' => $allowlist,
             'enabled'   => $allowlist !== [],
@@ -101,6 +125,32 @@ switch ((string) ($input['action'] ?? '')) {
 
         json_ok(['message' => $changes ? 'Settings saved.' : 'Nothing was changed.']);
 
+    case 'save-student-verification-settings':
+        $changes = 0;
+        foreach (STUDENT_VERIFICATION_SETTINGS as $key => $meta) {
+            $raw = strtolower(trim((string) ($input[$key] ?? '1')));
+            $enabled = in_array($raw, ['1', 'true', 'yes', 'on', 'enabled'], true);
+            $value = $enabled ? '1' : '0';
+
+            if (setting($key, '1') !== $value) {
+                $changes++;
+            }
+
+            $pdo->prepare(
+                'INSERT INTO app_settings (setting_key, setting_value, updated_by) VALUES (?, ?, ?)
+                 ON DUPLICATE KEY UPDATE setting_value = ?, updated_by = ?'
+            )->execute([
+                $key, $value, $_SESSION['admin_id'],
+                $value, $_SESSION['admin_id'],
+            ]);
+        }
+
+        audit_log('settings.student-verification', 'settings', null, $changes
+            ? 'Updated the student verification configuration.'
+            : 'No student verification settings changed.');
+
+        json_ok(['message' => $changes ? 'Student verification settings saved.' : 'Nothing was changed.']);
+
     case 'save-ip-allowlist':
         $entries = parse_allowlist((string) ($input['allowlist'] ?? ''));
 
@@ -156,8 +206,8 @@ switch ((string) ($input['action'] ?? '')) {
         if (!isset(ADMIN_ROLE_LABELS[$role])) {
             json_fail(400, 'Choose an access level from the list.');
         }
-        if (strlen($password) < 12) {
-            json_fail(400, 'The password needs at least 12 characters.');
+        if (strlen($password) < 15) {
+            json_fail(400, 'The password needs at least 15 characters.');
         }
 
         $stmt = $pdo->prepare('SELECT id FROM admins WHERE username = ?');

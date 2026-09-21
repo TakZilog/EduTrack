@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack Staff Panel - Users &amp; Access</title>
+<meta name="theme-color" content="#1A73E8">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<link rel="stylesheet" href="../assets/css/admin.css?v=11">
+<meta name="robots" content="noindex">
+</head>
+<body class="users-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="rail" id="rail"></aside>
+  <main class="work" id="main">
+    <div class="work-head page-title-row">
+      <div>
+        <h1>Users &amp; Access</h1>
+        <p class="work-lede">Manage people authorized to access the EduTrack Admin Panel.</p>
+      </div>
+      <button type="button" class="btn" id="createUserTop">+ Create User</button>
+    </div>
+    <div class="work-body">
+      <div class="desk">
+        <section class="panel" aria-labelledby="usersTitle">
+          <div class="panel-head"><h2 id="usersTitle">Authorized Users</h2></div>
+          <ul class="rows" id="adminRows"></ul>
+        </section>
+        <section class="drawer" id="drawer" aria-live="polite"
+                 data-empty-title="No user selected"
+                 data-empty-text="Select an authorized user to view access details."></section>
+      </div>
+      <section class="panel" id="createUserPanel">
+        <div class="panel-head">
+          <div>
+            <h2>Create User</h2>
+            <p class="section-lede">Assign the access needed to manage EduTrack.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <form id="addForm">
+            <div class="form-grid">
+              <div class="field"><label for="newName">Full Name</label><input type="text" id="newName" autocomplete="off" maxlength="100"></div>
+              <div class="field"><label for="newUsername">Username</label><input type="text" id="newUsername" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+              <div class="field"><label for="newRole">Access Level</label><select id="newRole"><option value="faculty">View Only</option><option value="admin">Map Editor</option><option value="super_admin">Administrator</option></select></div>
+              <div class="field"><label for="newPassword">Password</label><input type="password" id="newPassword" autocomplete="new-password"><p class="field-hint">Minimum 15 characters.</p></div>
+            </div>
+            <p class="field-error" id="addError"></p>
+            <button type="submit" class="btn" id="addBtn">Create User</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="../assets/js/admin/admin.js?v=11"></script>
+<script>
+(async function () {
+  const s = await boot();
+  if (!s) return;
+  const rows = document.getElementById('adminRows');
+  const drawer = document.getElementById('drawer');
+  let openId = null;
+  const roleLabels = { faculty: 'View Only', admin: 'Map Editor', super_admin: 'Administrator' };
+  const rolePermissions = {
+    faculty: 'Can view locations, routes, and walkthroughs.',
+    admin: 'Can add and update locations, routes, and walkthroughs.',
+    super_admin: 'Full access to EduTrack.'
+  };
+
+  async function load() {
+    const { data } = await apiGet('settings.php');
+    if (!data.ok) { toast(data.error || 'Could not load authorized users.', 'bad'); return; }
+    rows.replaceChildren();
+    data.admins.forEach(admin => {
+      const lastLogin = document.createElement('span');
+      lastLogin.className = 'row-when';
+      lastLogin.textContent = 'Last login: ' + (admin.lastLogin ? relativeTime(admin.lastLogin) : 'Never');
+      rows.appendChild(listRow({
+        title: admin.fullName + (admin.isYou ? ' (you)' : ''),
+        sub: admin.username,
+        end: [pill(roleLabels[admin.role] || admin.roleLabel, 'off'), pill(admin.active ? 'Active' : 'Inactive', admin.active ? 'verified' : 'revoked'), lastLogin],
+        selected: admin.id === openId,
+        onOpen: row => { markOpenRow(rows, row); openUser(admin); }
+      }));
+    });
+    openUser(data.admins.find(admin => admin.id === openId) || null);
+  }
+
+  function openUser(admin) {
+    openId = admin ? admin.id : null;
+    if (!admin) { drawDrawer(drawer, null); return; }
+    const actions = [];
+    if (!admin.isYou) {
+      actions.push(button(
+        admin.active ? 'Turn this account off' : 'Turn this account back on',
+        admin.active ? 'btn-danger' : 'btn',
+        async () => {
+          const yes = await confirmAction({
+            title: admin.active ? 'Turn this account off?' : 'Turn this account back on?',
+            message: admin.active ? admin.fullName + ' will not be able to sign in to this panel.' : admin.fullName + ' will be able to sign in again.',
+            confirmLabel: admin.active ? 'Yes, turn it off' : 'Yes, turn it on',
+            danger: admin.active
+          });
+          if (!yes) return;
+          const { data } = await apiPost('settings.php', { action: 'set-admin-active', id: admin.id, active: !admin.active });
+          if (!data.ok) { toast(data.error, 'bad'); return; }
+          toast(data.message); load();
+        }
+      ));
+    }
+    drawDrawer(drawer, {
+      title: admin.fullName + (admin.isYou ? ' (you)' : ''),
+      sub: admin.username,
+      body: facts([
+        ['Username', admin.username],
+        ['Access level', roleLabels[admin.role] || admin.roleLabel],
+        ['Status', admin.active ? pill('Active', 'verified') : pill('Inactive', 'revoked')],
+        ['Last login', admin.lastLogin ? relativeTime(admin.lastLogin) : 'Never'],
+        ['Permissions', rolePermissions[admin.role] || 'Managed by EduTrack.']
+      ]),
+      actions
+    });
+  }
+
+  document.getElementById('createUserTop').addEventListener('click', () => {
+    document.getElementById('newName').focus();
+    document.getElementById('createUserPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.getElementById('addForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const error = document.getElementById('addError');
+    error.classList.remove('on');
+    const button = document.getElementById('addBtn');
+    button.disabled = true;
+    button.textContent = 'Creating…';
+    const { data } = await apiPost('settings.php', {
+      action: 'add-admin',
+      fullName: document.getElementById('newName').value.trim(),
+      username: document.getElementById('newUsername').value.trim(),
+      role: document.getElementById('newRole').value,
+      password: document.getElementById('newPassword').value
+    });
+    button.disabled = false;
+    button.textContent = 'Create User';
+    if (!data.ok) { error.textContent = data.error; error.classList.add('on'); return; }
+    toast(data.message); event.target.reset(); load();
+  });
+  drawDrawer(drawer, null);
+  load();
+})();
+</script>
+</body>
+</html>

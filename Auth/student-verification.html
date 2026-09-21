@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack - Student Verification</title>
+<meta name="description" content="Verify your student information to access EduTrack room navigation.">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/student-verification.css?v=1">
+</head>
+<body>
+<div class="verification-shell">
+  <header class="verification-brand">
+    <img src="../assets/img/aclc-logo.jpg" width="44" height="44" alt="">
+    <span>
+      <span class="brand-name">EduTrack</span>
+      <span class="brand-context">Student access</span>
+    </span>
+  </header>
+
+  <main class="verification-main" id="main">
+    <div class="progress" aria-label="Verification progress">
+      <span class="is-current" data-progress="1"></span>
+      <span data-progress="2"></span>
+      <span data-progress="3"></span>
+      <span data-progress="4"></span>
+    </div>
+
+    <section class="verification-card" aria-live="polite">
+      <div class="card-content">
+        <section class="step-panel" data-step="1">
+          <h1>Student Verification</h1>
+          <p class="card-subtitle">Verify your student information to access EduTrack.</p>
+          <div id="startAlert" class="alert" role="alert"></div>
+          <form id="startForm" novalidate>
+            <div class="form-grid">
+              <div class="field full">
+                <label for="studentId">Student ID</label>
+                <input id="studentId" name="studentId" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" placeholder="Enter Student ID" required>
+              </div>
+              <div class="field">
+                <label for="schoolYear">School Year</label>
+                <select id="schoolYear" name="schoolYear">
+                  <option value="2026-2027">2026–2027</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="semester">Semester</label>
+                <select id="semester" name="semester">
+                  <option value="1">1st Semester</option>
+                  <option value="2">2nd Semester</option>
+                </select>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="button" type="submit" id="verifyStudentButton">Verify Student</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="step-panel" data-step="2" hidden>
+          <h1>Verify Your Identity</h1>
+          <p class="card-subtitle">Confirm that the student information matches your school record.</p>
+          <div class="summary-grid">
+            <div class="summary-item"><dt>Student ID</dt><dd class="masked" data-student-id></dd></div>
+            <div class="summary-item"><dt>Student Name</dt><dd data-student-name></dd></div>
+            <div class="summary-item"><dt>Program</dt><dd data-program></dd></div>
+            <div class="summary-item"><dt>School Year</dt><dd>2026–2027</dd></div>
+          </div>
+          <div class="actions">
+            <button class="button" type="button" id="identityContinue">Continue</button>
+            <button class="button secondary" type="button" data-back>Back</button>
+          </div>
+        </section>
+
+        <section class="step-panel" data-step="3" hidden>
+          <h1>Study Load Verification</h1>
+          <p class="card-subtitle">Confirm that your current study load matches your active enrollment.</p>
+          <dl class="study-meta">
+            <div><dt>Student ID</dt><dd class="masked" data-student-id></dd></div>
+            <div><dt>Program</dt><dd data-program></dd></div>
+            <div><dt>School Year</dt><dd>2026–2027</dd></div>
+            <div><dt>Semester</dt><dd>1st Semester</dd></div>
+          </dl>
+          <div class="table-wrap">
+            <table class="study-table">
+              <caption class="field-hint" style="caption-side: top; padding: 12px 14px; text-align: left;">Study Load</caption>
+              <thead><tr><th>Course Code</th><th>Subject</th><th>Units</th><th>Schedule</th><th>Room</th></tr></thead>
+              <tbody>
+                <tr><td>IT 301</td><td>Database Management</td><td>3</td><td>M/W 8:00 AM</td><td>204</td></tr>
+                <tr><td>IT 302</td><td>Web Development</td><td>3</td><td>T/Th 10:00 AM</td><td>205</td></tr>
+                <tr><td>IT 303</td><td>Networking</td><td>3</td><td>M/W 1:00 PM</td><td>301</td></tr>
+                <tr><td>IT 304</td><td>Systems Integration</td><td>3</td><td>F 8:00 AM</td><td>302</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="studyAlert" class="alert" role="alert"></div>
+          <div class="actions">
+            <button class="button" type="button" id="verifyStudyButton">Verify Study Load</button>
+            <button class="button secondary" type="button" data-back>Back</button>
+          </div>
+        </section>
+
+        <section class="step-panel" data-step="4" hidden>
+          <div class="result-status"><span class="status-mark" aria-hidden="true">✓</span>Verification Complete</div>
+          <h1 style="margin-top: 14px;">You're ready to navigate</h1>
+          <p class="card-subtitle">Your student information and current study load have been verified.</p>
+          <div class="summary-grid">
+            <div class="summary-item"><dt>Student</dt><dd data-student-name></dd></div>
+            <div class="summary-item"><dt>Program</dt><dd data-program></dd></div>
+            <div class="summary-item"><dt>Student ID</dt><dd class="masked" data-student-id></dd></div>
+            <div class="summary-item"><dt>Semester</dt><dd>1st Semester</dd></div>
+            <div class="summary-item"><dt>School Year</dt><dd>2026–2027</dd></div>
+          </div>
+          <div class="actions">
+            <button class="button" type="button" id="continueToEduTrack">Continue to EduTrack</button>
+          </div>
+        </section>
+
+        <section class="step-panel" data-step="failed" hidden>
+          <h1 class="failure-title">Verification Unsuccessful</h1>
+          <p class="card-subtitle">Student verification could not be completed. Please check your credentials and enrollment information.</p>
+          <div id="failureAlert" class="alert is-visible is-error" role="alert">Student verification could not be completed. Please check your credentials and enrollment information.</div>
+          <div class="actions">
+            <button class="button" type="button" id="tryAgain">Try Again</button>
+          </div>
+        </section>
+      </div>
+      <div class="card-footer">Your Student ID and enrollment information are used to verify your access.</div>
+    </section>
+  </main>
+</div>
+<script src="auth.js"></script>
+<script>
+  const panels = [...document.querySelectorAll('[data-step]')];
+  const progress = [...document.querySelectorAll('[data-progress]')];
+  const state = { step: 1, studentName: '', maskedStudentId: '', program: '' };
+
+  function showStep(step) {
+    state.step = step;
+    panels.forEach(panel => { panel.hidden = panel.dataset.step !== String(step); });
+    progress.forEach(item => {
+      const number = Number(item.dataset.progress);
+      item.classList.toggle('is-current', number === step);
+      item.classList.toggle('is-done', number < step);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function fillIdentity(data) {
+    state.studentName = data.studentName;
+    state.maskedStudentId = data.maskedStudentId;
+    state.program = data.program;
+    document.querySelectorAll('[data-student-name]').forEach(el => { el.textContent = state.studentName; });
+    document.querySelectorAll('[data-student-id]').forEach(el => { el.textContent = state.maskedStudentId; });
+    document.querySelectorAll('[data-program]').forEach(el => { el.textContent = state.program; });
+  }
+
+  function showAlert(id, message, type = 'error') {
+    const alert = document.getElementById(id);
+    alert.textContent = message;
+    alert.className = 'alert is-visible is-' + type;
+  }
+
+  function clearAlert(id) {
+    const alert = document.getElementById(id);
+    alert.className = 'alert';
+    alert.textContent = '';
+  }
+
+  document.getElementById('startForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    clearAlert('startAlert');
+    const button = document.getElementById('verifyStudentButton');
+    button.disabled = true;
+    button.textContent = 'Verifying…';
+
+    try {
+      const { data } = await apiPost('student-verification.php', {
+        action: 'lookup',
+        studentId: document.getElementById('studentId').value.trim(),
+        schoolYear: document.getElementById('schoolYear').value,
+        semester: document.getElementById('semester').value
+      });
+      if (!data.ok) {
+        showStep('failed');
+        return;
+      }
+      fillIdentity(data);
+      showStep(2);
+    } catch {
+      showStep('failed');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Verify Student';
+    }
+  });
+
+  document.getElementById('identityContinue').addEventListener('click', () => showStep(3));
+
+  document.getElementById('verifyStudyButton').addEventListener('click', async () => {
+    clearAlert('studyAlert');
+    const button = document.getElementById('verifyStudyButton');
+    button.disabled = true;
+    button.textContent = 'Verifying…';
+    try {
+      const { data } = await apiPost('student-verification.php', { action: 'verify-study-load' });
+      if (!data.ok) {
+        showAlert('studyAlert', data.error || 'We could not verify your current study load.');
+        return;
+      }
+      fillIdentity(data);
+      showStep(4);
+    } catch {
+      showAlert('studyAlert', 'Could not reach EduTrack. Try again.');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Verify Study Load';
+    }
+  });
+
+  document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showStep(Math.max(1, state.step - 1))));
+  document.getElementById('tryAgain').addEventListener('click', () => {
+    document.getElementById('startForm').reset();
+    clearAlert('startAlert');
+    showStep(1);
+  });
+  document.getElementById('continueToEduTrack').addEventListener('click', () => {
+    window.location.href = 'student-home.html';
+  });
+</script>
+</body>
+</html>

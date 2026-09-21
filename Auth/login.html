@@ -72,7 +72,7 @@
           return;
         }
         // Older accounts have no enrolment numbers; the tour would refuse them.
-        window.location.href = data.needsDetails ? 'add-details.html' : '../map/select-room.html';
+        window.location.href = data.needsDetails ? 'add-details.html' : 'student-verification.html';
       })
       .catch(() => {
         setSubmitting(false);

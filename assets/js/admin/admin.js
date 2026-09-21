@@ -76,11 +76,13 @@ function toSignIn() {
 const MENU = [
   { href: 'index.html',    label: 'Overview',  needs: 'student.view',
     icon: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/>' },
-  { href: 'students.html', label: 'Students',  needs: 'student.view',
-    icon: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M14.8 13.3c2.2.4 3.7 2.1 3.7 4.4"/>' },
-  { href: 'rooms.html',    label: 'Rooms',     needs: 'room.view',
+  { href: 'rooms.html',    label: 'Locations', needs: 'room.view',
     icon: '<rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="14.5" cy="12" r="1" fill="currentColor" stroke="none"/>' },
-  { href: 'activity.html', label: 'Activity',  needs: 'audit.view',
+  { href: 'navigation-map.html', label: 'Navigation Map', needs: 'room.view',
+    icon: '<path d="M4 5.5 10 3l4 2 4-2.5v16L14 21l-4-2-6 2.5z"/><path d="M10 3v16M14 5v16"/>' },
+  { href: 'users-access.html', label: 'Users & Access', needs: 'settings.manage',
+    icon: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M14.8 13.3c2.2.4 3.7 2.1 3.7 4.4"/>' },
+  { href: 'activity.html', label: 'Activity Log', needs: 'audit.view',
     icon: '<path d="M3 12h4l2-7 4 14 2-7h6"/>' },
   { href: 'settings.html', label: 'Settings',  needs: 'settings.manage',
     icon: '<line x1="4" y1="6" x2="20" y2="6"/><circle cx="15" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="9" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="15" cy="18" r="2"/>' }
@@ -179,7 +181,9 @@ function drawRail() {
   name.textContent = session.admin.fullName;
   const role = document.createElement('div');
   role.className = 'rail-role';
-  role.textContent = session.admin.roleLabel;
+  role.textContent = session.admin.roleLabel === 'Full access'
+    ? 'Administrator / Full Access'
+    : session.admin.roleLabel;
   who.append(name, role);
 
   const out = document.createElement('button');
@@ -355,7 +359,7 @@ function button(label, kind, onClick) {
  * a title, a quieter second line, and whatever belongs at the right edge
  * (a status word, a date).
  */
-function listRow({ title, sub, end = [], selected = false, onOpen }) {
+function listRow({ title, sub, end = [], endMode = 'group', selected = false, onOpen }) {
   const li = document.createElement('li');
 
   const row = document.createElement('button');
@@ -380,7 +384,12 @@ function listRow({ title, sub, end = [], selected = false, onOpen }) {
 
   row.appendChild(main);
 
-  if (end.length) {
+  if (end.length && endMode === 'columns') {
+    end.forEach(node => {
+      node.classList.add('row-end-column');
+      row.appendChild(node);
+    });
+  } else if (end.length) {
     const tail = document.createElement('div');
     tail.className = 'row-end';
     end.forEach(node => tail.appendChild(node));

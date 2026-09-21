@@ -35,6 +35,45 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
     json_fail(401, 'Incorrect email or password');
 }
 
+$studentVerificationEnabled = strtolower(trim((string) setting('student_id_verification_enabled', '1'))) !== '0';
+$requireActiveStudyLoad = strtolower(trim((string) setting('require_active_study_load_enabled', '1'))) !== '0';
+$verifyCurrentSemester = strtolower(trim((string) setting('verify_current_semester_enabled', '1'))) !== '0';
+$verifyCurrentSchoolYear = strtolower(trim((string) setting('verify_current_school_year_enabled', '1'))) !== '0';
+
+if ($studentVerificationEnabled) {
+    $studentNo = trim((string) ($user['student_no'] ?? ''));
+    if ($studentNo === '') {
+        rate_limit_record($email, 'student_login', false);
+        rate_limit_record($ip, 'student_login_ip', false);
+        error_log('[EduTrack] student login blocked: missing student ID for user ' . (int) $user['id']);
+        json_fail(401, 'Student verification could not be completed. Please check your credentials and enrollment information.');
+    }
+}
+
+if ($requireActiveStudyLoad) {
+    $studyLoad = trim((string) ($user['study_load_no'] ?? ''));
+    if ($studyLoad === '') {
+        rate_limit_record($email, 'student_login', false);
+        rate_limit_record($ip, 'student_login_ip', false);
+        error_log('[EduTrack] student login blocked: missing active study load for user ' . (int) $user['id']);
+        json_fail(401, 'Student verification could not be completed. Please check your credentials and enrollment information.');
+    }
+}
+
+if ($verifyCurrentSemester || $verifyCurrentSchoolYear) {
+    $semester = trim((string) ($input['semester'] ?? ''));
+    $schoolYear = trim((string) ($input['schoolYear'] ?? ''));
+    $expectedSemester = '1';
+    $expectedSchoolYear = '2026-2027';
+
+    if (($verifyCurrentSemester && $semester !== $expectedSemester) || ($verifyCurrentSchoolYear && $schoolYear !== $expectedSchoolYear)) {
+        rate_limit_record($email, 'student_login', false);
+        rate_limit_record($ip, 'student_login_ip', false);
+        error_log('[EduTrack] student login blocked: verification mismatch for user ' . (int) $user['id']);
+        json_fail(401, 'Student verification could not be completed. Please check your credentials and enrollment information.');
+    }
+}
+
 /*
   Deactivation has to be enforced here or it means nothing. The admin panel
   tells whoever turns an account off that the student "can no longer sign in"
@@ -79,6 +118,10 @@ session_regenerate_id(true); // closes off session fixation
 $_SESSION['user_id']   = $user['id'];
 $_SESSION['full_name'] = $user['full_name'];
 $_SESSION['email']     = $user['email'];
+
+if ($studentVerificationEnabled) {
+    $_SESSION['student_id_verified'] = true;
+}
 
 // Accounts made before migration 006 have no enrolment numbers yet. They can
 // log in, but the room tour needs both, so the page sends them to add them.

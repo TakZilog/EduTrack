@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-const SESSION_IDLE_TIMEOUT = 1800; // 30 minutes
+const SESSION_IDLE_TIMEOUT = 1800; // 30 minutes fallback
 
 function app_session_start(): void
 {
@@ -27,10 +27,23 @@ function app_session_start(): void
 
     session_start();
 
-    // Idle timeout. Anything older than the window starts over with a fresh id,
-    // which matters most on shared machines.
+    // Idle timeout. Anything older than the configured window starts over with
+    // a fresh id, which matters most on shared machines.
+    $idleTimeout = SESSION_IDLE_TIMEOUT;
+    try {
+        require_once __DIR__ . '/db.php';
+        $configured = get_db()->query(
+            "SELECT setting_value FROM app_settings WHERE setting_key = 'session_timeout_minutes'"
+        )->fetchColumn();
+        if (is_numeric($configured)) {
+            $idleTimeout = max(300, min(28800, (int) $configured * 60));
+        }
+    } catch (Throwable) {
+        // Keep the secure 30-minute fallback when storage is unavailable.
+    }
+
     $now = time();
-    if (isset($_SESSION['last_activity']) && ($now - $_SESSION['last_activity']) > SESSION_IDLE_TIMEOUT) {
+    if (isset($_SESSION['last_activity']) && ($now - $_SESSION['last_activity']) > $idleTimeout) {
         $_SESSION = [];
         session_regenerate_id(true);
     }

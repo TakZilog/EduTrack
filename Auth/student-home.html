@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack - Student Home</title>
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/student-verification.css?v=1">
+<style>
+  .home-card { margin-top: 24px; padding: 20px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); }
+  .home-card h2 { margin: 0; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 1.35rem; }
+  .home-card p { margin: 5px 0 0; color: var(--muted); font-size: .9rem; }
+  .student-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+  .student-strip dt { color: var(--muted); font-size: .76rem; }
+  .student-strip dd { margin: 2px 0 0; font-size: .9rem; font-weight: 600; }
+  .class-list { display: grid; gap: 10px; margin-top: 18px; }
+  .class-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 15px 0; border-top: 1px solid var(--border); }
+  .class-item h3 { margin: 0; font-size: 1rem; }
+  .class-item p { margin: 3px 0 0; }
+  .class-room { color: var(--blue-deep); font-weight: 600; }
+  .class-action { min-height: 40px; padding: 0 14px; font-size: .86rem; }
+  .route-detail { display: none; grid-column: 1 / -1; padding: 13px 14px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); }
+  .route-detail.is-open { display: block; }
+  .route-detail p { margin: 0; }
+  .link-button { padding: 0; border: 0; background: transparent; color: var(--blue); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 600px) { .student-strip { grid-template-columns: 1fr; } .class-item { grid-template-columns: 1fr; } .class-action { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="verification-shell">
+  <header class="verification-brand">
+    <img src="../assets/img/aclc-logo.jpg" width="44" height="44" alt="">
+    <span><span class="brand-name">EduTrack</span><span class="brand-context">Student navigation</span></span>
+  </header>
+  <main class="verification-main" id="main">
+    <div class="progress"><span class="is-done"></span><span class="is-done"></span><span class="is-done"></span><span class="is-done"></span></div>
+    <section class="verification-card">
+      <div class="card-content">
+        <h1>Welcome, <span id="studentName">Student</span></h1>
+        <p class="card-subtitle">Find an assigned room and start the route from the campus gate.</p>
+        <dl class="student-strip">
+          <div><dt>Student ID</dt><dd class="masked" id="studentId">••••••••</dd></div>
+          <div><dt>Program</dt><dd id="program">BS Information Technology</dd></div>
+          <div><dt>Current study load</dt><dd>1st Semester · 2026–2027</dd></div>
+        </dl>
+        <section class="home-card" aria-labelledby="classesTitle">
+          <h2 id="classesTitle">Today's classes</h2>
+          <p>Choose a room to review its location and start navigation.</p>
+          <div class="class-list">
+            <article class="class-item" data-room="204">
+              <div><h3>Database Management</h3><p>8:00 AM – 9:30 AM · <span class="class-room">Room 204</span></p></div>
+              <button class="button secondary class-action" type="button">Find Room</button>
+              <div class="route-detail"><p><strong>Room 204</strong><br>2nd Floor · Admin Building<br>Route from the gate through the EduTrack walkthrough.</p><div class="actions"><a class="button class-action" href="../map/walkthrough.html?room=204">Start Navigation</a></div></div>
+            </article>
+            <article class="class-item" data-room="205">
+              <div><h3>Web Development</h3><p>10:00 AM – 11:30 AM · <span class="class-room">Room 205</span></p></div>
+              <button class="button secondary class-action" type="button">Find Room</button>
+              <div class="route-detail"><p><strong>Room 205</strong><br>2nd Floor · Admin Building<br>Route from the gate through the EduTrack walkthrough.</p><div class="actions"><a class="button class-action" href="../map/walkthrough.html?room=205">Start Navigation</a></div></div>
+            </article>
+          </div>
+        </section>
+      </div>
+      <div class="card-footer"><a href="../map/select-room.html">Browse all rooms</a> · <button class="link-button" id="signOut" type="button">Sign out</button></div>
+    </section>
+  </main>
+</div>
+<script src="auth.js"></script>
+<script>
+  fetch('../api/whoami.php', { credentials: 'same-origin' })
+    .then(response => response.json())
+    .then(data => {
+      if (!data.signedIn) {
+        window.location.href = 'student-verification.html';
+        return;
+      }
+      document.getElementById('studentName').textContent = data.fullName;
+      document.getElementById('studentId').textContent = data.studentId;
+      document.getElementById('program').textContent = data.program;
+    })
+    .catch(() => { window.location.href = 'student-verification.html'; });
+
+  document.querySelectorAll('.class-item button.class-action').forEach(button => {
+    button.addEventListener('click', () => {
+      const detail = button.parentElement.parentElement.querySelector('.route-detail');
+      const open = detail.classList.toggle('is-open');
+      button.textContent = open ? 'Hide route' : 'Find Room';
+    });
+  });
+
+  document.getElementById('signOut').addEventListener('click', async () => {
+    await apiPost('logout.php');
+    window.location.href = '../index.html';
+  });
+</script>
+</body>
+</html>

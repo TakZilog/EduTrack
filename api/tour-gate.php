@@ -18,6 +18,9 @@ function require_tour_access(): void
 {
     app_session_start();
     $id = $_SESSION["user_id"] ?? null;
+    if ($id && !isset($_SESSION['student_verified_at'])) {
+        json_fail(401, "Verify your student information before opening the room tour.", ["code" => "verification_required"]);
+    }
     if ($id) {
         $s = get_db()->prepare("SELECT email_verified, deactivated_at, student_no, study_load_no FROM users WHERE id = ?");
         $s->execute([$id]);

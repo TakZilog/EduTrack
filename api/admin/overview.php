@@ -20,6 +20,11 @@ $students = $pdo->query(
 
 $graph    = load_graph();
 $problems = graph_health($graph);
+$reachable = reachable_nodes($graph);
+$reachableLocations = count(array_filter(
+    $graph['rooms'],
+    static fn ($room) => isset($reachable[$room['node_id']])
+));
 
 $recent = [];
 if (can('audit.view')) {
@@ -39,8 +44,10 @@ json_ok([
         'turnedOff'  => (int) $students['turned_off'],
     ],
     'rooms' => [
-        'total'    => count($graph['rooms']),
-        'problems' => count($problems),
+        'total'      => count($graph['rooms']),
+        'photos'     => count($graph['nodes']),
+        'reachable'  => $reachableLocations,
+        'problems'   => count($problems),
     ],
     'problems' => $problems,
     'recent'   => $recent,

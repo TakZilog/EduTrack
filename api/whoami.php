@@ -27,7 +27,7 @@ if (!$userId) {
     json_ok(['signedIn' => false]);
 }
 
-$stmt = get_db()->prepare('SELECT id, full_name, deactivated_at FROM users WHERE id = ?');
+$stmt = get_db()->prepare('SELECT id, full_name, student_no, deactivated_at FROM users WHERE id = ?');
 $stmt->execute([$userId]);
 $user = $stmt->fetch();
 
@@ -46,4 +46,15 @@ if (!$user || $user['deactivated_at'] !== null) {
 json_ok([
     'signedIn' => true,
     'fullName' => $user['full_name'],
+    'studentId' => mask_student_id((string) $user['student_no']),
+    'program' => 'BS Information Technology',
 ]);
+
+function mask_student_id(string $studentId): string
+{
+    $length = strlen($studentId);
+    if ($length <= 4) {
+        return str_repeat('•', $length);
+    }
+    return str_repeat('•', $length - 4) . substr($studentId, -4);
+}

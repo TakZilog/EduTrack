@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=7">
-<link rel="stylesheet" href="../assets/css/admin.css?v=6">
+<link rel="stylesheet" href="../assets/css/admin.css?v=11">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -38,16 +38,20 @@
 
   <main class="work" id="main">
     <div class="work-head">
-      <h1>Overview</h1>
-      <p class="work-lede" id="greeting">Everything at a glance.</p>
+      <div class="page-title-row">
+        <div>
+          <h1>Overview</h1>
+          <p class="work-lede">A clear view of location coverage, route health, and recent Admin activity.</p>
+        </div>
+      </div>
     </div>
 
     <div class="work-body">
-      <h2 class="sr-only">Students and rooms</h2>
+      <h2 class="sr-only">Navigation overview</h2>
       <div class="counts" id="counts"></div>
 
       <section class="panel">
-        <div class="panel-head"><h2>The campus map</h2></div>
+        <div class="panel-head"><h2>Navigation Status</h2></div>
         <div class="panel-body" id="problems"></div>
       </section>
 
@@ -62,14 +66,11 @@
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js?v=6"></script>
+<script src="../assets/js/admin/admin.js?v=11"></script>
 <script>
 (async function () {
   const s = await boot();
   if (!s) return;
-
-  document.getElementById('greeting').textContent =
-    'Signed in as ' + s.admin.fullName + '. ' + s.admin.roleLabel + '.';
 
   const { data } = await apiGet('overview.php');
   if (!data.ok) {
@@ -80,10 +81,10 @@
   /* Each figure links to the list it summarises, with the filter already
      applied, so a number is something you can act on rather than just read. */
   const counts = [
-    { n: data.students.verified, l: 'Total Registered Accounts', href: 'students.html?status=verified', tone: '' },
-    { n: data.students.pending,  l: 'Waiting to verify email',  href: 'students.html?status=pending',  tone: '' },
-    { n: data.rooms.total,       l: 'Rooms on the map',         href: 'rooms.html',                    tone: 'is-quiet' },
-    { n: data.rooms.problems,    l: 'Map problems found',       href: 'rooms.html',                    tone: data.rooms.problems > 0 ? 'is-bad' : 'is-quiet' }
+    { n: data.rooms.total,      l: 'Mapped Locations',     href: 'rooms.html', tone: '' },
+    { n: data.rooms.photos,     l: 'Walkthrough Photos',   href: 'rooms.html', tone: '' },
+    { n: data.rooms.reachable,  l: 'Reachable Locations',  href: 'rooms.html', tone: '' },
+    { n: data.rooms.problems,   l: 'Navigation Issues',    href: 'rooms.html', tone: data.rooms.problems > 0 ? 'is-bad' : '' }
   ];
 
   const host = document.getElementById('counts');
@@ -107,8 +108,8 @@
   /* Map problems */
   const problems = document.getElementById('problems');
   if (data.problems.length === 0) {
-    problems.appendChild(notice('good', 'The map is healthy',
-      'Every room can be reached from the gate.'));
+    problems.appendChild(notice('good', '✓ ' + data.rooms.reachable + ' locations have valid routes',
+      'All mapped locations currently have valid routes.'));
   } else {
     data.problems.forEach(p => {
       problems.appendChild(notice(p.severity === 'error' ? 'error' : 'warning', p.title, p.detail));

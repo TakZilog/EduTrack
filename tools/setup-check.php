@@ -61,9 +61,9 @@ echo 'Project: ' . $root . PHP_EOL;
 
 section('php');
 
-PHP_VERSION_ID >= 80100
+PHP_VERSION_ID >= 80000
     ? report('ok', 'PHP ' . PHP_VERSION)
-    : report('fail', 'PHP ' . PHP_VERSION . ' is too old', 'EduTrack needs PHP 8.1 or newer. Install a newer version of XAMPP.');
+    : report('fail', 'PHP ' . PHP_VERSION . ' is too old', 'EduTrack needs PHP 8.0 or newer. Install a newer version of XAMPP.');
 
 foreach (['pdo_mysql', 'mbstring', 'openssl', 'json'] as $ext) {
     extension_loaded($ext)

@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=7">
-<link rel="stylesheet" href="../assets/css/admin.css?v=6">
+<link rel="stylesheet" href="../assets/css/admin.css?v=11">
 <meta name="robots" content="noindex">
 </head>
-<body>
+<body class="settings-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
@@ -21,117 +21,111 @@
 
   <main class="work" id="main">
     <div class="work-head">
-      <h1>Settings</h1>
-      <p class="work-lede">How long email codes last, who is allowed into this panel, and who works here.</p>
+      <div class="page-title-row">
+        <div>
+          <h1>Settings</h1>
+          <p class="work-lede">Manage EduTrack security and administrator access.</p>
+        </div>
+      </div>
     </div>
 
     <div class="work-body">
       <section class="panel">
-        <div class="panel-head"><h2>Timings</h2></div>
+        <div class="panel-head">
+          <div>
+            <h2>Authentication &amp; Security</h2>
+            <p class="section-lede">Set the safeguards that protect administrator accounts.</p>
+          </div>
+        </div>
         <div class="panel-body">
           <form id="settingsForm">
             <div class="form-grid" id="settingsFields"></div>
-            <button type="submit" class="btn" id="saveBtn">Save timings</button>
+            <button type="submit" class="btn" id="saveBtn">Save Security Settings</button>
           </form>
         </div>
       </section>
 
       <section class="panel">
-        <div class="panel-head"><h2>Which computers can open this panel</h2></div>
+        <div class="panel-head">
+          <div>
+            <h2>Student Verification</h2>
+            <p class="section-lede">Configure the student information checks used to verify access to EduTrack.</p>
+          </div>
+        </div>
         <div class="panel-body">
+          <form id="studentVerificationForm">
+            <div class="form-grid student-verification-grid" id="studentVerificationFields"></div>
+            <button type="submit" class="btn" id="saveStudentVerificationBtn">Save Verification Settings</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Admin Access Restrictions</h2>
+            <p class="section-lede">Control which devices or networks can access the EduTrack Admin Panel.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="field access-mode-field">
+            <label for="accessMode">Access mode</label>
+            <select id="accessMode">
+              <option value="approved">Approved addresses</option>
+              <option value="all">Allow all devices on the network</option>
+            </select>
+          </div>
           <div id="accessState"></div>
           <form id="accessForm">
-            <div class="field">
-              <label for="allowlist">Allowed addresses</label>
+            <div class="field" id="approvedAddressesField">
+              <label for="allowlist">Approved IP addresses</label>
               <textarea id="allowlist" rows="4" spellcheck="false"
-                placeholder="Leave empty to allow every computer on the network"></textarea>
+                placeholder="192.168.1.0/24"></textarea>
               <p class="field-hint">
-                One per line. Use a single address like <span class="mono">192.168.0.50</span> for one computer,
-                or <span class="mono">192.168.0.0/24</span> for a whole network. Leave it empty to turn the
-                restriction off. The server itself can always get in, so you cannot lock yourself out for good.
+                Enter one IP address or network per line.
               </p>
             </div>
             <p class="field-error" id="accessError"></p>
             <div class="btn-row">
-              <button type="submit" class="btn" id="accessSave">Save</button>
-              <button type="button" class="btn btn-quiet" id="addMine">Add this computer</button>
+              <button type="submit" class="btn" id="accessSave">Save Restrictions</button>
+              <button type="button" class="btn btn-quiet" id="addMine">Add IP Address</button>
             </div>
           </form>
         </div>
       </section>
 
-      <div class="desk">
-        <section class="panel" aria-labelledby="staffTitle">
-          <div class="panel-head"><h2 id="staffTitle">Staff accounts</h2></div>
-          <ul class="rows" id="adminRows"></ul>
-        </section>
-
-        <section class="drawer" id="drawer" aria-live="polite"
-                 data-empty-title="No account open"
-                 data-empty-text="Choose someone on the left to see their access, or add a new account below."></section>
-      </div>
-
-      <section class="panel">
-        <div class="panel-head"><h2>Create Staff Account</h2></div>
-        <div class="panel-body">
-          <form id="addForm">
-            <div class="form-grid">
-              <div class="field">
-                <label for="newName">Full name</label>
-                <input type="text" id="newName" autocomplete="off" maxlength="100">
-              </div>
-              <div class="field">
-                <label for="newUsername">Username for signing in</label>
-                <input type="text" id="newUsername" autocomplete="off" autocapitalize="none" spellcheck="false">
-                <p class="field-hint">Letters, numbers, dots, dashes and underscores.</p>
-              </div>
-              <div class="field">
-                <label for="newRole">Access level</label>
-                <select id="newRole">
-                  <option value="faculty">View only, cannot change anything</option>
-                  <option value="admin">Staff, day-to-day work</option>
-                  <option value="super_admin">Full access, including settings</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="newPassword">Password</label>
-                <input type="password" id="newPassword" autocomplete="new-password">
-                <p class="field-hint">At least 12 characters.</p>
-              </div>
-            </div>
-            <p class="field-error" id="addError"></p>
-            <button type="submit" class="btn" id="addBtn">Add this person</button>
-          </form>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head"><h2>Server-Level Configurations</h2></div>
-        <div class="panel-body">
-          <div class="notice notice-info">
-            <p class="t">Passwords for email and the database are not shown here</p>
-            <p class="d">
-              They live in a file on the server that is never sent to a browser. To change them, edit
-              <span class="mono">api/config.php</span> on the machine itself.
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js?v=6"></script>
+<script src="../assets/js/admin/admin.js?v=11"></script>
 <script>
 (async function () {
   const s = await boot();
   if (!s) return;
 
   const settingsFields = document.getElementById('settingsFields');
-  const adminRows = document.getElementById('adminRows');
-  const drawer = document.getElementById('drawer');
-
-  let openId = null;
+  const studentVerificationFields = document.getElementById('studentVerificationFields');
+  const accessMode = document.getElementById('accessMode');
+  const approvedAddressesField = document.getElementById('approvedAddressesField');
+  const settingCopy = {
+    otp_lifetime_minutes: {
+      label: 'Email verification code duration',
+      hint: 'How long an email verification code remains valid.'
+    },
+    login_max_attempts: {
+      label: 'Wrong password attempts',
+      hint: 'Number of failed attempts allowed before lockout.'
+    },
+    login_lockout_minutes: {
+      label: 'Lockout duration',
+      hint: 'How long a user remains locked out after exceeding failed attempts.'
+    },
+    session_timeout_minutes: {
+      label: 'Session timeout',
+      hint: 'Automatically sign out inactive administrators.'
+    }
+  };
 
   async function load() {
     const { data } = await apiGet('settings.php');
@@ -141,87 +135,59 @@
     data.settings.forEach(setting => {
       const field = document.createElement('div');
       field.className = 'field';
+      const copy = settingCopy[setting.key] || { label: setting.label, hint: '' };
 
       const label = document.createElement('label');
       label.setAttribute('for', 'set-' + setting.key);
-      label.textContent = setting.label;
+      label.textContent = copy.label;
 
-      const input = document.createElement('input');
-      input.type = 'number';
+      const input = setting.key === 'session_timeout_minutes'
+        ? document.createElement('select')
+        : document.createElement('input');
       input.id = 'set-' + setting.key;
       input.dataset.key = setting.key;
+      if (setting.key === 'session_timeout_minutes') {
+        [15, 30, 60, 120].forEach(minutes => {
+          const option = document.createElement('option');
+          option.value = minutes;
+          option.textContent = minutes + ' minutes';
+          input.appendChild(option);
+        });
+      } else {
+        input.type = 'number';
+        input.min = setting.min;
+        input.max = setting.max;
+      }
       input.value = setting.value;
-      input.min = setting.min;
-      input.max = setting.max;
 
       const hint = document.createElement('p');
       hint.className = 'field-hint';
-      hint.textContent = `Between ${setting.min} and ${setting.max} ${setting.unit}.`;
+      hint.textContent = copy.hint || `Between ${setting.min} and ${setting.max} ${setting.unit}.`;
 
       field.append(label, input, hint);
       settingsFields.appendChild(field);
     });
 
-    adminRows.replaceChildren();
-    data.admins.forEach(admin => {
-      adminRows.appendChild(listRow({
-        title: admin.fullName + (admin.isYou ? ' (you)' : ''),
-        sub: admin.username,
-        end: [pill(admin.roleLabel, admin.active ? 'verified' : 'off')],
-        selected: admin.id === openId,
-        onOpen: row => { markOpenRow(adminRows, row); openAdmin(admin); }
-      }));
-    });
+    studentVerificationFields.replaceChildren();
+    (data.studentVerification || []).forEach(item => {
+      const field = document.createElement('div');
+      field.className = 'field';
 
-    const still = data.admins.find(a => a.id === openId);
-    openAdmin(still || null);
+      const label = document.createElement('label');
+      label.setAttribute('for', 'student-setting-' + item.key);
+      label.textContent = item.label;
+
+      const select = document.createElement('select');
+      select.id = 'student-setting-' + item.key;
+      select.dataset.key = item.key;
+      select.innerHTML = '<option value="1">Enabled</option><option value="0">Disabled</option>';
+      select.value = item.enabled ? '1' : '0';
+
+      field.append(label, select);
+      studentVerificationFields.appendChild(field);
+    });
 
     drawAccess(data.access);
-  }
-
-  function openAdmin(admin) {
-    openId = admin ? admin.id : null;
-
-    if (!admin) { drawDrawer(drawer, null); return; }
-
-    const actions = [];
-
-    // You cannot turn your own account off: that is a locked door with the
-    // key left inside.
-    if (!admin.isYou) {
-      actions.push(button(
-        admin.active ? 'Turn this account off' : 'Turn this account back on',
-        admin.active ? 'btn-danger' : 'btn',
-        async () => {
-          const yes = await confirmAction({
-            title: admin.active ? 'Turn this account off?' : 'Turn this account back on?',
-            message: admin.active
-              ? admin.fullName + ' will not be able to sign in to this panel.'
-              : admin.fullName + ' will be able to sign in again.',
-            confirmLabel: admin.active ? 'Yes, turn it off' : 'Yes, turn it on',
-            danger: admin.active
-          });
-          if (!yes) return;
-
-          const { data } = await apiPost('settings.php', {
-            action: 'set-admin-active', id: admin.id, active: !admin.active
-          });
-          if (!data.ok) { toast(data.error, 'bad'); return; }
-          toast(data.message);
-          load();
-        }));
-    }
-
-    drawDrawer(drawer, {
-      title: admin.fullName + (admin.isYou ? ' (you)' : ''),
-      sub: admin.username,
-      body: facts([
-        ['Access level', admin.roleLabel],
-        ['Account', admin.active ? pill('Can sign in', 'verified') : pill('Turned off', 'off')],
-        ['Last signed in', admin.lastLogin ? relativeTime(admin.lastLogin) : 'Never']
-      ]),
-      actions
-    });
   }
 
   let yourIp = '';
@@ -229,6 +195,9 @@
   function drawAccess(access) {
     yourIp = access.yourIp;
     document.getElementById('allowlist').value = access.allowlist.join('\n');
+    accessMode.value = access.enabled ? 'approved' : 'all';
+    approvedAddressesField.hidden = !access.enabled;
+    document.getElementById('addMine').hidden = !access.enabled;
 
     const host = document.getElementById('accessState');
     host.replaceChildren();
@@ -253,6 +222,11 @@
     host.appendChild(notice);
   }
 
+  accessMode.addEventListener('change', () => {
+    approvedAddressesField.hidden = accessMode.value !== 'approved';
+    document.getElementById('addMine').hidden = accessMode.value !== 'approved';
+  });
+
   document.getElementById('addMine').addEventListener('click', () => {
     const field = document.getElementById('allowlist');
     const lines = field.value.split('\n').map(l => l.trim()).filter(Boolean);
@@ -270,7 +244,9 @@
     const error = document.getElementById('accessError');
     error.classList.remove('on');
 
-    const value = document.getElementById('allowlist').value.trim();
+    const value = accessMode.value === 'approved'
+      ? document.getElementById('allowlist').value.trim()
+      : '';
 
     // Turning the restriction on is worth a second look: get it wrong and the
     // only way back is the server itself.
@@ -291,7 +267,7 @@
     const { data } = await apiPost('settings.php', { action: 'save-ip-allowlist', allowlist: value });
 
     btn.disabled = false;
-    btn.textContent = 'Save';
+    btn.textContent = 'Save Restrictions';
 
     if (!data.ok) {
       error.textContent = data.error;
@@ -309,50 +285,37 @@
     btn.textContent = 'Saving…';
 
     const payload = { action: 'save-settings' };
-    settingsFields.querySelectorAll('input[data-key]').forEach(input => {
+    settingsFields.querySelectorAll('[data-key]').forEach(input => {
       payload[input.dataset.key] = Number(input.value);
     });
 
     const { data } = await apiPost('settings.php', payload);
     btn.disabled = false;
-    btn.textContent = 'Save timings';
+    btn.textContent = 'Save Security Settings';
 
     if (!data.ok) { toast(data.error, 'bad'); return; }
     toast(data.message);
   });
 
-  document.getElementById('addForm').addEventListener('submit', async e => {
+  document.getElementById('studentVerificationForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const error = document.getElementById('addError');
-    error.classList.remove('on');
-
-    const btn = document.getElementById('addBtn');
+    const btn = document.getElementById('saveStudentVerificationBtn');
     btn.disabled = true;
-    btn.textContent = 'Adding…';
+    btn.textContent = 'Saving…';
 
-    const { data } = await apiPost('settings.php', {
-      action: 'add-admin',
-      fullName: document.getElementById('newName').value.trim(),
-      username: document.getElementById('newUsername').value.trim(),
-      role: document.getElementById('newRole').value,
-      password: document.getElementById('newPassword').value
+    const payload = { action: 'save-student-verification-settings' };
+    studentVerificationFields.querySelectorAll('[data-key]').forEach(select => {
+      payload[select.dataset.key] = select.value;
     });
 
+    const { data } = await apiPost('settings.php', payload);
     btn.disabled = false;
-    btn.textContent = 'Add this person';
+    btn.textContent = 'Save Verification Settings';
 
-    if (!data.ok) {
-      error.textContent = data.error;
-      error.classList.add('on');
-      return;
-    }
-
+    if (!data.ok) { toast(data.error, 'bad'); return; }
     toast(data.message);
-    document.getElementById('addForm').reset();
-    load();
   });
 
-  drawDrawer(drawer, null);
   load();
 })();
 </script>

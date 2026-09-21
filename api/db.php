@@ -12,7 +12,7 @@ declare(strict_types=1);
 class DatabaseUnavailableException extends RuntimeException
 {
     public function __construct(
-        public readonly string $hint,
+        public string $hint,
         ?Throwable $previous = null
     ) {
         parent::__construct($hint, 0, $previous);

@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack Staff Panel - Activity</title>
-<meta name="theme-color" content="#0044d6">
+<title>EduTrack Staff Panel - Activity Log</title>
+<meta name="theme-color" content="#1A73E8">
 <link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=7">
-<link rel="stylesheet" href="../assets/css/admin.css?v=6">
+<link rel="stylesheet" href="../assets/css/admin.css?v=11">
 <meta name="robots" content="noindex">
 </head>
-<body>
+<body class="activity-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
@@ -21,38 +21,71 @@
 
   <main class="work" id="main">
     <div class="work-head">
-      <h1>Activity</h1>
-      <p class="work-lede">A permanent record of everything staff have done in this panel. Nothing here can be edited or removed.</p>
+      <div class="page-title-row">
+        <div>
+          <h1>Activity Log</h1>
+          <p class="work-lede">A permanent record of actions performed in EduTrack. Entries cannot be edited or removed.</p>
+        </div>
+        <div class="export-menu">
+          <button class="btn btn-quiet btn-small" id="exportToggle" type="button" aria-expanded="false" aria-controls="exportMenu">
+            Export Log <span class="export-caret" aria-hidden="true"></span>
+          </button>
+          <div class="export-menu-popover" id="exportMenu" hidden>
+            <button type="button" id="exportCsv">Export CSV</button>
+            <button type="button" id="exportPdf">Export PDF</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="work-body">
-      <div class="toolbar">
-        <div>
-          <label class="sr-only" for="who">Person</label>
+      <div class="activity-filters" role="search" aria-label="Filter activity log">
+        <label class="activity-search">
+          <span class="sr-only">Search activity</span>
+          <input id="search" type="search" placeholder="Search activity..." autocomplete="off">
+        </label>
+        <label>
+          <span class="sr-only">Person</span>
           <select id="who"><option value="">Everyone</option></select>
-        </div>
-        <div>
-          <label class="sr-only" for="what">Action</label>
+        </label>
+        <label>
+          <span class="sr-only">Action</span>
           <select id="what"><option value="">Every action</option></select>
+        </label>
+        <label>
+          <span class="sr-only">Date</span>
+          <select id="date">
+            <option value="">Date</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="custom">Custom date</option>
+          </select>
+        </label>
+        <div class="custom-dates" id="customDates" hidden>
+          <label><span class="sr-only">From date</span><input id="dateFrom" type="date"></label>
+          <span aria-hidden="true">to</span>
+          <label><span class="sr-only">To date</span><input id="dateTo" type="date"></label>
         </div>
       </div>
 
       <div class="desk">
         <section class="panel" aria-labelledby="listTitle">
           <div class="panel-head"><h2 id="listTitle">What has happened</h2></div>
-          <ul class="rows" id="rows"></ul>
+          <ul class="rows" id="rows" aria-live="polite"></ul>
           <div class="pager" id="pager" hidden></div>
         </section>
 
         <section class="drawer" id="drawer" aria-live="polite"
-                 data-empty-title="No entry open"
-                 data-empty-text="Choose a line on the left to see the whole entry."></section>
+                 data-empty-title="No entry selected"
+                 data-empty-text="Select an activity from the list to view its complete details."></section>
       </div>
     </div>
   </main>
 </div>
 
-<script src="../assets/js/admin/admin.js?v=6"></script>
+<script src="../assets/js/admin/admin.js?v=11"></script>
 <script>
 (async function () {
   const s = await boot();
@@ -61,37 +94,68 @@
   const rows = document.getElementById('rows');
   const pager = document.getElementById('pager');
   const drawer = document.getElementById('drawer');
+  const searchInput = document.getElementById('search');
   const whoSelect = document.getElementById('who');
   const whatSelect = document.getElementById('what');
+  const dateSelect = document.getElementById('date');
+  const customDates = document.getElementById('customDates');
+  const dateFrom = document.getElementById('dateFrom');
+  const dateTo = document.getElementById('dateTo');
+  const exportToggle = document.getElementById('exportToggle');
+  const exportMenu = document.getElementById('exportMenu');
+  const exportCsv = document.getElementById('exportCsv');
+  const exportPdf = document.getElementById('exportPdf');
 
-  const state = { who: '', action: '', page: 1, openKey: null };
+  const state = { search: '', who: '', action: '', date: '', dateFrom: '', dateTo: '', page: 1, openKey: null };
   let filtersBuilt = false;
+  let visibleEntries = [];
 
   /* The stored action name is a dotted key; these are the words for it. */
   const WORDS = {
     'admin.login': 'Signed in',
     'admin.logout': 'Signed out',
-    'admin.create': 'Added a staff account',
-    'admin.enable': 'Turned a staff account on',
-    'admin.disable': 'Turned a staff account off',
-    'student.verify': 'Marked a student verified',
-    'student.deactivate': 'Turned a student account off',
-    'student.reactivate': 'Turned a student account on',
-    'student.delete': 'Deleted a student',
-    'settings.save': 'Changed settings',
-    'access.denied': 'Was refused access'
+    'admin.create': 'User created',
+    'admin.enable': 'User access changed',
+    'admin.disable': 'User access changed',
+    'settings.save': 'Settings changed',
+    'access.denied': 'Access denied',
+    'room.register': 'Room registered',
+    'room.update': 'Room updated',
+    'room.remove': 'Room removed',
+    'route.create': 'Route created',
+    'route.update': 'Route updated',
+    'route.remove': 'Route removed',
+    'walkthrough.add': 'Walkthrough added',
+    'walkthrough.update': 'Walkthrough updated',
+    'walkthrough.photo.remove': 'Walkthrough photo removed',
+    'map.issue.detected': 'Map issue detected',
+    'map.issue.resolved': 'Map issue resolved',
+    'user.create': 'User created',
+    'user.access.change': 'User access changed',
+    'admin.failed_login': 'Failed sign-in'
   };
 
   /* The log stores the role key. These are the same words the rest of the
      panel uses for it. */
   const ROLES = {
-    super_admin: 'Full access',
-    admin: 'Staff, day-to-day work',
-    faculty: 'View only'
+    super_admin: 'Administrator',
+    admin: 'Map Editor',
+    faculty: 'View Only'
   };
 
-  whoSelect.addEventListener('change', e => { state.who = e.target.value; state.page = 1; load(); });
-  whatSelect.addEventListener('change', e => { state.action = e.target.value; state.page = 1; load(); });
+  const reload = () => { state.page = 1; load(); };
+  searchInput.addEventListener('input', debounce(e => { state.search = e.target.value.trim(); reload(); }, 350));
+  whoSelect.addEventListener('change', e => { state.who = e.target.value; reload(); });
+  whatSelect.addEventListener('change', e => { state.action = e.target.value; reload(); });
+  dateSelect.addEventListener('change', e => {
+    state.date = e.target.value;
+    customDates.hidden = state.date !== 'custom';
+    reload();
+  });
+  [dateFrom, dateTo].forEach(input => input.addEventListener('change', e => {
+    state[e.target === dateFrom ? 'dateFrom' : 'dateTo'] = e.target.value;
+    if (state.date === 'custom') reload();
+  }));
 
   /* Entries have no id of their own, so an open one is remembered by the
      things that make it unique: when it happened, who did it, and what. */
@@ -100,7 +164,8 @@
   async function load() {
     showSkeleton(rows, 8);
     const { data } = await apiGet('activity.php', {
-      who: state.who, action: state.action, page: state.page
+      search: state.search, who: state.who, action: state.action, date: state.date,
+      date_from: state.dateFrom, date_to: state.dateTo, page: state.page
     });
 
     if (!data.ok) { toast(data.error || 'Could not load the activity log.', 'bad'); return; }
@@ -120,7 +185,7 @@
     }
 
     if (data.data.length === 0) {
-      const filtered = state.who !== '' || state.action !== '';
+      const filtered = state.search !== '' || state.who !== '' || state.action !== '' || state.date !== '';
       showEmpty(rows,
         filtered ? 'Nothing matches' : 'Nothing has happened yet',
         filtered
@@ -128,8 +193,9 @@
           : 'Actions taken in this panel will be listed here as they happen.',
         filtered ? 'Clear the filters' : null,
         filtered ? () => {
-          state.who = ''; state.action = ''; state.page = 1;
-          whoSelect.value = ''; whatSelect.value = '';
+          state.search = ''; state.who = ''; state.action = ''; state.date = ''; state.dateFrom = ''; state.dateTo = ''; state.page = 1;
+          searchInput.value = ''; whoSelect.value = ''; whatSelect.value = ''; dateSelect.value = '';
+          dateFrom.value = ''; dateTo.value = ''; customDates.hidden = true;
           load();
         } : null);
       drawPager(pager, data, () => {});
@@ -137,11 +203,16 @@
       return;
     }
 
+    visibleEntries = data.data;
     rows.replaceChildren();
     data.data.forEach(entry => {
       const end = [];
-      // A refused attempt is the one thing in this list worth a red mark.
-      if (entry.action === 'access.denied') end.push(pill('Refused', 'revoked'));
+      const isError = entry.action === 'access.denied' || entry.action === 'admin.failed_login';
+      const isWarning = entry.action === 'map.issue.detected';
+      const isSuccess = ['room.register', 'route.create', 'walkthrough.add', 'map.issue.resolved', 'user.create'].includes(entry.action);
+      if (isError) end.push(pill('Security', 'revoked'));
+      else if (isWarning) end.push(pill('Review', 'warning'));
+      else if (isSuccess) end.push(pill('Success', 'verified'));
       const when = document.createElement('span');
       when.className = 'row-when';
       when.textContent = relativeTime(entry.created_at);
@@ -154,6 +225,7 @@
         selected: keyOf(entry) === state.openKey,
         onOpen: row => { markOpenRow(rows, row); openEntry(entry); }
       }));
+      rows.lastElementChild.querySelector('.row').dataset.status = isError ? 'error' : isWarning ? 'warning' : isSuccess ? 'success' : 'normal';
     });
 
     drawPager(pager, data, page => { state.page = page; load(); });
@@ -176,15 +248,48 @@
       sub: relativeTime(entry.created_at),
       body: facts([
         ['Who', entry.admin_name],
-        ['Their access level', ROLES[entry.role] || entry.role],
+        ['Access level', ROLES[entry.role] || entry.role],
+        ['Affected room or route', ['room', 'route'].includes(entry.target_type) ? entry.target_id : null],
+        ['Location', entry.target_type === 'room' ? 'Admin Building' : null],
+        ['Building', entry.target_type === 'building' ? entry.target_id : null],
+        ['Floor', entry.target_type === 'floor' ? entry.target_id : null],
         ['Exactly when', formatDateTime(entry.created_at)],
-        ['Details', entry.detail || 'None recorded'],
-        ['From this address', ip]
+        ['Action details', entry.detail || 'None recorded'],
+        ['IP address', ip]
       ])
     });
   }
 
   drawDrawer(drawer, null);
+  exportToggle.addEventListener('click', () => {
+    const isOpen = !exportMenu.hidden;
+    exportMenu.hidden = isOpen;
+    exportToggle.setAttribute('aria-expanded', String(!isOpen));
+  });
+  document.addEventListener('click', event => {
+    if (!event.target.closest('.export-menu')) {
+      exportMenu.hidden = true;
+      exportToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      exportMenu.hidden = true;
+      exportToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+  exportCsv.addEventListener('click', () => {
+    const lines = [['Action', 'Username', 'Description', 'Timestamp', 'Target'], ...visibleEntries.map(entry => [
+      WORDS[entry.action] || entry.action, entry.admin_name, entry.detail || '', formatDateTime(entry.created_at), entry.target_id || ''
+    ])];
+    const csv = lines.map(line => line.map(value => '"' + String(value).replaceAll('"', '""') + '"').join(',')).join('\n');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    link.download = 'edutrack-activity-log.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+  exportPdf.addEventListener('click', () => window.print());
   load();
 })();
 </script>
