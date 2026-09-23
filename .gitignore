@@ -26,3 +26,6 @@ sql/edutrack_backup.sql
 .idea/
 .swarm/
 .impeccable/questions/
+
+# Built by tools/import-photos.php --build; goes live with --publish
+assets/nodes-new/
