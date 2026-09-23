@@ -53,48 +53,61 @@ tradeoff, not a gap.
 
 ## The campus map
 
-`assets/nodes/nodes-edges.json` plus 113 WebP panoramas, about 52 MB. Not in
-the database, and that is fine for now.
+`assets/nodes/nodes-edges.json` plus WebP panoramas. Not in the database, and
+that is fine for now. `walkthrough.js` walks the links breadth-first from the
+node with `type == "landmark"` (the gate).
 
-**The map is not reproducible from the build script.** `build_node_graph_v2.py`
-emits `N0001`-style ids and `type="unassigned"`; the live map uses
-`GATE` / `HALL-01` / `ROOM-105` with types assigned by hand afterwards.
-`walkthrough.js` finds the starting point with `type == "landmark"`, so a
-rebuild would break the walkthrough. That script now refuses to overwrite an
-existing map without `--force`.
+**Today's map is the old hand-built one** (`GATE` / `HALL-01` / `ROOM-105`,
+113 photos). Its node `label` values are unreliable, and its hallway photos
+are shared between rooms. It is being replaced by a map built from folders.
 
-To add a room, or re-record one with more photos:
+**The building-and-floor map** (`api/admin/walk-lib.php` describes it): one
+gate; for each floor of each building a locked *fixed path* from the gate to
+that floor's point; each room its own short walk from the floor point, the
+last photo being the room. Ids read `MAIN-F3-PATH-02`, `MAIN-F3-FACULTY-01`,
+`MAIN-F3-FACULTY`. Nodes carry `building`, `floor` and `role`; the map lists
+`buildings`. The gate and fixed paths can have their pictures replaced but can
+never be removed (`graph-write.php`).
 
-    python map/add_walk.py "<walk folder>" --room "NAME" --floor "FLOOR" --dry-run
-    python map/add_walk.py "<walk folder>" --room "NAME" --floor "FLOOR" --replace
+It is built once by the developer from a folder tree, with the photos shrunk
+to 4096 px WebP 80:
 
-It hashes the photos already on disk, recognises corridors you re-walked, and
-only creates nodes for what it has never seen. Existing ids, types and labels
-are never touched.
+    php tools/import-photos.php --check "C:\School Photos"   report only
+    php tools/import-photos.php --build "C:\School Photos"   writes assets/nodes-new/
+    php tools/import-photos.php --publish                     puts it live
+    php tools/import-photos.php --rollback                    puts the old map back
+
+The folder layout is in the header of `tools/import-photos.php`.
+`--make-sample <folder>` makes a small tree to try it on. Shrinking needs
+PHP's GD extension: turn on `extension=gd` in `C:\xampp\php\php.ini` and
+restart Apache (until then, run the tool as `php -d extension=gd ...`).
+
+After that, staff change it on the **Walkthrough** page of the staff panel:
+choose a room's photos again, add, swap, rename or remove a room, or replace
+a fixed-path picture. Old photos are deleted when a change is saved.
 
 `assets/nodes/review_report.csv` is left over from the original build and
 refers to `N0001`-style ids that no longer exist. It is stale and unused.
 
-Node `label` values are unreliable: each is the folder that first produced that
-photo, so a node now called `ROOM-105` can still carry the label `101`. The
-room list is authoritative; the id is a better fallback than the label.
-
 ## Known open items
 
-- **`LINUX` is unreachable.** Its three photos form an island with no link back
-  to the gate, because the walk was recorded starting mid-building. Fixed by
-  re-walking it from the gate with `add_walk.py --replace`.
+- **`LINUX` is unreachable** on today's map. Its three photos form an island
+  with no link back to the gate. The folder import replaces it.
 - **No HTTPS.** The admin password and session cookie cross the network in
   cleartext. `Secure` is correctly absent from the cookie as a result.
 - **No password change or reset** for admins. Recovery is
   `tools/create-admin.php` on the server.
-- **Adding a room is command line only.** Replacing a single photo works in the
-  panel; adding a room needs the image matching, which lives in Python.
+- **The Walkthrough page needs the building map.** On today's map it says so
+  and offers nothing to change until the folder import is published.
 
 ## Safety nets
 
-- `storage/map-snapshots/` — the map before each change, last 20 kept
-- `storage/photo-backups/` — the previous photo before each replacement
+- `storage/map-snapshots/` — the map file before each change, last 20 kept.
+  Photos are not kept: a replaced photo is deleted.
+- `storage/map-previous/` — the whole previous map after `--publish`, until
+  `--rollback` or until it is deleted by hand
+- `storage/photo-backups/`, `storage/photo-originals-*` — photos from before
+  the folder import; delete them once the new map is live and approved
 - `tools/reset-ip-allowlist.php` — clears an admin IP restriction that locked
   everyone out
 - `tools/setup-check.php` — diagnoses the environment, read-only

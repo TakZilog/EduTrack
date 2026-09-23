@@ -5,7 +5,7 @@
   gate node to the room requested via ?room=NAME in the URL, then lets
   the user step through each node's 360 photo with Next/Back.
 
-  Data expected (produced by build_node_graph.py):
+  Data expected (built by tools/import-photos.php):
   {
     "nodes": [{ node_id, label, image_file, type }],
     "edges": [{ from_node, to_node, direction_label }],
