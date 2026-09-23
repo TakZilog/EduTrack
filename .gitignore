@@ -21,3 +21,8 @@ sql/edutrack_backup.sql
 .env
 .env.*
 !.env.example
+
+# Per-machine editor and tooling state. Kept on disk, never shared.
+.idea/
+.swarm/
+.impeccable/questions/
