@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/db.php';
 require __DIR__ . '/session.php';
+require __DIR__ . '/rate-limit.php';
 
 app_session_start();
 security_headers();
@@ -32,7 +33,13 @@ if ($attempts >= OTP_MAX_ATTEMPTS) {
     json_fail(429, 'Too many incorrect codes. Request a new one.');
 }
 
+// The per-code cap above resets whenever a new code is sent, so it cannot
+// bound guessing on its own. This caps wrong codes per address across every
+// code and session.
+rate_limit_check(client_ip(), 'verify_otp_ip', 15, 15, 'Too many incorrect codes. Wait %d minutes and try again.');
+
 if (!hash_equals($otp['code'], $code)) {
+    rate_limit_record(client_ip(), 'verify_otp_ip', false);
     $_SESSION['otp']['attempts'] = $attempts + 1;
     $remaining = OTP_MAX_ATTEMPTS - ($attempts + 1);
 

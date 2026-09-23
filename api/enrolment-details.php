@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/db.php';
 require __DIR__ . '/session.php';
+require __DIR__ . '/rate-limit.php';
 
 app_session_start();
 security_headers();
@@ -23,6 +24,12 @@ $userId = $_SESSION['user_id'] ?? null;
 if (!$userId) {
     json_fail(401, 'Log in first.', ['code' => 'tour_locked']);
 }
+
+// The "already has an account" answer below says whether a student number is
+// registered. Capping submissions per account stops that being used to walk
+// through the whole range of numbers.
+rate_limit_action('user:' . (int) $userId, 'enrolment_details', 10, 15,
+    'Too many attempts. Wait a few minutes and try again.');
 
 $input       = json_input();
 $studentNo   = strtoupper(trim((string) ($input['studentNo'] ?? '')));
