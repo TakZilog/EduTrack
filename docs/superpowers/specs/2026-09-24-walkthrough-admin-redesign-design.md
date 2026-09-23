@@ -84,6 +84,21 @@ C:\School Photos\
 - Replaces `map/add_walk.py` and `map/build_node_graph_v2.py`, which are
   removed.
 
+## Rooms per building (from the owner, 2026-09-24)
+
+The current map lists every room under "ADMIN BUILDING". These belong to the
+second building, which has its own fixed 1st/2nd/3rd floor paths:
+
+| Floor | Second building rooms |
+|---|---|
+| 1st | 106, 107, 108, 110, Slab 3, Slab 1 |
+| 2nd | 214, 215, Library |
+| 3rd | Canteen / Auditorium (one room: the canteen is inside the auditorium) |
+
+Everything else in today's room list stays in the Admin Building. The import
+`--check` compares the folder tree against this list and reports any room that
+is missing or in the other building.
+
 ## Names
 
 Staff never see these; they only need to be readable to a developer.
