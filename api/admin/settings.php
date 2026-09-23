@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/../rate-limit.php';
 
 /**
  * Operational settings and admin accounts.
@@ -31,6 +32,43 @@ function student_verification_bool(string $key, string $default = '1'): bool
     return in_array($value, ['1', 'true', 'yes', 'on'], true);
 }
 
+/** One staff account, or a 404 the page can explain. */
+function admin_by_id(PDO $pdo, int $id): array
+{
+    $stmt = $pdo->prepare('SELECT id, username, full_name, role, active FROM admins WHERE id = ?');
+    $stmt->execute([$id]);
+    $admin = $stmt->fetch();
+    if (!$admin) {
+        json_fail(404, 'That account no longer exists. Refresh the page.');
+    }
+
+    return $admin;
+}
+
+/**
+ * Refuses a change that would leave no full-access account turned on: nobody
+ * could then reach this screen to undo it.
+ */
+function keep_one_full_access(PDO $pdo, array $target): void
+{
+    if ($target['role'] !== 'super_admin' || !(int) $target['active']) {
+        return;
+    }
+    $remaining = (int) $pdo->query(
+        "SELECT COUNT(*) AS n FROM admins WHERE role = 'super_admin' AND active = 1"
+    )->fetch()['n'];
+    if ($remaining <= 1) {
+        json_fail(400, 'This is the last full-access account. Changing it would lock everyone out of this screen.');
+    }
+}
+
+function valid_new_password(string $password): void
+{
+    if (strlen($password) < ADMIN_PASSWORD_MIN) {
+        json_fail(400, 'The password needs at least ' . ADMIN_PASSWORD_MIN . ' characters.');
+    }
+}
+
 $isWrite = $_SERVER['REQUEST_METHOD'] === 'POST';
 $input   = admin_boot('settings.manage', $isWrite ? 'POST' : 'GET');
 $pdo     = get_db();
@@ -42,9 +80,11 @@ if (!$isWrite) {
         $values[] = $meta + ['key' => $key, 'value' => setting($key, $default)];
     }
 
+    // Accounts that can sign in first, then by level (most access first), then by name.
     $admins = $pdo->query(
-        'SELECT id, username, full_name, role, active, last_login_at, created_at
-           FROM admins ORDER BY role, username'
+        "SELECT id, username, full_name, role, active, last_login_at, created_at
+           FROM admins
+          ORDER BY active DESC, FIELD(role, 'super_admin', 'admin', 'faculty'), full_name"
     )->fetchAll();
 
     $allowlist = parse_allowlist(setting(IP_ALLOWLIST_KEY, ''));
@@ -76,7 +116,9 @@ if (!$isWrite) {
             'createdAt' => $a['created_at'],
             'isYou'     => (int) $a['id'] === (int) $_SESSION['admin_id'],
         ], $admins),
-        'roles' => ADMIN_ROLE_LABELS,
+        'roles'         => ADMIN_ROLE_LABELS,
+        'roleSummaries' => ADMIN_ROLE_SUMMARIES,
+        'passwordMin'   => ADMIN_PASSWORD_MIN,
     ]);
 }
 
@@ -206,9 +248,7 @@ switch ((string) ($input['action'] ?? '')) {
         if (!isset(ADMIN_ROLE_LABELS[$role])) {
             json_fail(400, 'Choose an access level from the list.');
         }
-        if (strlen($password) < 15) {
-            json_fail(400, 'The password needs at least 15 characters.');
-        }
+        valid_new_password($password);
 
         $stmt = $pdo->prepare('SELECT id FROM admins WHERE username = ?');
         $stmt->execute([$username]);
@@ -228,27 +268,12 @@ switch ((string) ($input['action'] ?? '')) {
         $id     = (int) ($input['id'] ?? 0);
         $active = (bool) ($input['active'] ?? false);
 
-        $stmt = $pdo->prepare('SELECT id, username, full_name, role, active FROM admins WHERE id = ?');
-        $stmt->execute([$id]);
-        $target = $stmt->fetch();
-
-        if (!$target) {
-            json_fail(404, 'That admin no longer exists.');
-        }
+        $target = admin_by_id($pdo, $id);
         if ($id === (int) $_SESSION['admin_id']) {
             json_fail(400, 'You cannot turn off your own account.');
         }
-
-        // Losing the last full-access account would lock everyone out of the
-        // settings screen permanently, so it is refused.
-        if (!$active && $target['role'] === 'super_admin') {
-            $remaining = (int) $pdo->query(
-                "SELECT COUNT(*) AS n FROM admins WHERE role = 'super_admin' AND active = 1"
-            )->fetch()['n'];
-
-            if ($remaining <= 1) {
-                json_fail(400, 'This is the last full-access account. Turning it off would lock everyone out.');
-            }
+        if (!$active) {
+            keep_one_full_access($pdo, $target);
         }
 
         $pdo->prepare('UPDATE admins SET active = ? WHERE id = ?')->execute([$active ? 1 : 0, $id]);
@@ -261,6 +286,89 @@ switch ((string) ($input['action'] ?? '')) {
         );
 
         json_ok(['message' => $target['full_name'] . ($active ? ' can sign in again.' : ' can no longer sign in.')]);
+
+    case 'update-admin':
+        // A name spelled wrong, or someone who needs more or less access.
+        // The new access level applies from their very next click.
+        $id       = (int) ($input['id'] ?? 0);
+        $fullName = trim(preg_replace('/\s+/u', ' ', (string) ($input['fullName'] ?? '')) ?? '');
+        $role     = (string) ($input['role'] ?? '');
+        $target   = admin_by_id($pdo, $id);
+
+        if (mb_strlen($fullName) < 2 || mb_strlen($fullName) > 100) {
+            json_fail(400, 'Enter the person\'s full name.');
+        }
+        if (!isset(ADMIN_ROLE_LABELS[$role])) {
+            json_fail(400, 'Choose an access level from the list.');
+        }
+        if ($role !== $target['role']) {
+            if ($id === (int) $_SESSION['admin_id']) {
+                json_fail(400, 'You cannot change your own access level. Ask another full-access admin.');
+            }
+            keep_one_full_access($pdo, $target);
+        }
+
+        $pdo->prepare('UPDATE admins SET full_name = ?, role = ? WHERE id = ?')->execute([$fullName, $role, $id]);
+
+        $what = [];
+        if ($fullName !== $target['full_name']) {
+            $what[] = "renamed {$target['full_name']} to {$fullName}";
+        }
+        if ($role !== $target['role']) {
+            $what[] = 'changed access from ' . ADMIN_ROLE_LABELS[$target['role']] . ' to ' . ADMIN_ROLE_LABELS[$role];
+        }
+        if ($what) {
+            audit_log('admin.update', 'admin', $target['username'], ucfirst(implode(' and ', $what)) . '.');
+        }
+
+        json_ok(['message' => $what ? 'Saved.' : 'Nothing was changed.']);
+
+    case 'reset-password':
+        // For someone who forgot theirs. Tell them the new one in person.
+        $id       = (int) ($input['id'] ?? 0);
+        $password = (string) ($input['password'] ?? '');
+        $target   = admin_by_id($pdo, $id);
+
+        if ($id === (int) $_SESSION['admin_id']) {
+            json_fail(400, 'To change your own password, use "Change my password".');
+        }
+        valid_new_password($password);
+
+        $pdo->prepare('UPDATE admins SET password_hash = ? WHERE id = ?')->execute([hash_password($password), $id]);
+        audit_log('admin.password', 'admin', $target['username'], "Set a new password for {$target['full_name']}.");
+
+        json_ok(['message' => $target['full_name'] . '\'s new password is saved. Tell them in person, not by message.']);
+
+    case 'change-own-password':
+        $me      = current_admin();
+        $current = (string) ($input['currentPassword'] ?? '');
+        $new     = (string) ($input['password'] ?? '');
+
+        // Someone at an unattended desk must not be able to guess their way
+        // to a password that outlives the session.
+        rate_limit_check($me['username'], 'admin_pw_change', 5, 15,
+            'Too many wrong tries. Please wait %d minutes and try again.');
+
+        $stmt = $pdo->prepare('SELECT password_hash FROM admins WHERE id = ?');
+        $stmt->execute([$me['id']]);
+        if (!verify_password($current, (string) $stmt->fetchColumn(), 'admins', $me['id'])) {
+            rate_limit_record($me['username'], 'admin_pw_change', false);
+            json_fail(400, 'Your current password is not right.');
+        }
+        rate_limit_record($me['username'], 'admin_pw_change', true);
+
+        valid_new_password($new);
+        if (hash_equals($current, $new)) {
+            json_fail(400, 'Choose a password different from the one you have now.');
+        }
+
+        $hash = hash_password($new);
+        $pdo->prepare('UPDATE admins SET password_hash = ? WHERE id = ?')->execute([$hash, $me['id']]);
+        // This session stays signed in; any other session on the old password ends.
+        $_SESSION['admin_pw_mark'] = password_mark($hash);
+        audit_log('admin.password', 'admin', $me['username'], 'Changed their own password.');
+
+        json_ok(['message' => 'Your password has been changed.']);
 
     default:
         json_fail(400, 'That action is not recognised.');

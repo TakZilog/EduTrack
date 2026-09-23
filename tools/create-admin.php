@@ -1,14 +1,19 @@
 <?php
 
 /**
- * Creates an admin account.
+ * Creates an admin account, or gives an existing one a new password.
  *
- * Command line only. There is deliberately no web page for this: the first
- * account has to come from someone with access to the machine, otherwise the
- * panel would ship with a way to mint its own administrators.
+ * Command line only. There is deliberately no web page for creating the first
+ * account: it has to come from someone with access to the machine, otherwise
+ * the panel would ship with a way to mint its own administrators. Later
+ * accounts are made on the Users & Access page.
  *
  *     php tools/create-admin.php
  *     php tools/create-admin.php --username=mrosales --name="M. Rosales" --role=admin
+ *     php tools/create-admin.php --reset --username=mrosales
+ *
+ * --reset is the way back in when nobody who can sign in remembers their
+ * password: it sets a new password and turns the account back on.
  *
  * Roles: super_admin (everything), admin (daily work), faculty (view only).
  */
@@ -55,7 +60,26 @@ function ask(string $prompt, bool $hidden = false): string
     return trim((string) fgets(STDIN));
 }
 
-echo PHP_EOL . 'Create an EduTrack admin' . PHP_EOL . str_repeat('-', 40) . PHP_EOL;
+/** Asks for a password twice and checks it against the panel's own rule. */
+function new_password(): string
+{
+    $password = flag('password') ?? ask('Password (' . ADMIN_PASSWORD_MIN . ' characters minimum): ', true);
+    if (strlen($password) < ADMIN_PASSWORD_MIN) {
+        exit('Password must be at least ' . ADMIN_PASSWORD_MIN . " characters.\n");
+    }
+
+    $confirm = flag('password') ?? ask('Repeat the password: ', true);
+    if (!hash_equals($password, $confirm)) {
+        exit("Those passwords do not match.\n");
+    }
+
+    return $password;
+}
+
+$reset = in_array('--reset', $GLOBALS['argv'], true);
+
+echo PHP_EOL . ($reset ? 'Set a new password for an EduTrack admin' : 'Create an EduTrack admin')
+    . PHP_EOL . str_repeat('-', 40) . PHP_EOL;
 
 try {
     $pdo = get_db();
@@ -64,8 +88,31 @@ try {
 }
 
 $username = flag('username') ?? ask('Username (for signing in): ');
-$fullName = flag('name')     ?? ask('Full name: ');
-$role     = flag('role')     ?? ask('Role [super_admin, admin, faculty] (default super_admin): ');
+
+$stmt = $pdo->prepare('SELECT id, active FROM admins WHERE username = ?');
+$stmt->execute([$username]);
+$existing = $stmt->fetch();
+
+if ($reset) {
+    if (!$existing) {
+        exit("There is no admin called '{$username}'.\n");
+    }
+
+    $password = new_password();
+    $pdo->prepare('UPDATE admins SET password_hash = ?, active = 1 WHERE id = ?')
+        ->execute([hash_password($password), $existing['id']]);
+
+    echo PHP_EOL . "'{$username}' has a new password" . ((int) $existing['active'] ? '' : ' and is turned on again')
+        . '.' . PHP_EOL . 'Anyone still signed in to that account is signed out.' . PHP_EOL . PHP_EOL;
+    exit;
+}
+
+if ($existing) {
+    exit("An admin called '{$username}' already exists. To give it a new password, add --reset.\n");
+}
+
+$fullName = flag('name') ?? ask('Full name: ');
+$role     = flag('role') ?? ask('Role [super_admin, admin, faculty] (default super_admin): ');
 $role     = $role !== '' ? $role : 'super_admin';
 
 if (!preg_match('/^[a-zA-Z0-9._-]{4,50}$/', $username)) {
@@ -78,21 +125,7 @@ if (!in_array($role, ROLES, true)) {
     exit('Role must be one of: ' . implode(', ', ROLES) . PHP_EOL);
 }
 
-$stmt = $pdo->prepare('SELECT id FROM admins WHERE username = ?');
-$stmt->execute([$username]);
-if ($stmt->fetch()) {
-    exit("An admin called '{$username}' already exists.\n");
-}
-
-$password = flag('password') ?? ask('Password (12 characters minimum): ', true);
-if (strlen($password) < 12) {
-    exit("Password must be at least 12 characters.\n");
-}
-
-$confirm = flag('password') ?? ask('Repeat the password: ', true);
-if (!hash_equals($password, $confirm)) {
-    exit("Those passwords do not match.\n");
-}
+$password = new_password();
 
 $stmt = $pdo->prepare(
     'INSERT INTO admins (username, full_name, password_hash, role) VALUES (?, ?, ?, ?)'

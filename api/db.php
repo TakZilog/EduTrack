@@ -80,6 +80,9 @@ function get_db(): PDO
  */
 const PASSWORD_OPTIONS = ['cost' => 12];
 
+/** Shortest staff password, the same in the panel and in tools/create-admin.php. */
+const ADMIN_PASSWORD_MIN = 15;
+
 function hash_password(string $password): string
 {
     return password_hash($password, PASSWORD_BCRYPT, PASSWORD_OPTIONS);

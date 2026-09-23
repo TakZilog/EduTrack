@@ -56,6 +56,12 @@ $_SESSION['admin_id']   = (int) $admin['id'];
 $_SESSION['admin_name'] = $admin['username'];
 $_SESSION['admin_role'] = $admin['role'];
 
+// Read the hash again: verify_password() may have just upgraded it. A later
+// password change is spotted by current_admin() comparing against this.
+$hash = $pdo->prepare('SELECT password_hash FROM admins WHERE id = ?');
+$hash->execute([$admin['id']]);
+$_SESSION['admin_pw_mark'] = password_mark((string) $hash->fetchColumn());
+
 $pdo->prepare('UPDATE admins SET last_login_at = NOW() WHERE id = ?')->execute([$admin['id']]);
 
 audit_log('admin.login', 'admin', (string) $admin['id'], 'Signed in.');

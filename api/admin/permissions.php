@@ -53,6 +53,18 @@ const ADMIN_ROLE_LABELS = [
     'faculty'     => 'View only',
 ];
 
+/*
+  What each level can do, in the words the Users & Access page shows. Kept
+  beside ADMIN_PERMISSIONS so a change there is made here too: whoever hands
+  out a level must know it includes student records.
+*/
+const ADMIN_ROLE_SUMMARIES = [
+    'super_admin' => 'Everything, including staff accounts, settings and deleting student accounts.',
+    'admin'       => 'Student accounts (look up, export, verify, turn off), rooms and the walkthrough '
+        . '(look up and change), and the activity log.',
+    'faculty'     => 'Can look up student accounts and rooms. Cannot change anything.',
+];
+
 function can(string $permission): bool
 {
     $role = $_SESSION['admin_role'] ?? null;

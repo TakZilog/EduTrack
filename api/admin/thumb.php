@@ -28,7 +28,7 @@ const THUMB_W   = 480;   // 2:1, so 480x240
 app_session_start();
 enforce_ip_allowlist();
 
-if (empty($_SESSION['admin_id']) || !can('room.view')) {
+if (empty($_SESSION['admin_id']) || current_admin() === null || !can('room.view')) {
     http_response_code(403);
     exit;
 }

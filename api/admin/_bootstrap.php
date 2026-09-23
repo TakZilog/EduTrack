@@ -48,6 +48,9 @@ function admin_boot(string|array $permission, string $method = 'GET'): array
     if (empty($_SESSION['admin_id'])) {
         json_fail(401, 'Please sign in to continue.', ['code' => 'auth']);
     }
+    if (current_admin() === null) {
+        json_fail(401, 'Your session has ended. Please sign in again.', ['code' => 'auth']);
+    }
 
     if ($method !== 'GET') {
         csrf_check();
@@ -71,6 +74,52 @@ function admin_boot(string|array $permission, string $method = 'GET'): array
     }
 
     return $method === 'GET' ? $_GET : json_input();
+}
+
+/**
+ * The signed-in account, read fresh on every request.
+ *
+ * The session only says who signed in. Whether that account is still turned
+ * on, and what it may do, can change while a page is open, so both are
+ * checked against the database each time rather than trusted until the next
+ * sign-in. An account that is gone or turned off ends the session at once.
+ *
+ * @return array{id: int, username: string, full_name: string, role: string}|null
+ */
+function current_admin(): ?array
+{
+    static $admin = false;
+    if ($admin !== false) {
+        return $admin;
+    }
+
+    $stmt = get_db()->prepare('SELECT id, username, full_name, role, active, password_hash FROM admins WHERE id = ?');
+    $stmt->execute([(int) ($_SESSION['admin_id'] ?? 0)]);
+    $row = $stmt->fetch();
+
+    // A new password also ends every session signed in with the old one,
+    // which is the point of resetting a password that may be known to others.
+    // Sessions from before this check existed carry no mark and are given one.
+    $mark = $row ? password_mark((string) $row['password_hash']) : '';
+    $_SESSION['admin_pw_mark'] ??= $mark;
+
+    if (!$row || !(int) $row['active'] || !hash_equals($_SESSION['admin_pw_mark'], $mark)) {
+        $_SESSION = [];
+        session_destroy();
+        return $admin = null;
+    }
+
+    $_SESSION['admin_role'] = $row['role'];
+    $row['id'] = (int) $row['id'];
+    unset($row['password_hash']);
+
+    return $admin = $row;
+}
+
+/** Stands in for the password in the session, so a password change can be noticed. */
+function password_mark(string $hash): string
+{
+    return hash('sha256', $hash);
 }
 
 /* ------------------------------------------------------------------ helpers */

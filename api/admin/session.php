@@ -26,18 +26,11 @@ if (empty($_SESSION['admin_id'])) {
     json_fail(401, 'Please sign in to continue.', ['code' => 'auth']);
 }
 
-$stmt = get_db()->prepare('SELECT id, username, full_name, role, active FROM admins WHERE id = ?');
-$stmt->execute([$_SESSION['admin_id']]);
-$admin = $stmt->fetch();
-
 // The account may have been turned off, or its role changed, since sign-in.
-if (!$admin || !$admin['active']) {
-    $_SESSION = [];
-    session_destroy();
+$admin = current_admin();
+if ($admin === null) {
     json_fail(401, 'Your session has ended. Please sign in again.', ['code' => 'auth']);
 }
-
-$_SESSION['admin_role'] = $admin['role'];
 
 json_ok([
     'admin' => [
