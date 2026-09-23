@@ -21,8 +21,8 @@ require_once __DIR__ . '/permissions.php';
 require_once __DIR__ . '/ip-guard.php';
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/graph-lib.php';
+require_once __DIR__ . '/walk-lib.php';   // THUMBS_DIR
 
-const THUMB_DIR = __DIR__ . '/../../storage/thumbs';
 const THUMB_W   = 480;   // 2:1, so 480x240
 
 app_session_start();
@@ -61,7 +61,7 @@ if (!is_file($source)) {
 // graph-write.php refuses an id that could act as a path. basename() is the
 // belt to that brace: a map file written before that rule existed cannot steer
 // this write out of the thumbnail folder.
-$cache = THUMB_DIR . '/' . basename($requested) . '.webp';
+$cache = THUMBS_DIR . '/' . basename($requested) . '.webp';
 
 /*
   Shrinking needs PHP's GD extension with WebP support, which XAMPP ships
@@ -80,7 +80,7 @@ if (!function_exists('imagecreatefromwebp')) {
 // Rebuild when the photo is newer than its thumbnail, so replacing a panorama
 // does not leave a stale preview behind.
 if (!is_file($cache) || filemtime($cache) < filemtime($source)) {
-    if (!is_dir(THUMB_DIR) && !mkdir(THUMB_DIR, 0775, true) && !is_dir(THUMB_DIR)) {
+    if (!is_dir(THUMBS_DIR) && !mkdir(THUMBS_DIR, 0775, true) && !is_dir(THUMBS_DIR)) {
         http_response_code(500);
         exit;
     }
