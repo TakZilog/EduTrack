@@ -79,6 +79,8 @@ function validate_graph(array $graph): array
     $landmarks = array_filter($graph['nodes'], static fn ($n) => ($n['type'] ?? '') === 'landmark');
     if (count($landmarks) === 0) {
         $errors[] = 'No starting point is marked. One photo must have the type "landmark".';
+    } elseif (count($landmarks) > 1) {
+        $errors[] = 'More than one photo is marked as the starting point. Only the main gate may be.';
     }
 
     foreach ($graph['edges'] as $edge) {
@@ -89,7 +91,8 @@ function validate_graph(array $graph): array
         }
     }
 
-    $names = [];
+    $reachable = reachable_nodes($graph);
+    $names     = [];
     foreach ($graph['rooms'] as $room) {
         foreach (['room_name', 'node_id'] as $field) {
             if (!isset($room[$field]) || trim((string) $room[$field]) === '') {
@@ -99,6 +102,10 @@ function validate_graph(array $graph): array
         }
         if (!isset($nodeIds[$room['node_id']])) {
             $errors[] = 'Room "' . $room['room_name'] . '" points at a photo that does not exist.';
+        } elseif (!isset($reachable[$room['node_id']])) {
+            // Named by photo, not by room, so renaming a room that was already
+            // stranded does not look like a new fault and get refused.
+            $errors[] = 'The room photo ' . $room['node_id'] . ' cannot be reached from the gate.';
         }
 
         // The walkthrough looks rooms up by name, so duplicates make all but
@@ -110,7 +117,86 @@ function validate_graph(array $graph): array
         $names[$key] = true;
     }
 
+    if (isset($graph['buildings'])) {
+        $errors = [...$errors, ...validate_floors($graph)];
+    }
+
     return array_values(array_unique($errors));
+}
+
+/**
+ * The rules of the building-and-floor map (see walk-lib.php): one gate, each
+ * floor's fixed path ending at its floor point, and no fixed path linked to
+ * another floor.
+ *
+ * @return string[]
+ */
+function validate_floors(array $graph): array
+{
+    $errors = [];
+    $byId   = array_column($graph['nodes'], null, 'node_id');
+
+    $gates = array_values(array_filter($graph['nodes'], static fn ($n) => ($n['role'] ?? '') === 'gate'));
+    if (count($gates) !== 1 || ($gates[0]['type'] ?? '') !== 'landmark') {
+        $errors[] = 'The map must have exactly one main gate photo, marked as the starting point.';
+    }
+
+    foreach ($graph['buildings'] as $building) {
+        foreach ($building['floors'] ?? [] as $floor) {
+            $point = $byId[$floor['point'] ?? ''] ?? null;
+            if ($point === null
+                || ($point['role'] ?? '') !== 'path'
+                || ($point['building'] ?? '') !== $building['code']
+                || (int) ($point['floor'] ?? 0) !== (int) $floor['n']) {
+                $errors[] = 'The fixed path of ' . $building['name'] . ' floor ' . $floor['n'] . ' has lost its end point.';
+            }
+        }
+    }
+
+    foreach ($graph['edges'] as $edge) {
+        $a = $byId[$edge['from_node']] ?? null;
+        $z = $byId[$edge['to_node']] ?? null;
+        if ($a === null || $z === null) {
+            continue;   // a link to a missing photo is reported by validate_graph()
+        }
+        foreach ([[$a, $z], [$z, $a]] as [$path, $other]) {
+            if (($path['role'] ?? '') !== 'path' || ($other['role'] ?? '') === 'gate') {
+                continue;
+            }
+            if (($other['building'] ?? null) !== ($path['building'] ?? null)
+                || (int) ($other['floor'] ?? 0) !== (int) ($path['floor'] ?? 0)) {
+                $errors[] = 'The fixed path photo ' . $path['node_id'] . ' is linked to a different floor.';
+            }
+        }
+    }
+
+    return $errors;
+}
+
+/**
+ * The gate and every fixed path photo are locked: a change may replace their
+ * pictures (photo-replace.php), never take them off the map.
+ *
+ * @return string[]
+ */
+function locked_photos_removed(array $before, array $after): array
+{
+    $now    = array_column($after['nodes'] ?? [], 'role', 'node_id');
+    $errors = [];
+
+    foreach ($before['nodes'] ?? [] as $node) {
+        $role = $node['role'] ?? '';
+        if ($role !== 'gate' && $role !== 'path') {
+            continue;
+        }
+        if (($now[$node['node_id']] ?? null) !== $role) {
+            $errors[] = $role === 'gate'
+                ? 'The main gate photo is locked and cannot be removed.'
+                : 'The fixed path photo ' . $node['node_id'] . ' is locked and cannot be removed.';
+        }
+    }
+
+    return $errors;
 }
 
 /** Copies the current map aside before it is replaced. */
@@ -140,28 +226,27 @@ function snapshot_graph(): ?string
 }
 
 /**
- * Validates, snapshots and replaces the live map.
+ * Changes the live map: reads it, applies $change, validates, snapshots and
+ * replaces it, all under one lock.
+ *
+ * The change is worked out from the map as it is at that moment, not as it
+ * was when the page loaded, so two staff saving at once cannot overwrite each
+ * other, and a photo one of them deletes is never left in the other's map.
+ * $change receives the current map and returns the new one; it may refuse by
+ * calling json_fail().
  *
  * A change is judged against what the map looked like before it, not against
  * perfection. The live map already has faults that predate this panel, and
  * refusing every save until they are gone would make them impossible to fix:
  * the duplicate room name can only be corrected by renaming a room, which is
- * itself a save. So only problems the change *introduces* block it.
+ * itself a save. So only problems the change *introduces* block it. The gate
+ * and the fixed paths are also locked (locked_photos_removed()).
+ *
+ * @param callable(array): array $change
+ * @return string the snapshot of the previous map, or '' when none was taken
  */
-function save_graph(array $graph): string
+function update_graph(callable $change): string
 {
-    $before = is_file(GRAPH_PATH)
-        ? validate_graph(json_decode((string) file_get_contents(GRAPH_PATH), true) ?: [])
-        : [];
-
-    $introduced = array_values(array_diff(validate_graph($graph), $before));
-
-    if ($introduced) {
-        json_fail(400, 'The change was not saved because it would break the map: ' . $introduced[0], [
-            'problems' => $introduced,
-        ]);
-    }
-
     /*
       The lock lives on a separate file, never on the map itself. Windows
       refuses rename() onto a destination that has an open handle, so locking
@@ -176,6 +261,21 @@ function save_graph(array $graph): string
     try {
         if (!flock($handle, LOCK_EX)) {
             json_fail(503, 'Someone else is saving a change right now. Please try again in a moment.');
+        }
+
+        $before = is_file(GRAPH_PATH)
+            ? (json_decode((string) file_get_contents(GRAPH_PATH), true) ?: [])
+            : [];
+        $graph = $change($before);
+
+        $introduced = [
+            ...array_diff(validate_graph($graph), $before ? validate_graph($before) : []),
+            ...locked_photos_removed($before, $graph),
+        ];
+        if ($introduced) {
+            json_fail(400, 'The change was not saved because it would break the map: ' . $introduced[0], [
+                'problems' => array_values($introduced),
+            ]);
         }
 
         $snapshot = snapshot_graph();
@@ -197,4 +297,10 @@ function save_graph(array $graph): string
         flock($handle, LOCK_UN);
         fclose($handle);
     }
+}
+
+/** Replaces the live map with one already worked out (see update_graph()). */
+function save_graph(array $graph): string
+{
+    return update_graph(static fn (): array => $graph);
 }
