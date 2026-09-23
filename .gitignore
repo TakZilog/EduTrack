@@ -16,3 +16,8 @@ assets/nodes/nodes-edges.json.lock
 .claude/.caveman-mode
 tools/cloudflared.exe
 sql/edutrack_backup.sql
+
+# Environment files (secrets). None exist today; this keeps a future one out of git.
+.env
+.env.*
+!.env.example
