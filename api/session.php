@@ -96,6 +96,33 @@ function json_ok(array $extra = []): never
     exit;
 }
 
+/**
+ * Sends a photo the browser must check before reusing. An unchanged file
+ * answers 304 with no body, so a repeat visit still costs almost nothing.
+ *
+ * A plain max-age is not safe here: photo names come back when a room is
+ * photographed again, and a replaced picture keeps its name, so the browser
+ * would go on showing the old picture for as long as it was told to keep it.
+ */
+function send_revalidated_file(string $path, string $type): never
+{
+    $etag = '"' . md5($path . '|' . filemtime($path) . '|' . filesize($path)) . '"';
+    header('Cache-Control: private, no-cache');
+    header('ETag: ' . $etag);
+
+    $sent = array_map(static fn ($t) => preg_replace('/^W\//', '', trim($t)),
+        explode(',', (string) ($_SERVER['HTTP_IF_NONE_MATCH'] ?? '')));
+    if (in_array($etag, $sent, true)) {
+        http_response_code(304);
+        exit;
+    }
+
+    header('Content-Type: ' . $type);
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+    exit;
+}
+
 function require_post(): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

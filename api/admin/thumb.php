@@ -70,11 +70,7 @@ $cache = THUMBS_DIR . '/' . basename($requested) . '.webp';
   Turning GD on restores the small previews with no other change.
 */
 if (!function_exists('imagecreatefromwebp')) {
-    header('Content-Type: image/webp');
-    header('Content-Length: ' . filesize($source));
-    header('Cache-Control: private, max-age=86400');
-    readfile($source);
-    exit;
+    send_revalidated_file($source, 'image/webp');
 }
 
 // Rebuild when the photo is newer than its thumbnail, so replacing a panorama
@@ -107,10 +103,6 @@ if (!is_file($cache) || filemtime($cache) < filemtime($source)) {
     imagedestroy($image);
 }
 
-header('Content-Type: image/webp');
-header('Content-Length: ' . filesize($cache));
-// Safe to cache hard: the filename is the node id and the content only changes
-// when the photo is replaced, which busts it through the mtime check above.
-header('Cache-Control: private, max-age=86400');
-
-readfile($cache);
+// Checked on every view rather than cached for a day: a node id comes back
+// when a room is photographed again, with a different picture.
+send_revalidated_file($cache, 'image/webp');

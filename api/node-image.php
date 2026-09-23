@@ -34,7 +34,4 @@ if (!preg_match("/^[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$/", $f)) { http_response
 $path = dirname(TOUR_GRAPH_PATH) . "/" . $f;
 if (!is_file($path)) { http_response_code(404); exit; }
 $types = ["webp" => "image/webp", "jpg" => "image/jpeg", "jpeg" => "image/jpeg", "png" => "image/png"];
-header("Content-Type: " . $types[strtolower(pathinfo($f, PATHINFO_EXTENSION))]);
-header("Cache-Control: private, max-age=86400");
-header("Content-Length: " . filesize($path));
-readfile($path);
+send_revalidated_file($path, $types[strtolower(pathinfo($f, PATHINFO_EXTENSION))]);

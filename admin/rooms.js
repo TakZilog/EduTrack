@@ -468,7 +468,12 @@
   async function removeRoom(room) {
     const yes = await confirmAction({
       title: 'Remove Location ' + room.name + '?',
-      message: 'This will remove the location from the EduTrack navigation system.',
+      // On the building map a room's photos are its own, and removing it
+      // deletes them for good; on the older map they stay.
+      message: structured
+        ? 'This takes the location off the map and deletes its photos for good. The fixed path is not affected. '
+          + 'To change its photos instead, use the Walkthrough page.'
+        : 'This will remove the location from the EduTrack navigation system.',
       confirmLabel: 'Remove Location',
       danger: true
     });

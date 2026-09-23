@@ -204,6 +204,8 @@ function scan_tree(string $root): array
 
         $buildingDir = $root . DIRECTORY_SEPARATOR . $buildingName;
         $building    = ['name' => $buildingName, 'code' => $code, 'floors' => []];
+        $pathFolders = [];   // floor number => folder, to catch two folders for one floor
+        $roomFloors  = [];
         warn_loose_files($buildingDir, $buildingName, $report);
 
         $pathDir = null;
@@ -224,6 +226,12 @@ function scan_tree(string $root): array
                     $report['errors'][] = "{$shown}: this is not a floor name. Use names like \"1st Floor\".";
                     continue;
                 }
+                // "1st Floor" and "1 Floor" are the same floor: one would quietly replace the other.
+                if (isset($pathFolders[$n])) {
+                    $report['errors'][] = "{$shown}: this is floor {$n} again, after \"{$pathFolders[$n]}\". Keep one folder per floor.";
+                    continue;
+                }
+                $pathFolders[$n] = $floorName;
                 $photos = folder_photos($pathDir . DIRECTORY_SEPARATOR . $floorName, $shown, $report);
                 if ($photos === []) {
                     $report['errors'][] = "{$shown}: the folder has no photos.";
@@ -244,6 +252,11 @@ function scan_tree(string $root): array
                 $report['errors'][] = "{$shown}: this is not a floor name. Use names like \"1st Floor\".";
                 continue;
             }
+            if (isset($roomFloors[$n])) {
+                $report['errors'][] = "{$shown}: this is floor {$n} again, after \"{$roomFloors[$n]}\". Keep one folder per floor.";
+                continue;
+            }
+            $roomFloors[$n] = $floorName;
             warn_loose_files($floorDir, $shown, $report);
 
             foreach (subfolders($floorDir) as $roomFolder) {
@@ -500,6 +513,15 @@ function publish(): int
     }
     if (validate_graph($graph) || !is_file(NEW_DIR . '/.htaccess')) {
         echo "assets/nodes-new is not a sound map. Run --build again.\n";
+        return 1;
+    }
+    // The public enrollment guide links rooms by name; a missing one would
+    // leave a step with no way to walk there.
+    $missing = array_values(array_diff(enrollment_room_names(), array_column($graph['rooms'], 'room_name')));
+    if ($missing) {
+        echo 'Nothing was published. The enrollment guide sends visitors to "' . implode('", "', $missing)
+            . "\", but the new map has no room with that name. Name the room folders to match, or change "
+            . "assets/enrollment/enrollment-steps.json, then build again.\n";
         return 1;
     }
     if (file_exists(PREVIOUS_DIR)) {
