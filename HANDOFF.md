@@ -95,8 +95,10 @@ refers to `N0001`-style ids that no longer exist. It is stale and unused.
   with no link back to the gate. The folder import replaces it.
 - **No HTTPS.** The admin password and session cookie cross the network in
   cleartext. `Secure` is correctly absent from the cookie as a result.
-- **No password change or reset** for admins. Recovery is
-  `tools/create-admin.php` on the server.
+- **Admin passwords** are changed and reset on Users & Access. If nobody who
+  can sign in remembers theirs: `php tools/create-admin.php --reset
+  --username=NAME` on the server. A reset signs out every session that used
+  the old password, and turning an account off ends its sessions at once.
 - **The Walkthrough page needs the building map.** On today's map it says so
   and offers nothing to change until the folder import is published.
 
