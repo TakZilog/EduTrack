@@ -17,9 +17,15 @@ function roomLabel(raw) {
   return raw.toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase());
 }
 
+/* "2ND FLOOR SECOND BUILDING": the floor, and the building after it. */
 function floorOf(raw) {
-  const m = /^(\d+)(st|nd|rd|th)\s+floor/i.exec(raw || '');
-  return m ? { n: Number(m[1]), label: m[1] + m[2].toLowerCase() + ' floor' } : { n: 0, label: 'Other' };
+  const m = /^(\d+)(st|nd|rd|th)\s+floor\s*(.*)$/i.exec(raw || '');
+  if (!m) return { n: 0, label: 'Other', building: '' };
+  return {
+    n: Number(m[1]),
+    label: m[1] + m[2].toLowerCase() + ' floor',
+    building: m[3].trim().toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase())
+  };
 }
 
 const plural = n => n + (n === 1 ? ' room' : ' rooms');
@@ -53,25 +59,35 @@ function render(rooms, query) {
     return;
   }
 
-  const floors = new Map();
+  // One group per building and floor, so two buildings' 1st floors stay apart.
+  const groups = new Map();
   rooms.forEach(r => {
     const f = floorOf(r.floor);
-    if (!floors.has(f.n)) floors.set(f.n, { label: f.label, rooms: [] });
-    floors.get(f.n).rooms.push(r);
+    const key = f.building + '|' + f.n;
+    if (!groups.has(key)) groups.set(key, { ...f, rooms: [] });
+    groups.get(key).rooms.push(r);
   });
 
-  // Ground floor first: 1, 2, 3, the order a student climbs from the gate.
-  const order = [...floors.keys()].sort((a, b) => a - b);
+  // Building by building, and in each one the ground floor first: 1, 2, 3,
+  // the order a student climbs from the gate.
+  const order = [...groups.values()].sort((a, b) => a.building.localeCompare(b.building) || a.n - b.n);
+  const severalBuildings = new Set(order.map(g => g.building)).size > 1;
+  const floorsSeen = new Set();
 
-  order.forEach(n => {
-    const group = floors.get(n);
+  order.forEach((group, i) => {
+    const n = group.n;
+    // The first group of each floor keeps id "floor-N", which the rail and
+    // the home page's floor links point at.
+    const id = floorsSeen.has(n) ? 'floor-' + n + '-' + i : 'floor-' + n;
+    floorsSeen.add(n);
+
     const section = document.createElement('section');
-    section.setAttribute('aria-labelledby', 'floor-' + n);
+    section.setAttribute('aria-labelledby', id);
     section.dataset.floor = n;
 
     const head = document.createElement('h2');
     head.className = 'floor-head';
-    head.id = 'floor-' + n;
+    head.id = id;
     const num = document.createElement('span');
     num.className = 'floor-num is-small';
     num.setAttribute('aria-hidden', 'true');
@@ -79,7 +95,14 @@ function render(rooms, query) {
     const count = document.createElement('span');
     count.className = 'count';
     count.textContent = plural(group.rooms.length);
-    head.append(num, group.label, count);
+    head.append(num, group.label);
+    if (severalBuildings && group.building) {
+      const building = document.createElement('span');
+      building.className = 'floor-building';
+      building.textContent = group.building;
+      head.appendChild(building);
+    }
+    head.appendChild(count);
 
     const ul = document.createElement('ul');
     ul.className = 'floor-rooms';
@@ -100,7 +123,7 @@ function render(rooms, query) {
     list.appendChild(section);
   });
 
-  setActive(order[0]);
+  setActive(order[0].n);
 
   // The rail follows the list: whichever floor's header sits at the top.
   observer = new IntersectionObserver(entries => {
