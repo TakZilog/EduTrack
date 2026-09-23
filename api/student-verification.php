@@ -14,6 +14,14 @@ csrf_check();
 const VERIFICATION_TTL = 600;
 const VERIFY_FALLBACK_MESSAGE = 'Student verification could not be completed. Please check your credentials and enrollment information.';
 
+// Verification confirms the student who is already signed in; it is not a way
+// in. Looking an account up by student ID alone signed in anyone who had seen
+// that ID, and it is printed on the school ID card.
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+if ($userId === 0) {
+    json_fail(401, 'Log in first.', ['code' => 'tour_locked']);
+}
+
 $input = json_input();
 $action = (string) ($input['action'] ?? '');
 $studentNo = strtoupper(trim((string) ($input['studentId'] ?? '')));
@@ -41,10 +49,11 @@ if ($action === 'lookup') {
         'SELECT id, full_name, email, student_no, study_load_no
            FROM users
           WHERE student_no = ?
+            AND id = ?
             AND email_verified = 1
             AND deactivated_at IS NULL' . ($requireActiveStudyLoad ? ' AND study_load_no IS NOT NULL' : '')
     );
-    $stmt->execute([$studentNo]);
+    $stmt->execute([$studentNo, $userId]);
     $user = $stmt->fetch();
 
     if (!$user) {
@@ -68,7 +77,7 @@ if ($action === 'lookup') {
 
 if ($action === 'verify-study-load') {
     $pending = $_SESSION['student_verification'] ?? null;
-    if (!is_array($pending) || (int) ($pending['expires_at'] ?? 0) < time()) {
+    if (!is_array($pending) || (int) ($pending['expires_at'] ?? 0) < time() || (int) ($pending['user_id'] ?? 0) !== $userId) {
         unset($_SESSION['student_verification']);
         json_fail(401, VERIFY_FALLBACK_MESSAGE, ['code' => 'verification_expired']);
     }

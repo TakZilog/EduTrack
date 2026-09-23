@@ -1,0 +1,9 @@
+tunnel: 52bfcdb2-6730-4db7-8a1e-96988a10963a
+credentials-file: C:\Users\firet\.cloudflared\52bfcdb2-6730-4db7-8a1e-96988a10963a.json
+
+ingress:
+  - hostname: edutrack.art
+    service: http://localhost:80
+  - hostname: www.edutrack.art
+    service: http://localhost:80
+  - service: http_status:404

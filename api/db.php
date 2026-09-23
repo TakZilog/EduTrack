@@ -73,6 +73,26 @@ function get_db(): PDO
 }
 
 /**
+ * An app_settings value, falling back to the given default.
+ *
+ * Lives here rather than in the admin bootstrap because student endpoints
+ * (login, student verification) read the same settings the admin panel writes.
+ */
+function setting(string $key, string $default = ''): string
+{
+    static $cache = null;
+
+    if ($cache === null) {
+        $cache = [];
+        foreach (get_db()->query('SELECT setting_key, setting_value FROM app_settings') as $row) {
+            $cache[$row['setting_key']] = $row['setting_value'];
+        }
+    }
+
+    return $cache[$key] ?? $default;
+}
+
+/**
  * Turns a driver-level failure into something the person running the machine
  * can act on. Never includes the password.
  */

@@ -470,7 +470,7 @@
         if (status === 401) {
           window.location.href = data.code === 'details_missing'
             ? '../Auth/add-details.html?next=select-room.html'
-            : '../Auth/student-verification.html';
+            : '../Auth/login.html?next=tour';
           throw new Error('locked');
         }
         allRooms = data.rooms.sort((a, b) => a.room_name.localeCompare(b.room_name, undefined, { numeric: true }));
@@ -544,7 +544,7 @@
       .catch(() => showGuestFooter());
   </script>
 <!-- impeccable-live-start -->
-<script src="http://localhost:8400/live.js?token=039ccad4-fb5c-484e-9552-60ab45ba2e39"></script>
+<script src="http://localhost:8400/live.js?token=8250a17e-b0aa-445e-a35b-a63e6f897e86"></script>
 <!-- impeccable-live-end -->
 </body>
 </html>

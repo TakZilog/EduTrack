@@ -123,19 +123,30 @@ html { scrollbar-gutter: auto; }
   text-decoration: none;
   transition: background-color .15s var(--ease), border-color .15s var(--ease);
 }
+/*
+  The rail spends colour once. A chip on every section and a tinted row for the
+  selected one used the same Blue Wash, so the section you are on wore nothing
+  the others did not, and the eye had to read the border to find it. Resting
+  glyphs now sit unfilled in Muted, which clears 3:1 on the white rail, and the
+  blue belongs to the current section alone.
+*/
 .nav-icon {
   flex-shrink: 0;
   display: inline-grid;
   place-items: center;
   width: 34px; height: 34px;
   border-radius: var(--r-chip);
-  background: var(--blue-wash);
-  color: var(--blue);
+  background: transparent;
+  color: var(--text-muted);
   transition: background-color .15s var(--ease), color .15s var(--ease);
 }
 .nav-icon svg { width: 19px; height: 19px; }
 @media (hover: hover) and (pointer: fine) {
+  /* Hover brings the glyph up to full ink rather than adding a second wash:
+     the pointer already says which row it is on. */
   .nav-item:hover { background: var(--blue-wash); }
+  .nav-item:hover .nav-icon { color: var(--text); }
+  .nav-item[aria-current="page"]:hover .nav-icon { color: var(--white); }
 }
 .nav-item[aria-current="page"] {
   background: var(--blue-wash);
@@ -705,11 +716,18 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
   width: 100%;
   max-width: 460px;
   padding: var(--s6);
-  background: var(--surface);
+  background: var(--blue-wash);
   border: 1px solid var(--border-strong);
   border-radius: var(--r-panel);
 }
-.signin-crest { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s5); }
+.signin-crest {
+  display: flex; align-items: center; justify-content: center; gap: var(--s3);
+  background: color-mix(in srgb, var(--blue-wash) 60%, transparent);
+  margin: calc(-1 * var(--s6)) calc(-1 * var(--s6)) var(--s5);
+  padding: var(--s5) var(--s6) var(--s4);
+  border-radius: var(--r-panel) var(--r-panel) 0 0;
+  text-align: center;
+}
 .signin-crest img {
   width: 56px; height: 56px;
   padding: 2px;
@@ -719,9 +737,9 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
 }
 .signin-crest .m { display: block; color: var(--blue); font-family: var(--font-display); font-size: var(--fs-numeral); font-weight: 700; line-height: 1; }
 .signin-crest .s { display: block; color: var(--text-muted); font-size: var(--fs-sm); font-weight: 600; }
-.signin h1 { margin: 0 0 var(--s2); font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 700; line-height: 1.05; }
+.signin h1 { margin: 0 0 var(--s2); color: var(--blue); font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 700; line-height: 1.05; }
 .signin .lede { margin: 0 0 var(--s5); color: var(--text-muted); }
-.signin .btn { width: 100%; }
+.signin .btn { width: 100%; box-shadow: 0 1px 2px color-mix(in srgb, var(--blue) 35%, transparent); }
 .signin-foot { margin: var(--s5) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
 
 /* --------------------------------------------------------------- responsive */

@@ -46,6 +46,28 @@ function validate_graph(array $graph): array
                 continue 2;
             }
         }
+
+        /*
+          Both of these become part of a path later: image_file is opened and
+          overwritten by photo-replace.php, and node_id names the cached
+          thumbnail in thumb.php. Neither is free text, and neither may carry a
+          slash or a dot pair, or the map file becomes a way to read and write
+          elsewhere on the server. Checked here because this function is the one
+          gate every map write passes through.
+        */
+        if (!preg_match('/^[A-Za-z0-9._-]{1,64}$/', (string) $node['node_id'])
+            || str_contains((string) $node['node_id'], '..')) {
+            $errors[] = 'The photo id "' . $node['node_id']
+                . '" is not allowed. Use letters, numbers, dots, dashes and underscores only.';
+            continue;
+        }
+        if (!preg_match('/^[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$/i', (string) $node['image_file'])
+            || str_contains((string) $node['image_file'], '..')) {
+            $errors[] = 'The picture file name "' . $node['image_file']
+                . '" is not allowed. It must be a plain .webp, .jpg or .png file name.';
+            continue;
+        }
+
         if (isset($nodeIds[$node['node_id']])) {
             $errors[] = 'Two photos share the id ' . $node['node_id'] . '.';
         }

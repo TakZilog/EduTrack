@@ -57,7 +57,11 @@ if (!is_file($source)) {
     exit;
 }
 
-$cache = THUMB_DIR . '/' . $requested . '.webp';
+// The id already had to match a node in the map to get this far, and
+// graph-write.php refuses an id that could act as a path. basename() is the
+// belt to that brace: a map file written before that rule existed cannot steer
+// this write out of the thumbnail folder.
+$cache = THUMB_DIR . '/' . basename($requested) . '.webp';
 
 /*
   Shrinking needs PHP's GD extension with WebP support, which XAMPP ships

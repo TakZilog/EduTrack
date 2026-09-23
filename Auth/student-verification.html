@@ -135,6 +135,12 @@
 </div>
 <script src="auth.js"></script>
 <script>
+  // Verification is for a student who has already logged in; it is not a way in.
+  fetch('../api/whoami.php', { credentials: 'same-origin' })
+    .then(response => response.json())
+    .then(data => { if (!data.signedIn) window.location.href = 'login.html'; })
+    .catch(() => { window.location.href = 'login.html'; });
+
   const panels = [...document.querySelectorAll('[data-step]')];
   const progress = [...document.querySelectorAll('[data-progress]')];
   const state = { step: 1, studentName: '', maskedStudentId: '', program: '' };
@@ -186,6 +192,7 @@
         semester: document.getElementById('semester').value
       });
       if (!data.ok) {
+        if (data.code === 'tour_locked') { window.location.href = 'login.html'; return; }
         showStep('failed');
         return;
       }
@@ -232,5 +239,8 @@
     window.location.href = 'student-home.html';
   });
 </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=8250a17e-b0aa-445e-a35b-a63e6f897e86"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

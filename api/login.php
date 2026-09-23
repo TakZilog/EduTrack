@@ -37,8 +37,8 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
 
 $studentVerificationEnabled = strtolower(trim((string) setting('student_id_verification_enabled', '1'))) !== '0';
 $requireActiveStudyLoad = strtolower(trim((string) setting('require_active_study_load_enabled', '1'))) !== '0';
-$verifyCurrentSemester = strtolower(trim((string) setting('verify_current_semester_enabled', '1'))) !== '0';
-$verifyCurrentSchoolYear = strtolower(trim((string) setting('verify_current_school_year_enabled', '1'))) !== '0';
+// Semester and school year are checked on the next page, which is the one
+// that asks for them (api/student-verification.php). The login form does not.
 
 if ($studentVerificationEnabled) {
     $studentNo = trim((string) ($user['student_no'] ?? ''));
@@ -56,20 +56,6 @@ if ($requireActiveStudyLoad) {
         rate_limit_record($email, 'student_login', false);
         rate_limit_record($ip, 'student_login_ip', false);
         error_log('[EduTrack] student login blocked: missing active study load for user ' . (int) $user['id']);
-        json_fail(401, 'Student verification could not be completed. Please check your credentials and enrollment information.');
-    }
-}
-
-if ($verifyCurrentSemester || $verifyCurrentSchoolYear) {
-    $semester = trim((string) ($input['semester'] ?? ''));
-    $schoolYear = trim((string) ($input['schoolYear'] ?? ''));
-    $expectedSemester = '1';
-    $expectedSchoolYear = '2026-2027';
-
-    if (($verifyCurrentSemester && $semester !== $expectedSemester) || ($verifyCurrentSchoolYear && $schoolYear !== $expectedSchoolYear)) {
-        rate_limit_record($email, 'student_login', false);
-        rate_limit_record($ip, 'student_login_ip', false);
-        error_log('[EduTrack] student login blocked: verification mismatch for user ' . (int) $user['id']);
         json_fail(401, 'Student verification could not be completed. Please check your credentials and enrollment information.');
     }
 }
@@ -119,9 +105,10 @@ $_SESSION['user_id']   = $user['id'];
 $_SESSION['full_name'] = $user['full_name'];
 $_SESSION['email']     = $user['email'];
 
-if ($studentVerificationEnabled) {
-    $_SESSION['student_id_verified'] = true;
-}
+// The checks above are the same account checks api/student-verification.php
+// makes, so passing them here is verification. Without this mark every login
+// was sent through a second form asking for a student ID already on file.
+$_SESSION['student_verified_at'] = time();
 
 // Accounts made before migration 006 have no enrolment numbers yet. They can
 // log in, but the room tour needs both, so the page sends them to add them.

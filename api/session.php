@@ -56,6 +56,23 @@ function security_headers(): void
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: same-origin');
     header('Cache-Control: no-store');
+
+    // An API answer is never a document, so nothing here may be framed and
+    // nothing here needs to load a resource of any kind. Saying so closes the
+    // two ways a JSON endpoint gets turned into a page.
+    header('X-Frame-Options: DENY');
+    header("Content-Security-Policy: default-src 'none'; frame-ancestors 'none'");
+
+    // XAMPP ships display_errors on. A warning printed mid-response both breaks
+    // the JSON and prints the server's paths, the SQL around the failure, and
+    // sometimes the values in it. The exception handler already decides what a
+    // remote caller may see; this makes PHP itself obey the same rule. The log
+    // keeps the full detail either way.
+    if (!is_local_request()) {
+        ini_set('display_errors', '0');
+        ini_set('display_startup_errors', '0');
+    }
+    ini_set('log_errors', '1');
 }
 
 /**

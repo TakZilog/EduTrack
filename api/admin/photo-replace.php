@@ -110,8 +110,14 @@ if (!is_dir(PHOTO_BACKUP_DIR) && !mkdir(PHOTO_BACKUP_DIR, 0775, true) && !is_dir
     json_fail(500, 'The server could not prepare a place to keep the old picture. Nothing was changed.');
 }
 
-$target = dirname(GRAPH_PATH) . '/' . $node['image_file'];
-$backup = PHOTO_BACKUP_DIR . '/' . date('Y-m-d_His') . '_' . $node['image_file'];
+// The name comes from the map file, not from this request, and graph-write.php
+// refuses one that could act as a path. basename() keeps that true for map
+// files written before that rule existed: this endpoint overwrites a picture
+// and must never be able to write outside the photo folder.
+$imageFile = basename((string) $node['image_file']);
+
+$target = dirname(GRAPH_PATH) . '/' . $imageFile;
+$backup = PHOTO_BACKUP_DIR . '/' . date('Y-m-d_His') . '_' . $imageFile;
 
 if (is_file($target) && !copy($target, $backup)) {
     json_fail(500, 'The old picture could not be saved first, so nothing was changed.');

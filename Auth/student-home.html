@@ -73,14 +73,14 @@
     .then(response => response.json())
     .then(data => {
       if (!data.signedIn) {
-        window.location.href = 'student-verification.html';
+        window.location.href = 'login.html';
         return;
       }
       document.getElementById('studentName').textContent = data.fullName;
       document.getElementById('studentId').textContent = data.studentId;
       document.getElementById('program').textContent = data.program;
     })
-    .catch(() => { window.location.href = 'student-verification.html'; });
+    .catch(() => { window.location.href = 'login.html'; });
 
   document.querySelectorAll('.class-item button.class-action').forEach(button => {
     button.addEventListener('click', () => {
@@ -95,5 +95,8 @@
     window.location.href = '../index.html';
   });
 </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=8250a17e-b0aa-445e-a35b-a63e6f897e86"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

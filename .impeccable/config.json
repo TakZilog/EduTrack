@@ -34,6 +34,12 @@
         "rule": "design-system-font-size",
         "value": "3.5rem",
         "createdAt": "2026-09-19T14:55:00.712Z"
+      },
+      {
+        "rule": "side-tab",
+        "value": "3px",
+        "createdAt": "2026-09-21T19:04:57.962Z",
+        "reason": "DESIGN.md Staff Panel: 'the open row is marked with a blue edge'. Base .row (L317) sets border-left 3px solid transparent, reserving space; blue only on [aria-current=true] (L329/L597/L1009). L590/L1002 re-declare width only, no colour. Selection state, not a decorative accent stripe."
       }
     ]
   }
