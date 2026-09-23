@@ -33,7 +33,7 @@ rename a room alone, without seeing a technical name, and the map stays small.
 
 ## Assumptions (correct these if wrong)
 
-- **Every walk starts at the one Main Gate**, including walks to Building 2.
+- **Every walk starts at the one Main Gate**, including walks to the Second Building.
 - **Each floor's fixed path starts right after the gate**, as the owner
   described ("from the gate through the third floor"). The 2nd and 3rd floor
   paths repeat the few ground-floor photos up to the stairs. This costs a few
@@ -51,7 +51,7 @@ The owner copies photos, unrenamed, into:
 ```
 C:\School Photos\
   Main Gate\                  one photo: the start of every walk
-  Admin Building\
+  Main Building\
     Fixed Path\
       1st Floor\              first photo after the gate -> 1st floor point
       2nd Floor\              first photo after the gate -> 2nd floor point
@@ -61,7 +61,7 @@ C:\School Photos\
       Registrar\
     2nd Floor\ ...
     3rd Floor\ ...
-  <Building 2 name>\          same shape
+  Second Building\          same shape
 ```
 
 - Folder names are what visitors see ("Cashier", "Room 201").
@@ -87,15 +87,15 @@ C:\School Photos\
 ## Rooms per building (from the owner, 2026-09-24)
 
 The current map lists every room under "ADMIN BUILDING". These belong to the
-second building, which has its own fixed 1st/2nd/3rd floor paths:
+Second Building, which has its own fixed 1st/2nd/3rd floor paths:
 
-| Floor | Second building rooms |
+| Floor | Second Building rooms |
 |---|---|
 | 1st | 106, 107, 108, 110, Slab 3, Slab 1 |
 | 2nd | 214, 215, Library |
 | 3rd | Canteen / Auditorium (one room: the canteen is inside the auditorium) |
 
-Everything else in today's room list stays in the Admin Building. The import
+Everything else in today's room list stays in the Main Building. The import
 `--check` compares the folder tree against this list and reports any room that
 is missing or in the other building.
 
@@ -106,12 +106,12 @@ Staff never see these; they only need to be readable to a developer.
 | Photo | Id |
 |---|---|
 | Main gate | `GATE` |
-| Fixed path, Admin 3rd floor, photo 2 | `ADMIN-F3-PATH-02` |
-| Walk to Faculty, Admin 3rd floor, photo 1 | `ADMIN-F3-FACULTY-01` |
-| The Faculty room itself (last photo) | `ADMIN-F3-FACULTY` |
+| Fixed path, Main 3rd floor, photo 2 | `MAIN-F3-PATH-02` |
+| Walk to Faculty, Main 3rd floor, photo 1 | `MAIN-F3-FACULTY-01` |
+| The Faculty room itself (last photo) | `MAIN-F3-FACULTY` |
 
 Building code: the building folder name, upper-cased, letters and digits only,
-short (`ADMIN`, `ENG`). Image file = id + `.webp`. Every node gets a correct
+short (`MAIN`, `SECOND`). Image file = id + `.webp`. Every node gets a correct
 `label`, so the stale-label problem disappears.
 
 ## Map file
@@ -122,8 +122,8 @@ unchanged (they walk edges breadth-first from the `landmark` node). Added:
 
 ```json
 "buildings": [
-  { "code": "ADMIN", "name": "Admin Building",
-    "floors": [ { "n": 3, "point": "ADMIN-F3-PATH-05" } ] }
+  { "code": "MAIN", "name": "Main Building",
+    "floors": [ { "n": 3, "point": "MAIN-F3-PATH-05" } ] }
 ]
 ```
 
@@ -145,8 +145,8 @@ Locations. Big buttons, plain words, no ids.
 Two choices only, in this order:
 
 1. **Where**: one list of every building and floor, each its own option:
-   "Admin Building – 1st Floor", "Admin Building – 2nd Floor", …,
-   "<Building 2> – 1st Floor", …. Each building has its own fixed paths.
+   "Main Building – 1st Floor", "Main Building – 2nd Floor", …,
+   "Second Building – 1st Floor", …. Each building has its own fixed paths.
 2. **Room**: the rooms on that building and floor.
 
 On the chosen floor the page shows:
