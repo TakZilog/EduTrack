@@ -35,6 +35,8 @@ Options -Indexes
 # ---------------------------------------------------------------- page policy
 #
 # The pages load type from Google Fonts and the 360 viewer from jsDelivr.
+# Cloudflare Web Analytics adds its own beacon script to every page and posts
+# visit timings back to cloudflareinsights.com; both are allowed for that.
 # Scripts come only from files on this site: every page keeps its script in a
 # sibling .js file, so no inline <script> is allowed. A string that escaped an
 # escaper therefore cannot run, has nowhere to send anything, and cannot pull
@@ -53,7 +55,7 @@ Options -Indexes
 </IfModule>
 <IfModule mod_headers.c>
     <FilesMatch "\.html$">
-        Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'" env=!edutrack_local
+        Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'" env=!edutrack_local
         Header always set X-Frame-Options "DENY"
         Header always set X-Content-Type-Options "nosniff"
         Header always set Referrer-Policy "same-origin"
