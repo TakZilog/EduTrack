@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/_bootstrap.php';
 require __DIR__ . '/graph-lib.php';
+require __DIR__ . '/walk-lib.php';
 
 $input = admin_boot('room.view');
 
@@ -63,6 +64,8 @@ foreach ($graph['nodes'] as $node) {
 }
 
 json_ok([
+    // Imported by building and floor: rooms move by swapping, not by picking a floor.
+    'structured' => map_has_buildings($graph),
     'rooms'    => $rooms,
     'unlisted' => $unlisted,
     'floors'   => $floors,
