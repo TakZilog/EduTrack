@@ -1138,7 +1138,8 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
 .wt-step.is-over { border-color: var(--blue); outline: 2px dashed var(--blue); outline-offset: 2px; }
 
 .wt-fixed-shots { display: flex; gap: var(--s1); min-width: 0; overflow: hidden; }
-.wt-fixed-shots img { flex: 0 0 64px; width: 64px; border-radius: var(--r-chip); }
+/* Shrink to fit the column, so a long fixed path never shows half a picture. */
+.wt-fixed-shots img { flex: 0 1 64px; width: 64px; min-width: 16px; border-radius: var(--r-chip); }
 
 .wt-step-title { display: flex; align-items: center; gap: var(--s2); margin: 0; color: var(--text); font-size: var(--fs-body); font-weight: 700; }
 .wt-step-meta { margin: 2px 0 0; color: var(--text-muted); font-size: var(--fs-sm); overflow-wrap: anywhere; }
