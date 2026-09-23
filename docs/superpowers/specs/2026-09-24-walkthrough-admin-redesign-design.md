@@ -127,8 +127,15 @@ floor, so two buildings' 1st floors do not merge.
 Replaces `admin/navigation-map.*` and the per-step "Replace this photo" in
 Locations. Big buttons, plain words, no ids.
 
-1. **Building** tabs (only shown if there is more than one).
-2. **Floor** buttons: 1st / 2nd / 3rd.
+Two choices only, in this order:
+
+1. **Where**: one list of every building and floor, each its own option:
+   "Admin Building – 1st Floor", "Admin Building – 2nd Floor", …,
+   "<Building 2> – 1st Floor", …. Each building has its own fixed paths.
+2. **Room**: the rooms on that building and floor.
+
+On the chosen floor the page shows:
+
 3. **Fixed path** strip: small pictures from the gate to the floor point, with
    a lock. Each picture has **Replace photo** only.
 4. **Rooms on this floor** as cards (picture of the room, name). Each card:
