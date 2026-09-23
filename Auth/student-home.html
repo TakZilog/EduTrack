@@ -210,34 +210,7 @@
   </main>
 
 <script src="auth.js"></script>
-<script>
-  fetch('../api/whoami.php', { credentials: 'same-origin' })
-    .then(response => response.json())
-    .then(data => {
-      if (!data.signedIn) {
-        window.location.href = 'login.html';
-        return;
-      }
-      document.getElementById('studentName').textContent = data.fullName;
-      document.getElementById('studentId').textContent = data.studentId;
-      document.getElementById('program').textContent = data.program;
-    })
-    .catch(() => { window.location.href = 'login.html'; });
-
-  document.querySelectorAll('.class-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const detail = document.getElementById(row.getAttribute('aria-controls'));
-      const open = detail.hidden;
-      detail.hidden = !open;
-      row.setAttribute('aria-expanded', String(open));
-    });
-  });
-
-  document.getElementById('signOut').addEventListener('click', async () => {
-    await apiPost('logout.php');
-    window.location.href = '../index.html';
-  });
-</script>
+<script src="student-home.js?v=1"></script>
 <!-- impeccable-live-start -->
 <script src="http://localhost:8400/live.js?token=a0930fcf-cc94-4509-8d01-b26d3fbb5a23"></script>
 <!-- impeccable-live-end -->
