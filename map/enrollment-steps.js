@@ -47,33 +47,17 @@ function officePhoto(stem) {
   return wrap;
 }
 
-function roomPhoto(imageFile) {
+/* The door photo is looked up by room name, so it shows for guests too: the
+   server hands out only the rooms this enrollment map names, without the
+   student-only room map. A room with no photo falls back to the office icon. */
+function renderRoomMedia(container, roomName) {
   const img = document.createElement('img');
   img.className = 'step-photo';
   img.alt = '';
   img.loading = 'lazy';
-  img.src = `../api/node-image.php?f=${encodeURIComponent(imageFile)}`;
+  img.src = `../api/node-image.php?room=${encodeURIComponent(roomName)}`;
   img.onerror = () => { img.replaceWith(el('span', 'step-placeholder', ICON_OFFICE)); };
-  return img;
-}
-
-function routeLink(roomName, label) {
-  const a = document.createElement('a');
-  a.className = 'step-route';
-  const ret = encodeURIComponent(`enrollment-steps.html?track=${track}`);
-  a.href = `walkthrough.html?room=${encodeURIComponent(roomName)}&return=${ret}`;
-  a.innerHTML = (label || 'See it on the map') + ICON_ARROW;
-  return a;
-}
-
-/* graph is the building's node/room data from api/tour.php, or null when
-   it could not be loaded (weak signal at the gate is the expected case,
-   not an error) — every render below works either way. */
-function renderRoomMedia(container, roomName, graph) {
-  const room = graph && graph.rooms.find(r => r.room_name === roomName);
-  const node = room && graph.nodes.find(n => n.node_id === room.node_id);
-  if (node) container.appendChild(roomPhoto(node.image_file));
-  else container.appendChild(el('span', 'step-placeholder', ICON_OFFICE));
+  container.appendChild(img);
 }
 
 function buildStepCard(step, graph) {
@@ -94,7 +78,7 @@ function buildStepCard(step, graph) {
       item.appendChild(el('span', 'substep-order', String.fromCharCode(97 + i)));
       item.appendChild(el('span', 'substep-label', sub.label));
       if (sub.kind === 'room') {
-        renderRoomMedia(item, sub.room_name, graph);
+        renderRoomMedia(item, sub.room_name);
         if (graph && graph.rooms.some(r => r.room_name === sub.room_name)) {
           item.appendChild(routeLink(sub.room_name, 'Walk there'));
         }
@@ -107,7 +91,7 @@ function buildStepCard(step, graph) {
   } else {
     const media = el('div', 'step-media');
     if (step.kind === 'room') {
-      renderRoomMedia(media, step.room_name, graph);
+      renderRoomMedia(media, step.room_name);
     } else if (step.kind === 'office') {
       media.appendChild(officePhoto(step.photo));
     } else {
