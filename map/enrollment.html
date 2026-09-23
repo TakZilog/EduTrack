@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack - Enrollment map</title>
+<meta name="description" content="The ACLC College Mandaue enrollment map: pick incoming first-year or ongoing student to see the enrollment steps, room by room.">
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<style>
+  /*
+    The choice a visitor makes once, at the gate: which enrollment they are
+    doing. Two equal boards, the same build as the home page's way cards, so
+    the product's one visual language carries straight through.
+  */
+  .page { padding-top: clamp(24px, 5vw, 40px); }
+
+  .tracks {
+    display: grid;
+    gap: var(--s4);
+    margin: var(--s6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 720px) {
+    .tracks { grid-template-columns: 1fr 1fr; gap: var(--s5); }
+  }
+
+  /* The two answers are set as big as a page title, so the choice reads from
+     arm's length at the gate; the explanation is one quiet line under it. */
+  .track {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    height: 100%;
+    padding: var(--s6) var(--s5);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-panel);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s var(--ease), background-color .15s var(--ease);
+  }
+
+  .track-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--s2);
+    border-radius: var(--r-chip);
+    background: var(--blue-wash);
+    color: var(--blue);
+  }
+  .track-icon svg { width: 22px; height: 22px; }
+
+  .track-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h1);
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  .track-text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .track-go {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    margin-top: auto;
+    padding-top: var(--s4);
+    color: var(--blue);
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+  }
+  .track-go svg { width: 20px; height: 20px; transition: transform .15s var(--ease); }
+
+  @media (hover: hover) and (pointer: fine) {
+    .track:hover { border-color: var(--blue); background: var(--blue-wash); }
+    .track:hover .track-go svg { transform: translateX(3px); }
+  }
+  .track:active { background: var(--blue-wash); }
+  .track:focus-visible { outline-offset: 3px; }
+
+  .track-note {
+    margin: var(--s6) 0 0;
+    padding: var(--s4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-panel);
+    color: var(--text-muted);
+  }
+  .track-note strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+  <header class="brand">
+    <a class="brand-link" href="../index.html" aria-label="EduTrack home">
+      <img class="brand-seal" src="../assets/img/aclc-logo.jpg" width="56" height="56" alt="">
+      <span class="brand-text">
+        <span class="brand-mark">EduTrack</span>
+        <span class="brand-sub">ACLC College, Mandaue Campus</span>
+      </span>
+    </a>
+  </header>
+
+
+
+
+  <main class="page fade-in" id="main">
+    <a class="back-link" href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to home
+    </a>
+    <h1 class="page-title">Enrollment map</h1>
+    <p class="page-lede">Pick the one that is you. Every step that has a room links straight to the walkthrough from the gate.</p>
+
+    <ul class="tracks">
+      <li>
+        <a class="track" href="enrollment-steps.html?track=incoming">
+          <span class="track-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 2.5 3 6 3s6-2 6-3v-5"/></svg></span>
+          <h2 class="track-title">Incoming first-year</h2>
+          <p class="track-text">New to ACLC College. Start here for your first enrollment.</p>
+          <span class="track-go">See the steps<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+      </li>
+      <li>
+        <a class="track" href="enrollment-steps.html?track=ongoing">
+          <span class="track-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.6-1.4 1.7-2 3-2s2.4.6 3 2M15 10h3M15 13h3"/></svg></span>
+          <h2 class="track-title">Ongoing student</h2>
+          <p class="track-text">Already enrolled before. Re-enrolling for a new term.</p>
+          <span class="track-go">See the steps<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="track-note"><strong>No account required.</strong> Anyone can open the enrollment map on their phone at the gate. Looking for a room instead of an enrollment step? <a href="select-room.html">Browse the full room list</a>.</p>
+  </main>
+
+
+
+
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=a0930fcf-cc94-4509-8d01-b26d3fbb5a23"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

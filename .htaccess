@@ -1,3 +1,26 @@
+# No folder ever lists its files. A folder without an index page answers 403.
+Options -Indexes
+
+# ------------------------------------------------------------------ HTTPS only
+#
+# Cloudflare also accepts plain http://edutrack.art and passes it through the
+# tunnel, so passwords would cross the internet unencrypted. Those visitors are
+# sent to https:// instead, and HSTS tells the browser never to try http again.
+# <If> applies to every folder below this one, including the ones with their
+# own RewriteEngine. Requests on this machine (no CF-Connecting-IP) are left
+# alone, so http://localhost keeps working.
+<If "-n req('CF-Connecting-IP') && req('X-Forwarded-Proto') == 'http'">
+    Redirect 301 "https://%{HTTP_HOST}%{REQUEST_URI}"
+</If>
+<IfModule mod_headers.c>
+    <If "-n req('CF-Connecting-IP') && req('X-Forwarded-Proto') == 'https'">
+        Header always set Strict-Transport-Security "max-age=31536000"
+    </If>
+    # Names the exact PHP version, which only helps someone pick an exploit.
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+</IfModule>
+
 # Pages are always checked for a newer version before a cached copy is used.
 # Without this, browsers and the Android app's WebView guess how long to keep
 # a page, and keep showing an old one after the site changes. An unchanged
@@ -22,6 +45,10 @@
 # caller gets the policy.
 <IfModule mod_setenvif.c>
     SetEnvIf Remote_Addr "^(127\.0\.0\.1|::1)$" edutrack_local=1
+    # Public visitors arrive through the Cloudflare tunnel, which connects from
+    # loopback too. Cloudflare always adds this header, so its presence means
+    # the request is not from the developer machine.
+    SetEnvIf CF-Connecting-IP "." !edutrack_local
 </IfModule>
 <IfModule mod_headers.c>
     <FilesMatch "\.html$">
@@ -38,10 +65,22 @@
 # printing it, but that is only true while PHP is working: a mis-set handler or
 # a half-finished upgrade serves it as plain text. Nothing fetches it over HTTP,
 # so refusing it outright costs nothing.
-<FilesMatch "^(config\.php|config\.example\.php|composer\.(json|lock)|\.env.*|.*\.sql|.*\.md)$">
+# Backup and editor copies too: config.php.bak is not run by PHP, so Apache
+# would hand the passwords in it out as plain text.
+<FilesMatch "^(config\.php.*|config\.example\.php|composer\.(json|lock)|\.env.*|.*\.sql|.*\.md|.*\.(bak|old|orig|save|swp|tmp|log)|.*~)$">
     Require all denied
 </FilesMatch>
 
 # Map snapshots and the photos staff replaced are kept here. PHP reads them
 # from disk; they were never meant to be browsable.
 RedirectMatch 404 ^/EduTrack/(storage|sql|tools|vendor)/
+
+# Repository and tooling files. The public site is served straight out of this
+# checkout, so without this /.git/ hands out the full source and history.
+# Only refused through the tunnel: the design tooling on this machine reads
+# .impeccable over localhost.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:CF-Connecting-IP} .
+    RewriteRule ^(\.|mobile_app/|node_modules/|EduTrack$|START-ONLINE\.bat$|package(-lock)?\.json$) - [R=404,L]
+</IfModule>

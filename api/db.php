@@ -73,6 +73,45 @@ function get_db(): PDO
 }
 
 /**
+ * Password hashing, in one place so every account is stored the same way.
+ *
+ * bcrypt at cost 12 rather than PHP's default 10: four times the work for
+ * anyone guessing against a stolen hash, still well under a second to sign in.
+ */
+const PASSWORD_OPTIONS = ['cost' => 12];
+
+function hash_password(string $password): string
+{
+    return password_hash($password, PASSWORD_BCRYPT, PASSWORD_OPTIONS);
+}
+
+/**
+ * Checks a password and, when it is right but stored at an older cost,
+ * re-stores it at the current one. Accounts made before the cost went up are
+ * upgraded the next time they sign in, with nothing for anyone to do.
+ */
+function verify_password(string $password, string $hash, string $table, int $id): bool
+{
+    if (!password_verify($password, $hash)) {
+        return false;
+    }
+
+    if (password_needs_rehash($hash, PASSWORD_BCRYPT, PASSWORD_OPTIONS)) {
+        // Only ever one of two fixed table names, never input.
+        $table = $table === 'admins' ? 'admins' : 'users';
+        try {
+            get_db()->prepare("UPDATE {$table} SET password_hash = ? WHERE id = ?")
+                ->execute([hash_password($password), $id]);
+        } catch (PDOException $e) {
+            // The password was right. A failed upgrade just waits for next time.
+            error_log('[EduTrack] password rehash failed for ' . $table . ' ' . $id);
+        }
+    }
+
+    return true;
+}
+
+/**
  * An app_settings value, falling back to the given default.
  *
  * Lives here rather than in the admin bootstrap because student endpoints

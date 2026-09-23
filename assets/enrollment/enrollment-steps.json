@@ -1,0 +1,95 @@
+{
+  "ongoing": {
+    "label": "Ongoing student",
+    "steps": [
+      {
+        "n": 1,
+        "title": "Get your enrollment clearance form",
+        "office": "Registrar's Office",
+        "kind": "office",
+        "photo": "step-01-registrar",
+        "detail": "Go to the Registrar's Office and ask for the enrollment clearance form."
+      },
+      {
+        "n": 2,
+        "title": "Fill up the clearance form",
+        "office": null,
+        "kind": "action",
+        "detail": "Write your full name, student ID number, last course taken, and incoming course. List every subject you are taking with its subject code and the instructor's name."
+      },
+      {
+        "n": 3,
+        "title": "Sign your clearance at five offices",
+        "office": null,
+        "kind": "group",
+        "detail": "Sign the form at each office, in this order.",
+        "substeps": [
+          { "label": "Hardware and Software Facilitator", "kind": "room", "room_name": "TECHNICAL OFFICE" },
+          { "label": "Property Custodian", "kind": "room", "room_name": "PROPERTY CUSTODIAN" },
+          { "label": "School Librarian", "kind": "room", "room_name": "LIBRARY" },
+          { "label": "HRM Facilitator", "kind": "office", "photo": "step-03-hrm" },
+          { "label": "Cashier", "kind": "room", "room_name": "CASHIER" }
+        ]
+      },
+      {
+        "n": 4,
+        "title": "Get your grades",
+        "office": "Room 107",
+        "kind": "room",
+        "room_name": "107",
+        "detail": "Go to Room 107 and get your grades from the department head who handles your grades."
+      },
+      {
+        "n": 5,
+        "title": "Sign your last clearance",
+        "office": "Registrar's Office",
+        "kind": "office",
+        "photo": "step-01-registrar",
+        "detail": "Return to the Registrar's Office and sign your last clearance."
+      },
+      {
+        "n": 6,
+        "title": "Get your enrollment permit",
+        "office": "Admin Office",
+        "kind": "office",
+        "photo": "step-06-admin",
+        "detail": "Go to the Admin Office and get your permit for the enrollment fee: 2,950 pesos."
+      },
+      {
+        "n": 7,
+        "title": "Pay, then seal your clearance",
+        "office": "Admin Office",
+        "kind": "office",
+        "photo": "step-06-admin",
+        "detail": "After paying, go back to the Admin Office. They approve and seal your clearance form, and sign it."
+      },
+      {
+        "n": 8,
+        "title": "Profiling",
+        "office": "Slab 1",
+        "kind": "room",
+        "room_name": "SLAB 1",
+        "detail": "Go to Slab 1 for profiling: change or double-check your information."
+      },
+      {
+        "n": 9,
+        "title": "Sign your clearance once more",
+        "office": null,
+        "kind": "action",
+        "detail": "The instructor assigned to you during profiling signs your clearance again."
+      },
+      {
+        "n": 10,
+        "title": "Pass your enrollment form",
+        "office": "Faculty",
+        "kind": "room",
+        "room_name": "FACULTY",
+        "detail": "Go to Faculty, pass your enrollment form, and get your study load."
+      }
+    ]
+  },
+  "incoming": {
+    "label": "Incoming first-year",
+    "steps": []
+  }
+}

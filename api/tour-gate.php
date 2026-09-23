@@ -34,6 +34,6 @@ function require_tour_access(): void
         json_fail(401, "The full room tour is for enrolled students. Log in to continue.", ["code" => "tour_locked"]);
     }
 
-    // Guest / enrolling visitor: no account required, open to everyone.
-    return;
+    // Guest / enrolling visitor: no account, so no full room tour.
+    json_fail(401, "The full room tour is for enrolled students. Log in to continue.", ["code" => "tour_locked"]);
 }

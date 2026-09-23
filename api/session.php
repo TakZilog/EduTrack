@@ -22,7 +22,10 @@ function app_session_start(): void
         'path'     => '/',
         'httponly' => true,                    // the cookie is unreadable from JavaScript
         'samesite' => 'Lax',                   // blocks cross-site form posts
-        'secure'   => !empty($_SERVER['HTTPS']), // on automatically once served over TLS
+        // On once served over TLS. The tunnel ends TLS at Cloudflare and talks
+        // plain HTTP to Apache, so HTTPS is empty there even though the visitor
+        // is on https://edutrack.art.
+        'secure'   => !empty($_SERVER['HTTPS']) || via_tunnel(),
     ]);
 
     session_start();
@@ -138,9 +141,34 @@ function csrf_check(): void
     }
 }
 
-/** The client address, used as a rate-limit identifier. */
+/**
+ * True when the request arrived through the Cloudflare tunnel.
+ *
+ * cloudflared forwards to http://localhost, so every public visitor reaches
+ * Apache from loopback. Its headers are only believed when that is where the
+ * request came from: a LAN client cannot originate from loopback, so it cannot
+ * forge them.
+ */
+function via_tunnel(): bool
+{
+    $remote = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+
+    return in_array($remote, ['127.0.0.1', '::1'], true)
+        && filter_var($_SERVER['HTTP_CF_CONNECTING_IP'] ?? '', FILTER_VALIDATE_IP) !== false;
+}
+
+/**
+ * The client address, used for rate limits and the staff IP allowlist.
+ *
+ * Behind the tunnel REMOTE_ADDR is always 127.0.0.1, which would make every
+ * visitor on the internet look like the server machine. The visitor's real
+ * address is in CF-Connecting-IP instead.
+ */
 function client_ip(): string
 {
+    if (via_tunnel()) {
+        return (string) $_SERVER['HTTP_CF_CONNECTING_IP'];
+    }
     return (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
 }
 

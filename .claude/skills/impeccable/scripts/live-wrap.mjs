@@ -91,7 +91,11 @@ The agent should insert variant HTML at insertLine.`);
 
   // Find the source file. Generated files are excluded from auto-search so we
   // don't silently write variants into a file the next build will wipe.
-  let targetFile = filePath;
+  // Several pages can share the same locator (every page's <main id="main">),
+  // and the tree search returns whichever matching file it reaches first. The
+  // browser says which page the element was picked on, so try that page's own
+  // file before searching.
+  let targetFile = filePath || (pageUrl && fileForPageUrl(pageUrl, process.cwd(), queries, genOpts));
   let matchedQuery = null;
   if (!targetFile) {
     for (const q of queries) {
@@ -725,6 +729,33 @@ function buildCssAuthoring(styleMode, count) {
  * `includeGenerated` second pass can still find the element there and report
  * `generatedMatch`.
  */
+/**
+ * The source file that serves `pageUrl`, when it exists and contains one of
+ * the element queries. Tries the full URL path, then drops leading segments,
+ * so a site served from a subfolder (/EduTrack/map/x.html, on disk as
+ * map/x.html) resolves too. A path ending in "/" means that folder's index.
+ */
+function fileForPageUrl(pageUrl, cwd, queries, genOpts = {}) {
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(pageUrl, 'http://localhost').pathname);
+  } catch {
+    return null;
+  }
+  if (pathname.endsWith('/')) pathname += 'index.html';
+  const root = path.resolve(cwd);
+  const segments = pathname.split('/').filter(Boolean);
+  for (let i = 0; i < segments.length; i++) {
+    const file = path.resolve(root, ...segments.slice(i));
+    if (!file.startsWith(root + path.sep)) continue;
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile()) continue;
+    if (isGeneratedFile(file, genOpts)) continue;
+    const content = fs.readFileSync(file, 'utf-8');
+    if (queries.some((q) => content.includes(q))) return file;
+  }
+  return null;
+}
+
 function findFileWithQuery(query, cwd, genOpts = {}) {
   return findSourceFile({
     query,

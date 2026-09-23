@@ -38,7 +38,7 @@ $stmt = $pdo->prepare('SELECT id, username, full_name, password_hash, role, acti
 $stmt->execute([$username]);
 $admin = $stmt->fetch();
 
-if (!$admin || !password_verify($password, $admin['password_hash'])) {
+if (!$admin || !verify_password($password, $admin['password_hash'], 'admins', (int) $admin['id'])) {
     rate_limit_record($username, 'admin_login', false);
     rate_limit_record($ip, 'admin_login_ip', false);
     json_fail(401, 'That username or password is not right.');

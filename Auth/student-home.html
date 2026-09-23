@@ -3,70 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduTrack - Student Home</title>
+<title>EduTrack - Student home</title>
+<meta name="description" content="Your EduTrack student dashboard: today's classes, room by room, with the walkthrough from the gate.">
+<meta name="theme-color" content="#0044d6">
 <link rel="icon" href="../assets/img/aclc-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/student-verification.css?v=1">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
 <style>
-  .home-card { margin-top: 24px; padding: 20px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); }
-  .home-card h2 { margin: 0; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 1.35rem; }
-  .home-card p { margin: 5px 0 0; color: var(--muted); font-size: .9rem; }
-  .student-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
-  .student-strip dt { color: var(--muted); font-size: .76rem; }
-  .student-strip dd { margin: 2px 0 0; font-size: .9rem; font-weight: 600; }
-  .class-list { display: grid; gap: 10px; margin-top: 18px; }
-  .class-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 15px 0; border-top: 1px solid var(--border); }
-  .class-item h3 { margin: 0; font-size: 1rem; }
-  .class-item p { margin: 3px 0 0; }
+  /*
+    The dashboard a student lands on after signing in: who they are, then the
+    rooms they need today. Class rows use the same numeral-plus-chevron build
+    as the room picker's own rows, so the two surfaces read as one product.
+  */
+
+  .dash-head { max-width: 60ch; }
+
+  .id-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    margin: var(--s5) 0 0;
+    padding: var(--s4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-panel);
+  }
+  .id-strip dt { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); }
+  .id-strip dd { margin: 2px 0 0; font-size: var(--fs-sm); font-weight: 700; overflow-wrap: anywhere; }
+  @media (max-width: 560px) {
+    .id-strip { grid-template-columns: 1fr; gap: var(--s3); }
+  }
+
+  .dash-card {
+    margin-top: var(--s6);
+    padding: var(--s5);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-panel);
+  }
+  .dash-card h2 { margin: 0; font-size: var(--fs-h2); font-weight: 700; }
+  .dash-card > p { margin: var(--s2) 0 0; color: var(--text-muted); }
+
+  .class-list { margin: var(--s4) 0 0; padding: 0; list-style: none; }
+  .class-list li + li { margin-top: var(--s3); }
+
+  .class-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    width: 100%;
+    min-height: 56px;
+    padding: var(--s2) var(--s3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color .12s var(--ease), border-color .12s var(--ease);
+  }
+  .class-body { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; }
+  .class-title { font-weight: 700; }
+  .class-meta { color: var(--text-muted); font-size: var(--fs-sm); }
   .class-room { color: var(--blue-deep); font-weight: 600; }
-  .class-action { min-height: 40px; padding: 0 14px; font-size: .86rem; }
-  .route-detail { display: none; grid-column: 1 / -1; padding: 13px 14px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); }
-  .route-detail.is-open { display: block; }
-  .route-detail p { margin: 0; }
-  .link-button { padding: 0; border: 0; background: transparent; color: var(--blue); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-  @media (max-width: 600px) { .student-strip { grid-template-columns: 1fr; } .class-item { grid-template-columns: 1fr; } .class-action { width: 100%; } }
+
+  .class-row .chevron {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: var(--text-muted);
+    transition: transform .15s var(--ease), color .15s var(--ease);
+  }
+  .class-row[aria-expanded="true"] .chevron { transform: rotate(90deg); }
+
+  @media (hover: hover) and (pointer: fine) {
+    .class-row:hover { background: var(--blue-wash); border-color: var(--blue); }
+    .class-row:hover .chevron { color: var(--blue); }
+  }
+  .class-row:active { background: var(--blue-wash); }
+  .class-row:focus-visible { outline-offset: -3px; }
+  .class-row[aria-expanded="true"] { border-color: var(--blue); }
+
+  .route-detail {
+    margin-top: var(--s2);
+    padding: var(--s4);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    background: var(--bg);
+  }
+  .route-detail[hidden] { display: none; }
+  .route-detail p { margin: 0 0 var(--s4); color: var(--text-muted); }
+  .route-detail strong { color: var(--text); }
+  .route-detail .btn { margin-top: 0; }
+
+  .dash-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s3);
+    margin-top: var(--s6);
+    padding-top: var(--s4);
+    border-top: 1px solid var(--border);
+  }
+  .browse-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s3);
+    min-height: 44px;
+    padding: var(--s1) 0;
+    color: var(--text);
+    text-decoration: none;
+    transition: color .15s var(--ease);
+  }
+  .browse-badge {
+    flex-shrink: 0;
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-chip);
+    background: var(--blue);
+    color: var(--white);
+  }
+  .browse-badge svg { width: 18px; height: 18px; }
+  .browse-label { font-weight: 600; }
+  .browse-link:hover { color: var(--blue); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .class-row[aria-expanded="true"] .chevron { transform: none; }
+  }
 </style>
 </head>
 <body>
-<div class="verification-shell">
-  <header class="verification-brand">
-    <img src="../assets/img/aclc-logo.jpg" width="44" height="44" alt="">
-    <span><span class="brand-name">EduTrack</span><span class="brand-context">Student navigation</span></span>
+
+  <a class="skip-link" href="#main">Skip to today's classes</a>
+
+  <header class="brand">
+    <a class="brand-link" href="../index.html" aria-label="EduTrack home">
+      <img class="brand-seal" src="../assets/img/aclc-logo.jpg" width="56" height="56" alt="">
+      <span class="brand-text">
+        <span class="brand-mark">EduTrack</span>
+        <span class="brand-sub">ACLC College, Mandaue Campus</span>
+      </span>
+    </a>
   </header>
-  <main class="verification-main" id="main">
-    <div class="progress"><span class="is-done"></span><span class="is-done"></span><span class="is-done"></span><span class="is-done"></span></div>
-    <section class="verification-card">
-      <div class="card-content">
-        <h1>Welcome, <span id="studentName">Student</span></h1>
-        <p class="card-subtitle">Find an assigned room and start the route from the campus gate.</p>
-        <dl class="student-strip">
-          <div><dt>Student ID</dt><dd class="masked" id="studentId">••••••••</dd></div>
-          <div><dt>Program</dt><dd id="program">BS Information Technology</dd></div>
-          <div><dt>Current study load</dt><dd>1st Semester · 2026–2027</dd></div>
-        </dl>
-        <section class="home-card" aria-labelledby="classesTitle">
-          <h2 id="classesTitle">Today's classes</h2>
-          <p>Choose a room to review its location and start navigation.</p>
-          <div class="class-list">
-            <article class="class-item" data-room="204">
-              <div><h3>Database Management</h3><p>8:00 AM – 9:30 AM · <span class="class-room">Room 204</span></p></div>
-              <button class="button secondary class-action" type="button">Find Room</button>
-              <div class="route-detail"><p><strong>Room 204</strong><br>2nd Floor · Admin Building<br>Route from the gate through the EduTrack walkthrough.</p><div class="actions"><a class="button class-action" href="../map/walkthrough.html?room=204">Start Navigation</a></div></div>
-            </article>
-            <article class="class-item" data-room="205">
-              <div><h3>Web Development</h3><p>10:00 AM – 11:30 AM · <span class="class-room">Room 205</span></p></div>
-              <button class="button secondary class-action" type="button">Find Room</button>
-              <div class="route-detail"><p><strong>Room 205</strong><br>2nd Floor · Admin Building<br>Route from the gate through the EduTrack walkthrough.</p><div class="actions"><a class="button class-action" href="../map/walkthrough.html?room=205">Start Navigation</a></div></div>
-            </article>
+
+  <main class="page fade-in" id="main">
+    <div class="dash-head">
+      <h1 class="page-title">Welcome, <span id="studentName">Student</span></h1>
+      <p class="page-lede">Find an assigned room and start the route from the campus gate.</p>
+    </div>
+
+    <dl class="id-strip">
+      <div><dt>Student ID</dt><dd class="masked" id="studentId">••••••••</dd></div>
+      <div><dt>Program</dt><dd id="program">BS Information Technology</dd></div>
+      <div><dt>Current study load</dt><dd>1st Semester · 2026–2027</dd></div>
+    </dl>
+
+    <section class="dash-card" aria-labelledby="classesTitle">
+      <h2 id="classesTitle">Today's classes</h2>
+      <p>Open a class to see its room and start the walkthrough from the gate.</p>
+
+      <ul class="class-list">
+        <li>
+          <button class="class-row" type="button" data-room="204" aria-expanded="false" aria-controls="route-204">
+            <span class="floor-num is-small" aria-hidden="true">2</span>
+            <span class="class-body">
+              <span class="class-title">Database Management</span>
+              <span class="class-meta">8:00 AM &ndash; 9:30 AM &middot; <span class="class-room">Room 204</span></span>
+            </span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <div class="route-detail" id="route-204" hidden>
+            <p><strong>Room 204</strong><br>2nd floor &middot; Admin Building<br>Route from the gate through the EduTrack walkthrough.</p>
+            <a class="btn" href="../map/walkthrough.html?room=204">Start navigation<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </div>
-        </section>
-      </div>
-      <div class="card-footer"><a href="../map/select-room.html">Browse all rooms</a> · <button class="link-button" id="signOut" type="button">Sign out</button></div>
+        </li>
+        <li>
+          <button class="class-row" type="button" data-room="205" aria-expanded="false" aria-controls="route-205">
+            <span class="floor-num is-small" aria-hidden="true">2</span>
+            <span class="class-body">
+              <span class="class-title">Web Development</span>
+              <span class="class-meta">10:00 AM &ndash; 11:30 AM &middot; <span class="class-room">Room 205</span></span>
+            </span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <div class="route-detail" id="route-205" hidden>
+            <p><strong>Room 205</strong><br>2nd floor &middot; Admin Building<br>Route from the gate through the EduTrack walkthrough.</p>
+            <a class="btn" href="../map/walkthrough.html?room=205">Start navigation<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </li>
+      </ul>
     </section>
+
+    <div class="dash-footer">
+      <a class="browse-link" href="../map/select-room.html">
+        <span class="browse-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+        <span class="browse-label">Browse all rooms</span>
+      </a>
+      <button class="link-button" id="signOut" type="button">Sign out</button>
+    </div>
   </main>
-</div>
+
 <script src="auth.js"></script>
 <script>
   fetch('../api/whoami.php', { credentials: 'same-origin' })
@@ -82,11 +224,12 @@
     })
     .catch(() => { window.location.href = 'login.html'; });
 
-  document.querySelectorAll('.class-item button.class-action').forEach(button => {
-    button.addEventListener('click', () => {
-      const detail = button.parentElement.parentElement.querySelector('.route-detail');
-      const open = detail.classList.toggle('is-open');
-      button.textContent = open ? 'Hide route' : 'Find Room';
+  document.querySelectorAll('.class-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const detail = document.getElementById(row.getAttribute('aria-controls'));
+      const open = detail.hidden;
+      detail.hidden = !open;
+      row.setAttribute('aria-expanded', String(open));
     });
   });
 
@@ -96,7 +239,7 @@
   });
 </script>
 <!-- impeccable-live-start -->
-<script src="http://localhost:8400/live.js?token=8250a17e-b0aa-445e-a35b-a63e6f897e86"></script>
+<script src="http://localhost:8400/live.js?token=a0930fcf-cc94-4509-8d01-b26d3fbb5a23"></script>
 <!-- impeccable-live-end -->
 </body>
 </html>

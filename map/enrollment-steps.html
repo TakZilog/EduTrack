@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack - Enrollment steps</title>
+<meta name="description" content="The ACLC College Mandaue enrollment steps in order, with a photo walkthrough to every office and room along the way.">
+<meta name="theme-color" content="#0044d6">
+<link rel="icon" href="../assets/img/aclc-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=7">
+<style>
+  /*
+    The clearance form made walkable: one ordered list, a floor numeral for
+    every stop the way the room picker uses one for every floor, a photo
+    where a real one exists, and a straight line into the same gate-to-room
+    walkthrough the rest of the product already builds routes with.
+  */
+  .page { padding-top: clamp(24px, 5vw, 40px); }
+
+  .page-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--s3); }
+  .page-head .head-text { min-width: 0; flex: 1 1 320px; }
+
+  .track-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 44px;
+    padding: 0 var(--s4);
+    border: 1px solid var(--border-control);
+    border-radius: var(--r-btn);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color .15s var(--ease), color .15s var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .track-switch:hover { border-color: var(--blue); color: var(--blue); }
+  }
+
+  .gate-note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    margin: var(--s3) 0 0;
+    color: var(--red-deep);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .gate-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--red); }
+
+  /* --------------------------------------------------------------- steps */
+
+  .step-list {
+    position: relative;
+    margin: var(--s6) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--s4);
+  }
+
+  /* The connecting line behind every numeral: the corridor between stops,
+     drawn in Directory Blue like a route on a wall directory. */
+  .step-list::before {
+    content: "";
+    position: absolute;
+    top: 26px;
+    bottom: 26px;
+    left: 24.5px;
+    width: 3px;
+    background: var(--blue);
+  }
+  @media (max-width: 479px) {
+    .step-list::before { left: 20.5px; }
+  }
+
+  .step-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: var(--s4);
+    padding: var(--s4) var(--s4) var(--s5);
+    background: var(--surface);
+    border: 1px solid color-mix(in oklch, var(--blue) 40%, var(--border));
+    border-radius: var(--r-panel);
+  }
+  @media (max-width: 479px) {
+    .step-card { grid-template-columns: 42px 1fr; padding: var(--s3) var(--s3) var(--s4); }
+  }
+
+  .step-num {
+    position: relative;
+    z-index: 1;
+  }
+  @media (max-width: 479px) {
+    .step-num { width: 42px; height: 42px; font-size: var(--fs-h3); }
+  }
+
+  .step-body { min-width: 0; display: grid; gap: var(--s2); align-content: start; }
+
+  .step-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s3); }
+  .step-title { margin: 0; font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 700; line-height: 1.15; }
+
+  .step-office {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--s2);
+    border-radius: var(--r-chip);
+    background: var(--blue);
+    color: var(--white);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .step-detail { margin: 0; color: var(--text-muted); }
+
+  .step-media {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-top: var(--s1);
+  }
+  .step-photo {
+    width: 96px;
+    height: 72px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: var(--r-chip);
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .step-placeholder {
+    display: inline-grid;
+    place-items: center;
+    width: 96px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: var(--r-chip);
+    border: 1px dashed var(--border-strong);
+    background: var(--bg);
+    color: var(--text-muted);
+  }
+  .step-placeholder svg { width: 28px; height: 28px; }
+
+  .step-route {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 44px;
+    padding: 0 var(--s4);
+    width: max-content;
+    border-radius: var(--r-btn);
+    background: var(--blue);
+    color: var(--white);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color .15s var(--ease);
+  }
+  .step-route svg { width: 18px; height: 18px; transition: transform .15s var(--ease); }
+  @media (hover: hover) and (pointer: fine) {
+    .step-route:hover { background: var(--blue-deep); }
+    .step-route:hover svg { transform: translateX(3px); }
+  }
+
+  /* ------------------------------------------------------------ substeps */
+
+  .substeps { margin: var(--s2) 0 0; padding: 0; list-style: none; display: grid; gap: var(--s3); }
+  .substep {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s3);
+    padding: var(--s3);
+    background: var(--bg);
+    border-radius: var(--r-chip);
+  }
+  .substep-order {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+  }
+  .substep-label { flex: 1 1 160px; min-width: 0; font-weight: 600; }
+  .substep .step-route { min-height: 40px; padding: 0 var(--s3); font-size: var(--fs-sm); }
+  .substep .step-placeholder { width: 40px; height: 40px; border-radius: 50%; }
+  .substep .step-placeholder svg { width: 18px; height: 18px; }
+  .substep .step-photo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+
+  /* --------------------------------------------------------------- empty */
+
+  .empty-state {
+    display: grid;
+    justify-items: start;
+    gap: var(--s3);
+    margin-top: var(--s6);
+    padding: var(--s7) var(--s5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-panel);
+    text-align: left;
+  }
+  .empty-state svg { width: 40px; height: 40px; color: var(--text-muted); }
+  .empty-state h2 { margin: 0; font-size: var(--fs-h2); }
+  .empty-state p { margin: 0; color: var(--text-muted); max-width: 44ch; }
+
+  .load-note { margin-top: var(--s5); color: var(--text-muted); font-size: var(--fs-sm); }
+</style>
+</head>
+<body>
+
+  <header class="brand">
+    <a class="brand-link" href="../index.html" aria-label="EduTrack home">
+      <img class="brand-seal" src="../assets/img/aclc-logo.jpg" width="56" height="56" alt="">
+      <span class="brand-text">
+        <span class="brand-mark">EduTrack</span>
+        <span class="brand-sub">ACLC College, Mandaue Campus</span>
+      </span>
+    </a>
+  </header>
+
+  <main class="page fade-in" id="main">
+    <a class="back-link" href="enrollment.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Change track
+    </a>
+
+    <div class="page-head">
+      <div class="head-text">
+        <h1 class="page-title" id="pageTitle">Enrollment steps</h1>
+        <p class="page-lede" id="pageLede">Follow these in order. Every step with a room links straight to the walkthrough from the gate.</p>
+        <p class="gate-note">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>
+          Every route starts at the main gate.
+        </p>
+      </div>
+    </div>
+
+    <ol class="step-list" id="stepList" aria-live="polite"></ol>
+
+    <p class="load-note" id="loadNote" hidden>The room map did not load, so the "See it on the map" links are off for now. The steps below are still correct.</p>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const track = params.get('track') === 'incoming' ? 'incoming' : 'ongoing';
+
+    const pageTitle = document.getElementById('pageTitle');
+    const pageLede = document.getElementById('pageLede');
+    const stepList = document.getElementById('stepList');
+    const loadNote = document.getElementById('loadNote');
+
+    const ICON_OFFICE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg>';
+    const ICON_PEN    = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 4 6 6L8 22H2v-6Z"/><path d="m12.5 5.5 6 6"/></svg>';
+    const ICON_ARROW  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    const ICON_EMPTY  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+
+    const PHOTO_EXTS = ['jpg', 'jpeg', 'webp', 'png'];
+
+    function el(tag, className, html) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (html !== undefined) node.innerHTML = html;
+      return node;
+    }
+
+    /* Tries each extension in turn; falls back to a plain office icon rather
+       than a broken image when nobody has added the photo yet. */
+    function officePhoto(stem) {
+      const wrap = el('span');
+      const placeholder = () => {
+        wrap.replaceChildren(el('span', 'step-placeholder', ICON_OFFICE));
+      };
+      if (!stem) { placeholder(); return wrap; }
+
+      let i = 0;
+      const img = document.createElement('img');
+      img.className = 'step-photo';
+      img.alt = '';
+      img.loading = 'lazy';
+      img.onerror = () => {
+        i++;
+        if (i < PHOTO_EXTS.length) img.src = `../assets/enrollment/${stem}.${PHOTO_EXTS[i]}`;
+        else placeholder();
+      };
+      img.src = `../assets/enrollment/${stem}.${PHOTO_EXTS[0]}`;
+      wrap.appendChild(img);
+      return wrap;
+    }
+
+    function roomPhoto(imageFile) {
+      const img = document.createElement('img');
+      img.className = 'step-photo';
+      img.alt = '';
+      img.loading = 'lazy';
+      img.src = `../api/node-image.php?f=${encodeURIComponent(imageFile)}`;
+      img.onerror = () => { img.replaceWith(el('span', 'step-placeholder', ICON_OFFICE)); };
+      return img;
+    }
+
+    function routeLink(roomName, label) {
+      const a = document.createElement('a');
+      a.className = 'step-route';
+      const ret = encodeURIComponent(`enrollment-steps.html?track=${track}`);
+      a.href = `walkthrough.html?room=${encodeURIComponent(roomName)}&return=${ret}`;
+      a.innerHTML = (label || 'See it on the map') + ICON_ARROW;
+      return a;
+    }
+
+    /* graph is the building's node/room data from api/tour.php, or null when
+       it could not be loaded (weak signal at the gate is the expected case,
+       not an error) — every render below works either way. */
+    function renderRoomMedia(container, roomName, graph) {
+      const room = graph && graph.rooms.find(r => r.room_name === roomName);
+      const node = room && graph.nodes.find(n => n.node_id === room.node_id);
+      if (node) container.appendChild(roomPhoto(node.image_file));
+      else container.appendChild(el('span', 'step-placeholder', ICON_OFFICE));
+    }
+
+    function buildStepCard(step, graph) {
+      const li = el('li', 'step-card');
+      li.appendChild(el('span', 'floor-num step-num', String(step.n)));
+
+      const body = el('div', 'step-body');
+      const head = el('div', 'step-head');
+      head.appendChild(el('h2', 'step-title', step.title));
+      if (step.office) head.appendChild(el('span', 'step-office', step.office));
+      body.appendChild(head);
+      body.appendChild(el('p', 'step-detail', step.detail));
+
+      if (step.kind === 'group') {
+        const ol = el('ol', 'substeps');
+        step.substeps.forEach((sub, i) => {
+          const item = el('li', 'substep');
+          item.appendChild(el('span', 'substep-order', String.fromCharCode(97 + i)));
+          item.appendChild(el('span', 'substep-label', sub.label));
+          if (sub.kind === 'room') {
+            renderRoomMedia(item, sub.room_name, graph);
+            if (graph && graph.rooms.some(r => r.room_name === sub.room_name)) {
+              item.appendChild(routeLink(sub.room_name, 'Walk there'));
+            }
+          } else {
+            item.appendChild(officePhoto(sub.photo));
+          }
+          ol.appendChild(item);
+        });
+        body.appendChild(ol);
+      } else {
+        const media = el('div', 'step-media');
+        if (step.kind === 'room') {
+          renderRoomMedia(media, step.room_name, graph);
+        } else if (step.kind === 'office') {
+          media.appendChild(officePhoto(step.photo));
+        } else {
+          media.appendChild(el('span', 'step-placeholder', ICON_PEN));
+        }
+        body.appendChild(media);
+
+        if (step.kind === 'room' && graph && graph.rooms.some(r => r.room_name === step.room_name)) {
+          body.appendChild(routeLink(step.room_name));
+        }
+      }
+
+      li.appendChild(body);
+      return li;
+    }
+
+    function renderEmpty() {
+      const empty = el('div', 'empty-state');
+      empty.innerHTML = ICON_EMPTY;
+      empty.appendChild(el('h2', null, 'Steps are coming soon'));
+      empty.appendChild(el('p', null, 'The incoming first-year enrollment steps are not published yet. If you already enrolled with ACLC before, the ongoing student steps are ready now.'));
+      const link = el('a', 'track-switch', 'See ongoing student steps');
+      link.href = 'enrollment-steps.html?track=ongoing';
+      empty.appendChild(link);
+      stepList.replaceWith(empty);
+    }
+
+    async function loadGraph() {
+      try {
+        const res = await fetch('../api/tour.php', { credentials: 'same-origin' });
+        if (res.status === 401) return null; // guest is allowed here; a signed-in, incomplete account just loses the room links
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (err) {
+        console.error('Could not load the room map:', err);
+        return null;
+      }
+    }
+
+    async function init() {
+      const [stepsRes, graph] = await Promise.all([
+        fetch('../assets/enrollment/enrollment-steps.json').then(r => r.json()),
+        loadGraph()
+      ]);
+
+      const data = stepsRes[track];
+      pageTitle.textContent = data.label + ' enrollment steps';
+      pageLede.textContent = track === 'incoming'
+        ? 'The first-time enrollment steps for new students.'
+        : 'Follow these in order. Every step with a room links straight to the walkthrough from the gate.';
+
+      if (!graph) loadNote.hidden = false;
+
+      if (!data.steps.length) {
+        renderEmpty();
+        return;
+      }
+
+      data.steps.forEach(step => stepList.appendChild(buildStepCard(step, graph)));
+    }
+
+    init();
+  </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=a0930fcf-cc94-4509-8d01-b26d3fbb5a23"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

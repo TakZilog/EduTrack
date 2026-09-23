@@ -218,7 +218,7 @@ switch ((string) ($input['action'] ?? '')) {
 
         $pdo->prepare(
             'INSERT INTO admins (username, full_name, password_hash, role) VALUES (?, ?, ?, ?)'
-        )->execute([$username, $fullName, password_hash($password, PASSWORD_DEFAULT), $role]);
+        )->execute([$username, $fullName, hash_password($password), $role]);
 
         audit_log('admin.create', 'admin', $username, "Added {$fullName} ({$username}) as " . ADMIN_ROLE_LABELS[$role] . '.');
 

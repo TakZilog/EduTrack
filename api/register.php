@@ -45,9 +45,11 @@ if (!preg_match('/^[A-Z0-9-]{3,30}$/', $studyLoadNo)) {
     json_fail(400, 'Enter the number printed on your study load.');
 }
 
-// Registration is throttled per address so one machine cannot mass-create accounts.
-$ip = client_ip();
-rate_limit_check($ip, 'register', 10, 15, 'Too many registration attempts. Wait %d minutes and try again.');
+// Registration is throttled per address so one machine cannot mass-create
+// accounts or use this form to send verification mail to strangers. Every
+// attempt counts: rate_limit_check() only counts failures, and this endpoint
+// has none to record, so it never tripped.
+rate_limit_action(client_ip(), 'register', 10, 15, 'Too many registration attempts. Wait a few minutes and try again.');
 
 $pdo  = get_db();
 $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -74,7 +76,7 @@ try {
         json_fail(400, 'That student ID number already has an account. Log in instead.');
     }
 
-    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+    $passwordHash = hash_password($password);
     $stmt = $pdo->prepare('INSERT INTO users (full_name, email, student_no, study_load_no, password_hash, email_verified) VALUES (?, ?, ?, ?, ?, 0)');
     $stmt->execute([$fullName, $email, $studentNo, $studyLoadNo, $passwordHash]);
     $userId = (int) $pdo->lastInsertId();
@@ -93,8 +95,6 @@ try {
     }
     json_fail(500, 'Could not send your verification email. Your code is still valid, so try again.');
 }
-
-rate_limit_record($ip, 'register', true);
 
 $_SESSION['otp'] = [
     'email'      => $email,

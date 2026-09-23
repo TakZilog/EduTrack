@@ -6,15 +6,17 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 /// Where the EduTrack website lives, as the phone sees it.
 ///
-/// The Android emulator reaches the PC running XAMPP at 10.0.2.2, which is
-/// the default. For a real phone on the same Wi-Fi, pass the PC's address:
+/// The live site is the default. To test against XAMPP instead, pass the PC's
+/// address (debug builds only; release builds refuse plain http). The
+/// emulator reaches the PC at 10.0.2.2, a phone on the same Wi-Fi at its LAN
+/// address:
 ///
 ///   flutter run --dart-define=SITE_URL=http://192.168.1.20/EduTrack/
 ///
 /// (In Android Studio: Run > Edit Configurations > Additional run args.)
 const String siteUrl = String.fromEnvironment(
   'SITE_URL',
-  defaultValue: 'http://10.0.2.2/EduTrack/',
+  defaultValue: 'https://edutrack.art/EduTrack/',
 );
 
 /// Path segments that the mobile app must never load. The admin panel is a

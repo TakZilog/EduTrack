@@ -29,7 +29,7 @@ $stmt = $pdo->prepare('SELECT id, full_name, email, password_hash, email_verifie
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
-if (!$user || !password_verify($password, $user['password_hash'])) {
+if (!$user || !verify_password($password, $user['password_hash'], 'users', (int) $user['id'])) {
     rate_limit_record($email, 'student_login', false);
     rate_limit_record($ip, 'student_login_ip', false);
     json_fail(401, 'Incorrect email or password');

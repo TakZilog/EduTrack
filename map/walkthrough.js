@@ -25,6 +25,27 @@ let arrivedHideTimer = null;
 const params = new URLSearchParams(window.location.search);
 const targetRoomName = params.get('room');
 
+/* Where "All rooms" and "Other rooms" send you back to. Defaults to the
+   room picker; a walk started from the enrollment map (?return=...) goes
+   back there instead. Restricted to a plain file in this same folder, with
+   an optional simple query string, so this can never become an open
+   redirect off a crafted link. */
+function resolveReturnTo() {
+  const raw = params.get('return');
+  if (raw && /^[a-zA-Z0-9_-]+\.html(\?[a-zA-Z0-9=&_.%-]*)?$/.test(raw)) return raw;
+  return 'select-room.html';
+}
+const returnTo = resolveReturnTo();
+const returnToEnrollment = returnTo.startsWith('enrollment-steps.html');
+const backLink = document.getElementById('backLink');
+const otherRoomsLink = document.getElementById('otherRoomsLink');
+backLink.href = returnTo;
+otherRoomsLink.href = returnTo;
+if (returnToEnrollment) {
+  backLink.querySelector('span').textContent = 'Enrollment steps';
+  otherRoomsLink.textContent = 'Back to enrollment steps';
+}
+
 init();
 
 async function init() {

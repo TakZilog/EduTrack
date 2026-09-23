@@ -1,0 +1,5 @@
+# Enrollment-process photos (offices, signing stations). Separate from
+# assets/nodes/, which is the gated 360 walkthrough graph. These are plain
+# static images the enrollment map pages load directly with <img>, open to
+# everyone the same way the enrollment map itself is (no account required).
+Options -Indexes

@@ -7313,11 +7313,37 @@
       return;
     }
     // In CONFIGURING: click outside the bar and selected element returns to PICKING.
+    // If that outside click landed on another pickable element, select it
+    // directly instead of just dismissing - otherwise picking a different
+    // element while one is already selected takes two clicks (dismiss, then
+    // pick) and looks stuck.
     if (
       state === 'CONFIGURING' && !own(e.target) && selectedElement
       && !selectedElement.contains(e.target)
     ) {
       if (configureKind === 'insert') { cancelInsertConfigure(); return; }
+      // pickActive still owns the click here (only insert mode releases it
+      // above), so stop the browser's own handling - e.g. a link navigating -
+      // before deciding whether the click also re-picks a new element.
+      if (pickActive) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const reclickTarget = document.elementFromPoint(e.clientX, e.clientY);
+      if (pickActive && reclickTarget && pickable(reclickTarget)) {
+        exitConfigureToPicking('configure-outside-click', { clearHover: true });
+        selectedElement = reclickTarget;
+        setLiveState('CONFIGURING');
+        showHighlight(selectedElement);
+        clearAnnotations();
+        showAnnotOverlay(selectedElement);
+        showBar('configure');
+        renderEditBadge(hasTextRows(selectedElement) ? 'idle' : 'hidden');
+        startScrollTracking();
+        maybePrefetchPage();
+        maybeWarnConditionalAncestor(selectedElement);
+        return;
+      }
       exitConfigureToPicking('configure-outside-click', { clearHover: true });
       return;
     }
@@ -8848,6 +8874,13 @@ void main() {
     const adopted = cached?.id ? null : findAdoptableServerSession(activeSessions);
     const saved = cached?.id ? cached : (adopted ? serverSessionAsSavedShape(adopted) : null);
     if (!saved?.id || isSessionHandled(saved.id)) return false;
+    // localStorage is per-origin, so a session saved on another page under
+    // this same host (e.g. Auth/login.html) is visible here too. This check
+    // needs no server round-trip, so run it before the activeSessions gate
+    // below - otherwise the very first optimistic resume on page load (which
+    // has no activeSessions yet) can hijack the wrong page with a stuck
+    // recovery banner for a session that was never here.
+    if (saved.pageUrl && !pageMatchesCurrent(saved.pageUrl)) return false;
     const savedState = String(saved.state || '').toUpperCase();
     if (savedState !== 'GENERATING' && savedState !== 'CYCLING') return false;
 

@@ -97,7 +97,7 @@ if (!hash_equals($password, $confirm)) {
 $stmt = $pdo->prepare(
     'INSERT INTO admins (username, full_name, password_hash, role) VALUES (?, ?, ?, ?)'
 );
-$stmt->execute([$username, $fullName, password_hash($password, PASSWORD_DEFAULT), $role]);
+$stmt->execute([$username, $fullName, hash_password($password), $role]);
 
 echo PHP_EOL . "Created '{$username}' ({$role})." . PHP_EOL;
 echo 'Sign in at /EduTrack/admin/login.html' . PHP_EOL . PHP_EOL;

@@ -2,13 +2,15 @@
     <!-- The app is the EduTrack website in a WebView, so it needs the network
          in release builds too, not only in debug. -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- usesCleartextTraffic: the XAMPP site is served over plain http during
-         development. Turn it off once the site has an https address. -->
+    <!-- Release builds talk to https://edutrack.art only. Plain http is
+         refused, so nothing a student types crosses the network unencrypted.
+         Debug builds allow it again (src/debug/AndroidManifest.xml) for the
+         local XAMPP site. -->
     <application
         android:label="EduTrack"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

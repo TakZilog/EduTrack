@@ -1,9 +1,14 @@
 tunnel: 52bfcdb2-6730-4db7-8a1e-96988a10963a
 credentials-file: C:\Users\firet\.cloudflared\52bfcdb2-6730-4db7-8a1e-96988a10963a.json
 
+# Only EduTrack is published. Everything else in htdocs (other projects,
+# XAMPP tools) stays on this machine. "/" is kept so the bare domain can
+# redirect into /EduTrack/.
 ingress:
   - hostname: edutrack.art
+    path: ^/(EduTrack(/.*)?)?$
     service: http://localhost:80
   - hostname: www.edutrack.art
+    path: ^/(EduTrack(/.*)?)?$
     service: http://localhost:80
   - service: http_status:404
