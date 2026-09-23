@@ -214,7 +214,86 @@
   .empty-state h2 { margin: 0; font-size: var(--fs-h2); }
   .empty-state p { margin: 0; color: var(--text-muted); max-width: 44ch; }
 
-  .load-note { margin-top: var(--s5); color: var(--text-muted); font-size: var(--fs-sm); }
+  /* ------------------------------------------------------------- progress */
+
+  .progress-bar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+    margin: var(--s6) 0 0;
+  }
+  .progress-bar + .step-list { margin-top: var(--s4); }
+  .progress-text { margin: 0; font-weight: 600; }
+  .progress-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--blue-wash);
+    overflow: hidden;
+  }
+  .progress-fill {
+    display: block;
+    height: 100%;
+    background: var(--blue);
+    transition: width .3s var(--ease);
+  }
+  .progress-reset {
+    min-height: 36px;
+    padding: 0 var(--s3);
+    border: 1px solid var(--border-control);
+    border-radius: var(--r-btn);
+    background: var(--surface);
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--fs-sm);
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .progress-reset:hover { border-color: var(--blue); color: var(--blue); }
+  }
+
+  .next-tag {
+    padding: 2px var(--s2);
+    border-radius: var(--r-chip);
+    background: var(--red);
+    color: var(--white);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .next-tag[hidden] { display: none; }
+  .step-card.is-next { border-color: var(--blue); box-shadow: var(--shadow); }
+
+  .step-done {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 44px;
+    margin-top: var(--s2);
+    padding: 0 var(--s4);
+    border: 1px solid var(--border-control);
+    border-radius: var(--r-btn);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .15s var(--ease), background-color .15s var(--ease), color .15s var(--ease);
+  }
+  .step-done svg { width: 18px; height: 18px; }
+  @media (hover: hover) {
+    .step-done:hover { border-color: var(--blue); color: var(--blue); }
+  }
+  .step-done[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+  /* A finished step stays readable and clickable, just quieter, so it can
+     still be opened again or unmarked. */
+  .step-card.is-done .step-title,
+  .step-card.is-done .step-detail { color: var(--text-muted); }
+  .step-card.is-done .step-media,
+  .step-card.is-done .substeps { opacity: .6; }
 </style>
 </head>
 <body>
@@ -247,10 +326,8 @@
     </div>
 
     <ol class="step-list" id="stepList" aria-live="polite"></ol>
-
-    <p class="load-note" id="loadNote" hidden>The room map did not load, so the "See it on the map" links are off for now. The steps below are still correct.</p>
   </main>
 
-  <script src="enrollment-steps.js?v=2"></script>
+  <script src="enrollment-steps.js?v=4"></script>
 </body>
 </html>

@@ -7,12 +7,12 @@ const track = params.get('track') === 'incoming' ? 'incoming' : 'ongoing';
 const pageTitle = document.getElementById('pageTitle');
 const pageLede = document.getElementById('pageLede');
 const stepList = document.getElementById('stepList');
-const loadNote = document.getElementById('loadNote');
 
 const ICON_OFFICE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg>';
 const ICON_PEN    = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 4 6 6L8 22H2v-6Z"/><path d="m12.5 5.5 6 6"/></svg>';
 const ICON_ARROW  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const ICON_EMPTY  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+const ICON_CHECK  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>';
 
 const PHOTO_EXTS = ['jpg', 'jpeg', 'webp', 'png'];
 
@@ -60,14 +60,104 @@ function renderRoomMedia(container, roomName) {
   container.appendChild(img);
 }
 
-function buildStepCard(step, graph) {
+function routeLink(roomName, label) {
+  const a = document.createElement('a');
+  a.className = 'step-route';
+  const ret = encodeURIComponent(`enrollment-steps.html?track=${track}`);
+  a.href = `walkthrough.html?room=${encodeURIComponent(roomName)}&return=${ret}`;
+  a.innerHTML = (label || 'See it on the map') + ICON_ARROW;
+  return a;
+}
+
+/* ------------------------------------------------------------- progress
+   Visitors enrolling have no account, so progress lives in this browser
+   only (localStorage), per track. Marking a step done never locks another:
+   people often finish steps out of order. Storage can be missing or throw
+   (private windows, blocked site data); the page then works, it just
+   forgets on reload. */
+const PROGRESS_KEY = `edutrack.enrollment.${track}.done`;
+
+function loadDone() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+    return new Set(Array.isArray(saved) ? saved : []);
+  } catch (err) {
+    return new Set();
+  }
+}
+
+function saveDone(done) {
+  try {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done]));
+  } catch (err) {
+    /* storage unavailable: progress lasts until the page is closed */
+  }
+}
+
+let done = loadDone();
+let totalSteps = 0;
+const progressBar = el('div', 'progress-bar');
+
+function renderProgress() {
+  const cards = [...stepList.querySelectorAll('.step-card')];
+  const count = cards.filter(c => done.has(Number(c.dataset.step))).length;
+  let nextFound = false;
+
+  cards.forEach(card => {
+    const isDone = done.has(Number(card.dataset.step));
+    const isNext = !isDone && !nextFound;
+    if (isNext) nextFound = true;
+    card.classList.toggle('is-done', isDone);
+    card.classList.toggle('is-next', isNext);
+
+    const btn = card.querySelector('.step-done');
+    btn.setAttribute('aria-pressed', String(isDone));
+    btn.innerHTML = isDone ? ICON_CHECK + 'Done' : 'Mark as done';
+    card.querySelector('.next-tag').hidden = !isNext;
+  });
+
+  progressBar.replaceChildren();
+  const text = count === totalSteps
+    ? `All ${totalSteps} steps done. You are enrolled.`
+    : `${count} of ${totalSteps} steps done`;
+  progressBar.appendChild(el('p', 'progress-text', text));
+  const bar = el('div', 'progress-track');
+  const fill = el('span', 'progress-fill');
+  fill.style.width = totalSteps ? `${(count / totalSteps) * 100}%` : '0';
+  bar.appendChild(fill);
+  progressBar.appendChild(bar);
+  if (count > 0) {
+    const reset = el('button', 'progress-reset', 'Start over');
+    reset.type = 'button';
+    reset.addEventListener('click', () => {
+      done = new Set();
+      saveDone(done);
+      renderProgress();
+    });
+    progressBar.appendChild(reset);
+  }
+}
+
+function toggleDone(n) {
+  if (done.has(n)) done.delete(n); else done.add(n);
+  saveDone(done);
+  renderProgress();
+}
+
+/* ---------------------------------------------------------------- steps */
+
+function buildStepCard(step) {
   const li = el('li', 'step-card');
+  li.dataset.step = String(step.n);
   li.appendChild(el('span', 'floor-num step-num', String(step.n)));
 
   const body = el('div', 'step-body');
   const head = el('div', 'step-head');
   head.appendChild(el('h2', 'step-title', step.title));
   if (step.office) head.appendChild(el('span', 'step-office', step.office));
+  const nextTag = el('span', 'next-tag', 'Up next');
+  nextTag.hidden = true;
+  head.appendChild(nextTag);
   body.appendChild(head);
   body.appendChild(el('p', 'step-detail', step.detail));
 
@@ -79,9 +169,7 @@ function buildStepCard(step, graph) {
       item.appendChild(el('span', 'substep-label', sub.label));
       if (sub.kind === 'room') {
         renderRoomMedia(item, sub.room_name);
-        if (graph && graph.rooms.some(r => r.room_name === sub.room_name)) {
-          item.appendChild(routeLink(sub.room_name, 'Walk there'));
-        }
+        item.appendChild(routeLink(sub.room_name, 'Walk there'));
       } else {
         item.appendChild(officePhoto(sub.photo));
       }
@@ -99,10 +187,13 @@ function buildStepCard(step, graph) {
     }
     body.appendChild(media);
 
-    if (step.kind === 'room' && graph && graph.rooms.some(r => r.room_name === step.room_name)) {
-      body.appendChild(routeLink(step.room_name));
-    }
+    if (step.kind === 'room') body.appendChild(routeLink(step.room_name));
   }
+
+  const doneBtn = el('button', 'step-done');
+  doneBtn.type = 'button';
+  doneBtn.addEventListener('click', () => toggleDone(step.n));
+  body.appendChild(doneBtn);
 
   li.appendChild(body);
   return li;
@@ -119,23 +210,8 @@ function renderEmpty() {
   stepList.replaceWith(empty);
 }
 
-async function loadGraph() {
-  try {
-    const res = await fetch('../api/tour.php', { credentials: 'same-origin' });
-    if (res.status === 401) return null; // guest is allowed here; a signed-in, incomplete account just loses the room links
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.error('Could not load the room map:', err);
-    return null;
-  }
-}
-
 async function init() {
-  const [stepsRes, graph] = await Promise.all([
-    fetch('../assets/enrollment/enrollment-steps.json').then(r => r.json()),
-    loadGraph()
-  ]);
+  const stepsRes = await fetch('../assets/enrollment/enrollment-steps.json').then(r => r.json());
 
   const data = stepsRes[track];
   pageTitle.textContent = data.label + ' enrollment steps';
@@ -143,15 +219,15 @@ async function init() {
     ? 'The first-time enrollment steps for new students.'
     : 'Follow these in order. Every step with a room links straight to the walkthrough from the gate.';
 
-  if (!graph) loadNote.hidden = false;
-
   if (!data.steps.length) {
     renderEmpty();
     return;
   }
 
-  data.steps.forEach(step => stepList.appendChild(buildStepCard(step, graph)));
+  totalSteps = data.steps.length;
+  data.steps.forEach(step => stepList.appendChild(buildStepCard(step)));
+  stepList.before(progressBar);
+  renderProgress();
 }
 
 init();
-

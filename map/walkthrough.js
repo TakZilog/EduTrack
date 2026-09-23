@@ -13,7 +13,7 @@
   }
 */
 
-const GRAPH_URL = '../api/tour.php';   // students only; 401 sends guests to log in
+const GRAPH_URL = '../api/tour.php';   // students; guests only for enrollment rooms, else 401 sends them to log in
 const IMAGE_BASE = '../api/node-image.php?f=';
 
 let graph = null;
@@ -55,7 +55,8 @@ async function init() {
   }
 
   try {
-    const res = await fetch(GRAPH_URL, { credentials: 'same-origin' });
+    // ?room= lets a guest walk to an enrollment room; students get the full map.
+    const res = await fetch(GRAPH_URL + '?room=' + encodeURIComponent(targetRoomName), { credentials: 'same-origin' });
     graph = await res.json();
     if (res.status === 401) {
       // No enrolment numbers yet: add them, then come straight back to this room.
