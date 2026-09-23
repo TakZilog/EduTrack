@@ -851,83 +851,40 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
 
 .users-page .work { background: var(--bg); }
 .users-page .panel,
-.users-page .drawer,
-.navigation-page .panel,
-.navigation-page .drawer { border-color: var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(23, 32, 51, .035); }
-.users-page .panel-head,
-.navigation-page .panel-head { padding: 18px 22px; }
-.users-page .panel-head h2,
-.navigation-page .panel-head h2 { color: var(--text); font-size: 1.3rem; letter-spacing: 0; }
-.users-page .desk,
-.navigation-page .navigation-desk { grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 16px; align-items: stretch; }
-.users-page .row,
-.navigation-page .row { min-height: 72px; padding: 14px 20px; }
-.users-page .row-title,
-.navigation-page .row-title { color: var(--text); font-size: .98rem; font-weight: 700; }
-.users-page .row-sub,
-.navigation-page .row-sub { color: var(--text-muted); font-size: .86rem; }
-.users-page .row-when,
-.navigation-page .row-when { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
-.users-page .row .pill,
-.navigation-page .row .pill { padding: 3px 8px; border-radius: 999px; font-size: .72rem; }
-.users-page .drawer,
-.navigation-page .drawer { border-top: 1px solid var(--border); }
-.users-page .drawer-head,
-.navigation-page .drawer-head { padding: 20px 22px 14px; }
-.users-page .drawer-body,
-.navigation-page .drawer-body { padding: 18px 22px 22px; }
+.users-page .drawer { border-color: var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(23, 32, 51, .035); }
+.users-page .panel-head { padding: 18px 22px; }
+.users-page .panel-head h2 { color: var(--text); font-size: 1.3rem; letter-spacing: 0; }
+.users-page .desk { grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 16px; align-items: stretch; }
+.users-page .row { min-height: 72px; padding: 14px 20px; }
+.users-page .row-title { color: var(--text); font-size: .98rem; font-weight: 700; }
+.users-page .row-sub { color: var(--text-muted); font-size: .86rem; }
+.users-page .row-when { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
+.users-page .row .pill { padding: 3px 8px; border-radius: 999px; font-size: .72rem; }
+.users-page .drawer { border-top: 1px solid var(--border); }
+.users-page .drawer-head { padding: 20px 22px 14px; }
+.users-page .drawer-body { padding: 18px 22px 22px; }
 .users-page .section-lede { margin: 4px 0 0; color: var(--text-muted); font-size: .9rem; }
 .users-page .form-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 18px; }
 .users-page .field { margin-bottom: 12px; }
 .users-page input,
 .users-page select { min-height: 46px; border-color: var(--border); border-radius: 7px; font-size: .95rem; }
-.navigation-page .panel-body { padding: 18px 22px; }
-.navigation-toolbar { display: flex; align-items: center; gap: 10px; padding: 0; }
-.navigation-toolbar label { flex: 0 0 190px; }
-.navigation-toolbar .navigation-location-select { flex: 1 1 300px; }
-.navigation-toolbar select { width: 100%; min-height: 46px; border-color: var(--border); border-radius: 7px; font-size: .95rem; }
-.navigation-workspace { min-height: 420px; }
-.route-empty { display: grid; gap: 6px; min-height: 260px; place-content: center; color: var(--text-muted); text-align: center; }
-.route-empty strong { color: var(--text); font-family: var(--font-display); font-size: 1.35rem; }
-.route-loading { color: var(--text-muted); }
-.route-status { display: inline-flex; align-items: center; padding: 7px 10px; border: 1px solid; border-radius: 999px; font-size: .84rem; font-weight: 600; }
-.route-status.is-good { border-color: var(--good); background: var(--good-wash); color: var(--good); }
-.route-status.is-bad { border-color: var(--red); background: var(--red-wash); color: var(--red); }
-.route-chain { display: grid; gap: 0; width: min(100%, 520px); margin: 22px auto 0; padding: 0; list-style: none; color: var(--text); font-weight: 600; }
-.route-chain li { position: relative; padding: 12px 16px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); }
-.route-chain li + li { margin-top: 22px; }
-.route-chain li + li::before { content: "↓"; position: absolute; top: -23px; left: 50%; color: var(--blue); font-size: 1.1rem; transform: translateX(-50%); }
-.route-chain li.is-missing { border-color: var(--red); background: var(--red-wash); color: var(--red); }
-.route-detail-copy { width: min(100%, 520px); margin: 22px auto 0; color: var(--text-muted); text-align: center; }
-.route-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
 
 @media (max-width: 1099px) {
   .users-page .work-head,
-  .users-page .work-body,
-  .navigation-page .work-head,
-  .navigation-page .work-body { padding-left: 32px; padding-right: 32px; }
-  .users-page .desk,
-  .navigation-page .navigation-desk { grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr); }
+  .users-page .work-body { padding-left: 32px; padding-right: 32px; }
+  .users-page .desk { grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr); }
   .users-page .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
   .work-head { flex-direction: column; }
   .page-account { width: 100%; justify-content: flex-end; }
-  .users-page .work-head,
-  .navigation-page .work-head { padding: 24px 20px 18px; }
-  .users-page .work-body,
-  .navigation-page .work-body { padding: 0 20px 32px; }
-  .users-page .desk,
-  .navigation-page .navigation-desk { grid-template-columns: 1fr; }
+  .users-page .work-head { padding: 24px 20px 18px; }
+  .users-page .work-body { padding: 0 20px 32px; }
+  .users-page .desk { grid-template-columns: 1fr; }
   .users-page .form-grid { grid-template-columns: 1fr; }
-  .navigation-toolbar { flex-direction: column; align-items: stretch; }
-  .navigation-toolbar label,
-  .navigation-toolbar .navigation-location-select { flex-basis: auto; width: 100%; }
-  .users-page .panel-head,
-  .navigation-page .panel-head { padding-left: 16px; padding-right: 16px; }
-  .users-page .panel-body,
-  .navigation-page .panel-body { padding: 18px 16px 20px; }
+  .users-page .panel-head { padding-left: 16px; padding-right: 16px; }
+  .users-page .panel-body { padding: 18px 16px 20px; }
 }
 
 @media (max-width: 1099px) {
@@ -956,7 +913,9 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
 
 /* -------------------------------------------------------------- rooms page */
 
-.rooms-page {
+/* The Walkthrough page is the same desk as Locations, so it shares the palette. */
+.rooms-page,
+.walkthrough-page {
   --blue: #1A73E8;
   --blue-deep: #1557B0;
   --blue-wash: rgba(26, 115, 232, .08);
@@ -977,7 +936,8 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
   --warning-wash: #FFF7DA;
 }
 
-.rooms-page .work { background: var(--bg); }
+.rooms-page .work,
+.walkthrough-page .work { background: var(--bg); }
 .rooms-register { flex-shrink: 0; margin-top: 2px; }
 
 .room-filters { flex-wrap: nowrap; gap: 10px; padding: 0; }
@@ -990,9 +950,12 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
 
 .rooms-page .room-desk { grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr); gap: 16px; align-items: start; }
 .rooms-page .panel,
-.rooms-page .drawer { border-color: var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(23, 32, 51, .035); }
-.rooms-page .panel-head { padding: 20px 22px; }
-.rooms-page .panel-head h2 { color: var(--text); font-size: 1.3rem; letter-spacing: 0; }
+.rooms-page .drawer,
+.walkthrough-page .panel { border-color: var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(23, 32, 51, .035); }
+.rooms-page .panel-head,
+.walkthrough-page .panel-head { padding: 20px 22px; }
+.rooms-page .panel-head h2,
+.walkthrough-page .panel-head h2 { color: var(--text); font-size: 1.3rem; letter-spacing: 0; }
 .rooms-page .row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content max-content;
@@ -1026,9 +989,12 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
 .rooms-page .drawer-foot .btn { width: auto; }
 .room-list-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 22px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: .84rem; }
 .room-page-controls { display: flex; gap: 8px; }
-.rooms-page .btn-quiet { border-color: var(--border); color: var(--text); background: var(--surface); }
-.rooms-page .btn-quiet:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
-.rooms-page .btn-quiet:disabled { color: var(--text-muted); background: #F8FAFC; border-color: var(--border); }
+.rooms-page .btn-quiet,
+.walkthrough-page .btn-quiet { border-color: var(--border); color: var(--text); background: var(--surface); }
+.rooms-page .btn-quiet:hover:not(:disabled),
+.walkthrough-page .btn-quiet:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+.rooms-page .btn-quiet:disabled,
+.walkthrough-page .btn-quiet:disabled { color: var(--text-muted); background: #F8FAFC; border-color: var(--border); }
 
 @media (max-width: 1099px) {
   .rooms-page .room-desk { grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr); }
@@ -1048,4 +1014,150 @@ dialog::backdrop { background: rgba(16,23,42,.45); }
   .room-list-footer { padding: 14px 16px; align-items: flex-start; flex-direction: column; }
   .rooms-page .facts > div { grid-template-columns: 1fr; gap: 3px; }
   .rooms-page .drawer-foot { padding-left: 16px; padding-right: 16px; }
+}
+
+/* -------------------------------------------------------- walkthrough page */
+
+/* One building and floor at a time: its locked fixed path from the gate, then
+   the rooms reached from the end of it. Panels and quiet buttons come from
+   the Locations rules above; what follows is only this page's furniture. */
+
+.wt-where { display: flex; flex-wrap: wrap; gap: var(--s4); }
+.wt-choice { flex: 1 1 280px; max-width: 440px; }
+.wt-choice label { display: block; margin-bottom: var(--s2); color: var(--text); font-size: var(--fs-sm); font-weight: 600; }
+/* Control edges stay at 3:1 or better: these are the page's two main controls. */
+.walkthrough-page .wt-where select { margin: 0; border-color: var(--text-muted); border-radius: var(--r-input); }
+.walkthrough-page .wt-where select:disabled { color: var(--text-muted); background: var(--bg); }
+
+#floorView > * + * { margin-top: var(--s4); }
+#floorView:not(:empty) { margin-top: var(--s5); }
+
+/* The floor, marked the way the visitor pages mark it: its numeral. */
+.wt-floor-head { display: flex; align-items: center; gap: var(--s4); }
+.wt-floor-words { flex: 1; min-width: 0; }
+.wt-floor-words h2 { margin: 0; color: var(--text); font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 700; line-height: 1.1; }
+.wt-floor-sub { margin: var(--s1) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
+.wt-floor-head .btn { flex-shrink: 0; }
+
+.wt-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.wt-lock svg,
+.wt-step-title svg { flex-shrink: 0; width: 18px; height: 18px; }
+
+.wt-note { max-width: 70ch; margin: 0 0 var(--s4); color: var(--text-muted); font-size: var(--fs-sm); }
+.walkthrough-page .panel-body { padding: var(--s5); }
+
+/* The fixed path reads left to right, gate first, like the walk itself. */
+.wt-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 200px;
+  gap: var(--s4);
+  margin: 0;
+  padding: 0 0 var(--s2);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+.wt-shot { display: grid; align-content: start; gap: var(--s2); scroll-snap-align: start; }
+.wt-shot-name { margin: 0; color: var(--text); font-size: var(--fs-sm); font-weight: 600; }
+.wt-shot .btn { width: 100%; }
+
+.wt-shot img,
+.wt-room img,
+.wt-step img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: var(--r-chip);
+  background: var(--border);
+}
+
+/* Rooms: the room's own photo, its name, then what can be done to it. */
+.wt-room-list { margin: 0; padding: 0; list-style: none; }
+.wt-room {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-areas: "pic text" "pic actions";
+  gap: var(--s3) var(--s5);
+  padding: var(--s5);
+  border-top: 1px solid var(--border);
+}
+.wt-room:first-child { border-top: 0; }
+.wt-room img { grid-area: pic; align-self: start; }
+.wt-room-text { grid-area: text; min-width: 0; }
+.wt-room-text h3 { margin: 0; color: var(--text); font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
+.wt-room-meta { margin: var(--s1) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
+.wt-tag {
+  display: inline-block;
+  margin: var(--s2) 0 0;
+  padding: 2px var(--s3);
+  border: 1px solid var(--blue);
+  border-radius: 999px;
+  background: var(--blue-wash);
+  color: var(--blue-deep);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.wt-why { max-width: 60ch; margin: var(--s2) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
+.wt-room-actions { grid-area: actions; align-self: end; display: flex; flex-wrap: wrap; gap: var(--s2); }
+
+/* The editor: the walk as a visitor will see it, fixed path first. */
+.wt-editor .field { max-width: 480px; }
+.wt-pick { margin-bottom: var(--s3); }
+.wt-status p { max-width: 70ch; margin: 0 0 var(--s2); color: var(--text); font-size: var(--fs-sm); }
+.wt-status[role="alert"] p { color: var(--red-deep); font-weight: 600; }
+
+.wt-steps { display: grid; gap: var(--s3); margin: var(--s4) 0 0; padding: 0; list-style: none; }
+.wt-step {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+  transition: border-color .15s var(--ease), opacity .15s var(--ease);
+}
+.wt-step[draggable="true"] { cursor: grab; }
+.wt-step.is-fixed { grid-template-columns: 160px minmax(0, 1fr); background: var(--bg); }
+.wt-step.is-room { border-color: var(--blue); background: var(--blue-wash); }
+.wt-step.is-empty { display: block; padding: var(--s5); border-style: dashed; color: var(--text-muted); text-align: center; }
+.wt-step.is-dragging { opacity: .5; }
+.wt-step.is-over { border-color: var(--blue); outline: 2px dashed var(--blue); outline-offset: 2px; }
+
+.wt-fixed-shots { display: flex; gap: var(--s1); min-width: 0; overflow: hidden; }
+.wt-fixed-shots img { flex: 0 0 64px; width: 64px; border-radius: var(--r-chip); }
+
+.wt-step-title { display: flex; align-items: center; gap: var(--s2); margin: 0; color: var(--text); font-size: var(--fs-body); font-weight: 700; }
+.wt-step-meta { margin: 2px 0 0; color: var(--text-muted); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.wt-step-moves { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--s2); }
+
+.wt-editor-foot { display: flex; flex-wrap: wrap; gap: var(--s3); padding: var(--s4) var(--s5) var(--s5); border-top: 1px solid var(--border); }
+
+@media (max-width: 720px) {
+  .walkthrough-page .work-head { flex-direction: column; padding: 28px 20px 20px; }
+  .walkthrough-page .work-body { padding: 0 20px 32px; }
+  .walkthrough-page .panel-head,
+  .walkthrough-page .panel-body { padding-left: var(--s4); padding-right: var(--s4); }
+  .wt-choice { max-width: none; }
+  .wt-floor-head { flex-wrap: wrap; }
+  .wt-floor-head .btn { width: 100%; }
+  .wt-room { grid-template-columns: minmax(0, 1fr); grid-template-areas: "pic" "text" "actions"; padding: var(--s4); }
+  .wt-room img { max-width: 360px; }
+  .wt-step { grid-template-columns: 96px minmax(0, 1fr); }
+  .wt-step-moves { grid-column: 1 / -1; justify-content: flex-start; }
+  .wt-step.is-fixed { grid-template-columns: minmax(0, 1fr); }
+  .wt-editor-foot { padding-left: var(--s4); padding-right: var(--s4); }
 }

@@ -78,7 +78,7 @@ const MENU = [
     icon: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/>' },
   { href: 'rooms.html',    label: 'Locations', needs: 'room.view',
     icon: '<rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="14.5" cy="12" r="1" fill="currentColor" stroke="none"/>' },
-  { href: 'navigation-map.html', label: 'Navigation Map', needs: 'room.view',
+  { href: 'walkthrough.html', label: 'Walkthrough', needs: 'room.view',
     icon: '<path d="M4 5.5 10 3l4 2 4-2.5v16L14 21l-4-2-6 2.5z"/><path d="M10 3v16M14 5v16"/>' },
   { href: 'users-access.html', label: 'Users & Access', needs: 'settings.manage',
     icon: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M14.8 13.3c2.2.4 3.7 2.1 3.7 4.4"/>' },

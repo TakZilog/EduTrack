@@ -16,6 +16,7 @@
   let all = [];          // rooms visitors can choose
   let unlisted = [];     // photos on the map that are not offered to visitors
   let floors = [];
+  let structured = false; // the map is imported by building and floor
   let attentionNames = new Set();
   const state = { q: '', floor: '', type: '', status: '', page: 1, openName: null };
   const PAGE_SIZE = 20;
@@ -32,6 +33,7 @@
     all = data.rooms;
     unlisted = (data.unlisted || []).map(u => ({ ...u, isUnlisted: true }));
     floors = data.floors.filter(Boolean);
+    structured = Boolean(data.structured);
     attentionNames = new Set((data.problems || []).flatMap(problem => problem.items || []));
 
     fillFloorFilter();
@@ -77,9 +79,8 @@
     paint();
   }, 250));
 
-  registerRoom.addEventListener('click', () => {
-    toast('Locations are registered by adding their walkthrough photo to the campus map source.');
-  });
+  // Rooms are added with their photos, on the Walkthrough page.
+  registerRoom.addEventListener('click', () => { window.location.href = 'walkthrough.html'; });
 
   /* Rooms visitors can choose come first; photos that are on the map but not
      offered to anyone follow, marked, so both live in one list. */
@@ -153,12 +154,14 @@
     return attentionNames.has(room.name) ? 'attention' : 'reachable';
   }
 
+  /* "2ND FLOOR SECOND BUILDING" -> "Second Building – 2nd Floor". The older
+     single-building map says "1ST FLOOR ADMIN BUILDING" -> "1st Floor". */
   function floorLabel(value) {
-    return String(value || '')
-      .replace(/\s+ADMIN BUILDING\s*$/i, '')
-      .trim()
-      .toLowerCase()
-      .replace(/\b[a-z]/g, letter => letter.toUpperCase());
+    const m = /^(\d+)(st|nd|rd|th)\s+floor\s*(.*)$/i.exec(String(value || '').trim());
+    if (!m) return String(value || '');
+    const floor = m[1] + m[2].toLowerCase() + ' Floor';
+    const building = m[3].toLowerCase().replace(/\b[a-z]/g, letter => letter.toUpperCase());
+    return building && !/^admin building$/i.test(building) ? building + ' – ' + floor : floor;
   }
 
   function statusLabel(status) {
@@ -316,14 +319,6 @@
 
       text.append(n, t, d);
 
-      // Replacing is offered next to the picture itself. You choose the photo
-      // by looking at it, never by knowing what a node id is.
-      if (allowed('room.edit')) {
-        const swap = button('Replace this photo', 'btn-quiet btn-small', () => replacePhoto(step, img, text));
-        swap.style.marginTop = 'var(--s2)';
-        text.appendChild(swap);
-      }
-
       li.append(img, text);
       strip.appendChild(li);
     });
@@ -336,71 +331,12 @@
     });
   }
 
-  /*
-    One photo, swapped in place. The route does not change, so this cannot
-    strand a room or break a link. The old picture is kept on the server.
-  */
-  function replacePhoto(step, imgEl, host) {
-    const picker = document.createElement('input');
-    picker.type = 'file';
-    picker.accept = 'image/jpeg,image/png,image/webp';
-
-    picker.addEventListener('change', async () => {
-      const file = picker.files[0];
-      if (!file) return;
-
-      const yes = await confirmAction({
-        title: 'Replace the photo at step ' + step.position + '?',
-        message: 'Visitors will see this new picture at "' + step.title + '". '
-          + 'It must be a 360 photo, twice as wide as it is tall. '
-          + 'The old picture is kept on the server, so this can be undone.',
-        confirmLabel: 'Yes, replace it'
-      });
-      if (!yes) return;
-
-      const note = document.createElement('p');
-      note.className = 'd';
-      note.textContent = 'Uploading…';
-      host.appendChild(note);
-
-      const form = new FormData();
-      form.append('node', step.nodeId);
-      form.append('photo', file);
-
-      let data;
-      try {
-        const res = await fetch('../api/admin/photo-replace.php', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { 'X-CSRF-Token': csrfToken },
-          body: form   // no Content-Type: the browser sets the multipart boundary
-        });
-        data = await res.json();
-      } catch {
-        data = { ok: false, error: 'Could not reach the server. Please try again.' };
-      }
-
-      note.remove();
-
-      if (!data.ok) {
-        toast(data.error, 'bad');
-        return;
-      }
-
-      toast(data.message + ' Now ' + data.width + ' by ' + data.height + ', ' + data.sizeKb + ' KB.');
-      // Cache-bust so the new picture shows immediately.
-      imgEl.src = '../api/admin/thumb.php?node=' + encodeURIComponent(step.nodeId) + '&v=' + Date.now();
-    });
-
-    picker.click();
-  }
-
   /* ------------------------------------------------------- edit and relist */
 
   /*
-    Only the name and the floor. The route and the photos are not editable
-    here on purpose: which photo leads to which is worked out by comparing the
-    images, so it is changed by walking the building again, not by typing.
+    Only the name, and on the older single-building map the floor. The
+    photos are changed on the Walkthrough page, where a room's walk is
+    chosen again photo by photo.
   */
   function editRoom(room) {
     askFor({
@@ -481,7 +417,8 @@
 
     const error = document.createElement('p');
     error.className = 'field-error';
-    body.append(nameField, floorField, error);
+    // On the building map a room's floor comes from its photos: it moves by swapping.
+    body.append(nameField, ...(structured ? [] : [floorField]), error);
 
     const foot = document.createElement('div');
     foot.className = 'dialog-foot';
@@ -507,7 +444,7 @@
       save.disabled = true;
       save.textContent = 'Saving…';
 
-      const { data } = await onSave(nameInput.value.trim(), floorInput.value);
+      const { data } = await onSave(nameInput.value.trim(), structured ? '' : floorInput.value);
 
       save.disabled = false;
       save.textContent = confirmLabel;
