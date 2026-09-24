@@ -166,16 +166,16 @@
   .enroll-split .way-title { color: var(--blue); }
   .enroll-meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--s1) var(--s3);
-    margin-top: var(--s2);
+    flex-direction: column;
+    gap: var(--s1);
+    margin-top: 10px;
     color: var(--text);
     font-size: var(--fs-sm);
     font-weight: 600;
   }
   .enroll-meta span { display: inline-flex; align-items: center; gap: 6px; }
   .enroll-meta svg { width: 16px; height: 16px; color: var(--blue); }
-  .enroll-split .way-arrow { align-self: center; margin-right: var(--s4); color: var(--blue); }
+  .enroll-split .way-arrow { align-self: flex-start; margin: var(--s4) var(--s2) 0; color: var(--blue); }
   .enroll-split:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
   .enroll-split:active { background: var(--blue-wash); }
 
@@ -347,7 +347,7 @@
   .notice-text { display: block; margin-top: 2px; color: var(--text-muted); font-size: var(--fs-sm); text-wrap: pretty; }
 
   @media (max-width: 479px) {
-    .way, .floor-row, .directory-head, .directory-foot, .notices-head, .notices li { padding-left: var(--s4); padding-right: var(--s4); }
+    .way:not(.enroll-split), .floor-row, .directory-head, .directory-foot, .notices-head, .notices li { padding-left: var(--s4); padding-right: var(--s4); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -433,8 +433,8 @@
           <a class="way enroll-split" href="map/enrollment.html">
             <span class="enroll-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>Map</span>
             <span class="way-body">
-              <span class="way-title">Enrolling</span>
-              <span class="way-text">Follow the enrollment steps, room by room.</span>
+              <span class="way-title">Enrollment Day Map</span>
+              <span class="way-text">See where you need to go on Enrollment Day</span>
               <span class="enroll-meta">
                 <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>No account required</span>
                 <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>Open to everyone</span>
