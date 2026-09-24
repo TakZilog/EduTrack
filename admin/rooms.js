@@ -207,9 +207,21 @@
       actions.push(open);
     }
 
+    /* Locations is for checking, Walkthrough for changing. On the building
+       map every change to a room (photos, name, swap, remove) lives on the
+       Walkthrough page, so staff have one place to go. The older map has no
+       Walkthrough editor, so its rooms are still changed here. */
     if (allowed('room.edit')) {
-      actions.push(button('Edit Location', 'btn', () => editRoom(room)));
-      actions.push(button('Remove Location', 'btn-danger', () => removeRoom(room)));
+      if (structured) {
+        const change = document.createElement('a');
+        change.className = 'btn';
+        change.href = 'walkthrough.html';
+        change.textContent = 'Change this room on the Walkthrough page';
+        actions.push(change);
+      } else {
+        actions.push(button('Edit Location', 'btn', () => editRoom(room)));
+        actions.push(button('Remove Location', 'btn-danger', () => removeRoom(room)));
+      }
     }
 
     drawDrawer(drawer, {
@@ -468,12 +480,9 @@
   async function removeRoom(room) {
     const yes = await confirmAction({
       title: 'Remove Location ' + room.name + '?',
-      // On the building map a room's photos are its own, and removing it
-      // deletes them for good; on the older map they stay.
-      message: structured
-        ? 'This takes the location off the map and deletes its photos for good. The fixed path is not affected. '
-          + 'To change its photos instead, use the Walkthrough page.'
-        : 'This will remove the location from the EduTrack navigation system.',
+      // Only reached on the older map: the building map removes rooms on
+      // the Walkthrough page. Photos stay on disk here.
+      message: 'This will remove the location from the EduTrack navigation system.',
       confirmLabel: 'Remove Location',
       danger: true
     });
