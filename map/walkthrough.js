@@ -415,7 +415,7 @@ function reflectQuality() {
 
 /* Keeps this whole route on the phone: the page and the 360 viewer, the room
    map, and every photo at the current quality, so it opens again without
-   signal (assets/js/offline.js, sw.js). Shown only where the phone supports it. */
+   signal (assets/js/offline.js, sw.js). Shown only in the app. */
 function setupSaveRoute() {
   const button = document.getElementById('saveRoute');
   const offline = window.EduTrackOffline;

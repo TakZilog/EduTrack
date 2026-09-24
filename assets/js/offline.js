@@ -7,19 +7,35 @@
     EduTrackOffline.walkthroughFiles()      the walkthrough page and its files
     EduTrackOffline.forget()                delete the saved room map and photos
 
-  Service workers need a secure address (https, or localhost while
-  developing). Anywhere else `supported` is false and the pages simply stay
-  online-only, exactly as before.
+  Offline mode is for the Android app only: the app is a WebView that sends
+  the EduTrackMobile user agent. In a normal browser `supported` is false, the
+  Save buttons stay hidden, nothing is stored, and the site works online as it
+  always has. Service workers also need a secure address (https, or localhost
+  while developing).
 */
 (function () {
   const root = new URL('../../', document.currentScript.src);   // the site's base
   const DATA = 'edutrack-data';                                  // must match sw.js
 
-  const supported = 'serviceWorker' in navigator && window.isSecureContext;
+  const inApp = /EduTrackMobile/i.test(navigator.userAgent);
+  const supported = inApp && 'serviceWorker' in navigator && window.isSecureContext;
 
   if (supported) {
     navigator.serviceWorker.register(new URL('sw.js', root), { scope: root.pathname })
       .catch(() => { /* no offline mode; everything still works online */ });
+  } else {
+    // A browser that registered the worker before offline mode became
+    // app-only: remove it and whatever it saved.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then(regs => regs.filter(r => r.scope === root.href).forEach(r => r.unregister()))
+        .catch(() => {});
+    }
+    if ('caches' in window) {
+      caches.keys()
+        .then(names => names.filter(n => n.startsWith('edutrack-')).forEach(n => caches.delete(n)))
+        .catch(() => {});
+    }
   }
 
   /* Resolves with { done, total, failed } once every file has been tried. */

@@ -237,7 +237,7 @@ async function init() {
    can be followed at the gate without signal (assets/js/offline.js, sw.js).
    Everything saved is already open to everyone; the list comes from
    api/enrollment-guide.php. The walks are saved with the lighter photos,
-   which is what a phone opens with. */
+   which is what a phone opens with. Shown only in the app. */
 function setupSaveGuide() {
   const button = document.getElementById('saveGuide');
   const note = document.getElementById('saveGuideNote');

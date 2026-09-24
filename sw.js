@@ -1,5 +1,6 @@
 /*
-  EduTrack offline support.
+  EduTrack offline support, for the Android app only: assets/js/offline.js
+  registers this worker only inside the app, never in a normal browser.
 
   Keeps the student and visitor pages, the 360 viewer and the walkthrough
   photos on the phone, so a route that was opened or saved still works without
