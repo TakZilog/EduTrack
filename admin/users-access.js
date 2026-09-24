@@ -277,7 +277,7 @@
       password: newPassword.value
     });
     addBtn.disabled = false;
-    addBtn.textContent = 'Add this staff';
+    addBtn.textContent = 'Add Staff';
     if (!data.ok) { error.textContent = data.error; error.classList.add('on'); return; }
 
     toast(data.message);
