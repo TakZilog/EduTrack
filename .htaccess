@@ -80,10 +80,13 @@ RedirectMatch 404 ^/EduTrack/(storage|sql|tools|vendor)/
 
 # Repository and tooling files. The public site is served straight out of this
 # checkout, so without this /.git/ hands out the full source and history.
-# Only refused through the tunnel: the design tooling on this machine reads
-# .impeccable over localhost.
+# Refused to everyone except this machine itself: the design tooling reads
+# .impeccable over localhost. Checking only for the tunnel header was not
+# enough, because Apache also answers on the LAN address, and a phone or
+# laptop on the same Wi-Fi sends no such header.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{HTTP:CF-Connecting-IP} .
+    RewriteCond %{HTTP:CF-Connecting-IP} . [OR]
+    RewriteCond %{REMOTE_ADDR} !^(127\.0\.0\.1|::1)$
     RewriteRule ^(\.|mobile_app/|node_modules/|EduTrack$|START-ONLINE\.bat$|package(-lock)?\.json$) - [R=404,L]
 </IfModule>

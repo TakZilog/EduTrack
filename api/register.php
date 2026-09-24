@@ -57,7 +57,17 @@ $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 try {
     $pdo->beginTransaction();
 
-
+    // An account nobody verified within an hour proved nothing, so it stops
+    // holding its email and student ID. Otherwise anyone could register a
+    // stranger's email and lock them out for good, and a student who closed
+    // the tab before typing the code could never register again. The hour
+    // leaves a real sign-up plenty of time to finish before it can be replaced.
+    $pdo->prepare(
+        'DELETE FROM users
+          WHERE email_verified = 0
+            AND (email = ? OR student_no = ?)
+            AND created_at < NOW() - INTERVAL 1 HOUR'
+    )->execute([$email, $studentNo]);
 
     // Only the email is checked for collisions. Two students sharing a name is
     // normal and must not block the second one from registering.
