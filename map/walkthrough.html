@@ -376,7 +376,9 @@
        The choice below lets the visitor ask for lighter photos (served by
        node-image.php?q=low), and the pill in the top bar switches at any time. */
 
-    #speedToggle {
+    /* The quality pill and, beside it, "Save offline", which keeps this whole
+       route on the phone for use without signal (walkthrough.js). */
+    #speedToggle, #saveRoute {
       flex-shrink: 0;
       display: inline-flex;
       align-items: center;
@@ -393,21 +395,25 @@
       cursor: pointer;
       transition: color .15s var(--ease), border-color .15s var(--ease), background-color .15s var(--ease);
     }
-    #speedToggle svg { width: 16px; height: 16px; flex-shrink: 0; }
-    #speedToggle.on { background: var(--blue); border-color: var(--blue); color: var(--white); }
-    #speedToggle:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+    #saveRoute[hidden] { display: none; }
+    #speedToggle svg, #saveRoute svg { width: 16px; height: 16px; flex-shrink: 0; }
+    #speedToggle.on, #saveRoute.on { background: var(--blue); border-color: var(--blue); color: var(--white); }
+    #speedToggle:focus-visible, #saveRoute:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+    #saveRoute[aria-busy="true"] { cursor: progress; }
+    #saveRoute .icon-done, #saveRoute.on .icon-save { display: none; }
+    #saveRoute.on .icon-done { display: block; }
 
     @media (hover: hover) and (pointer: fine) {
-      #speedToggle:hover { color: var(--on-bar); border-color: var(--on-bar); }
-      #speedToggle.on:hover { color: var(--white); }
+      #speedToggle:hover, #saveRoute:hover { color: var(--on-bar); border-color: var(--on-bar); }
+      #speedToggle.on:hover, #saveRoute.on:hover { color: var(--white); }
     }
-    /* Phones: icon only, matching the back link and crest. */
+    /* Phones: icons only, matching the back link and crest. */
     @media (max-width: 599px) {
-      #speedToggleText {
+      #speedToggleText, #saveRouteText {
         position: absolute; width: 1px; height: 1px; overflow: hidden;
         clip: rect(0 0 0 0); white-space: nowrap;
       }
-      #speedToggle { padding: 0; width: 36px; justify-content: center; }
+      #speedToggle, #saveRoute { padding: 0; width: 36px; justify-content: center; }
     }
 
     /* The choice shown on arrival, over the whole screen until one is picked. */
@@ -488,6 +494,11 @@
       <span id="stepLabel">Loading…</span>
       <span id="stepCount"></span>
     </div>
+    <button id="saveRoute" type="button" hidden title="Save this route to use without signal">
+      <svg class="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>
+      <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>
+      <span id="saveRouteText" aria-live="polite">Save offline</span>
+    </button>
     <button id="speedToggle" type="button" aria-pressed="false" title="Switch to low-data photos">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
       <span id="speedToggleText">Fast</span>
@@ -546,8 +557,9 @@
   </div>
 
 
+  <script src="../assets/js/offline.js?v=2"></script>
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-  <script src="walkthrough.js?v=13"></script>
+  <script src="walkthrough.js?v=15"></script>
 </body>
 
 </html>

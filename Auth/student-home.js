@@ -24,6 +24,9 @@ document.querySelectorAll('.class-row').forEach(row => {
 });
 
 document.getElementById('signOut').addEventListener('click', async () => {
+  // The room map and photos saved for offline go first, whether or not the
+  // server answers, so the next person on this phone cannot open them.
+  if (window.EduTrackOffline) await EduTrackOffline.forget();
   await apiPost('logout.php');
   window.location.href = '../index.html';
 });

@@ -217,9 +217,12 @@ function showSignedInFooter(fullName) {
     '<button type="button" class="session-action is-exit" id="logoutBtn">' + ICON_LOGOUT + 'Log out</button>';
   sessionFooter.hidden = false;
 
-  document.getElementById('logoutBtn').addEventListener('click', function () {
+  document.getElementById('logoutBtn').addEventListener('click', async function () {
     this.disabled = true;
     this.textContent = 'Logging out...';
+    // The room map and photos saved for offline go first, whether or not the
+    // server answers, so the next person on this phone cannot open them.
+    if (window.EduTrackOffline) await EduTrackOffline.forget();
     apiPost('logout.php')
       .then(() => { window.location.href = '../index.html'; })
       .catch(() => {

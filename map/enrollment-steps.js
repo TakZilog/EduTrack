@@ -55,7 +55,8 @@ function renderRoomMedia(container, roomName) {
   img.className = 'step-photo';
   img.alt = '';
   img.loading = 'lazy';
-  img.src = `../api/node-image.php?room=${encodeURIComponent(roomName)}`;
+  // The light copy: a small card never needs the full 4096px photo.
+  img.src = `../api/node-image.php?room=${encodeURIComponent(roomName)}&q=low`;
   img.onerror = () => { img.replaceWith(el('span', 'step-placeholder', ICON_OFFICE)); };
   container.appendChild(img);
 }
@@ -230,4 +231,69 @@ async function init() {
   renderProgress();
 }
 
-init();
+/* ------------------------------------------------------------- offline */
+
+/* Keeps this guide and the walk to every room it names on the phone, so it
+   can be followed at the gate without signal (assets/js/offline.js, sw.js).
+   Everything saved is already open to everyone; the list comes from
+   api/enrollment-guide.php. The walks are saved with the lighter photos,
+   which is what a phone opens with. */
+function setupSaveGuide() {
+  const button = document.getElementById('saveGuide');
+  const note = document.getElementById('saveGuideNote');
+  const offline = window.EduTrackOffline;
+  if (!button || !offline || !offline.supported) return;
+  button.hidden = false;
+  const api = new URL('../api/', location.href).href;
+
+  // Saved on an earlier visit? Say so, judged by the walks this page links to.
+  const rooms = [...new Set([...document.querySelectorAll('a.step-route')]
+    .map(link => new URL(link.href).searchParams.get('room'))
+    .filter(Boolean))];
+  offline.isSaved(rooms.flatMap(room => [
+    api + 'tour.php?room=' + encodeURIComponent(room),
+    api + 'node-image.php?room=' + encodeURIComponent(room) + '&q=low',
+  ])).then(saved => { if (saved) showGuideSaved(button); });
+
+  button.addEventListener('click', async () => {
+    if (button.getAttribute('aria-busy') === 'true') return;
+    button.setAttribute('aria-busy', 'true');
+    note.textContent = 'Saving…';
+    try {
+      const res = await fetch('../api/enrollment-guide.php');
+      if (!res.ok) throw new Error('guide list unavailable');
+      const guide = await res.json();
+      const urls = [
+        'enrollment.html',
+        'enrollment-steps.html',
+        '../assets/enrollment/enrollment-steps.json',
+        ...[...document.querySelectorAll('script[src], link[rel="stylesheet"][href]')]
+          .map(node => node.getAttribute('src') || node.getAttribute('href')),
+        ...await offline.walkthroughFiles(),
+        ...guide.rooms.flatMap(room => [
+          api + 'tour.php?room=' + encodeURIComponent(room),
+          api + 'node-image.php?room=' + encodeURIComponent(room) + '&q=low',
+        ]),
+        ...guide.images.map(file => api + 'node-image.php?f=' + file + '&q=low&v=' + guide.version),
+        ...guide.photos.map(path => '../' + path),
+      ];
+      const result = await offline.save(urls, p => { note.textContent = `Saving ${p.done} of ${p.total}…`; });
+      if (!result.failed) showGuideSaved(button);
+      note.textContent = result.failed
+        ? `${result.failed} of ${result.total} files did not save. Try again with a better signal.`
+        : 'The steps and the walk to each room now open without signal.';
+    } catch (err) {
+      note.textContent = 'Could not save the guide. Check your connection and try again.';
+    } finally {
+      button.removeAttribute('aria-busy');
+    }
+  });
+}
+
+function showGuideSaved(button) {
+  button.classList.add('is-saved');
+  document.getElementById('saveGuideText').textContent = 'Saved on this phone';
+}
+
+// After the steps are on the page, since the save button reads their walks.
+init().finally(setupSaveGuide);

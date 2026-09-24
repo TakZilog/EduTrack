@@ -160,6 +160,8 @@ async function init() {
       showStep(currentStep);
     }
   });
+
+  setupSaveRoute();
 }
 
 /* Breadth-first search over the edges list, treated as bidirectional
@@ -393,6 +395,8 @@ function setupSpeedToggle() {
       const node = graph.nodes.find(n => n.node_id === path[currentStep]);
       if (node) loadPanorama(imageUrl(node.image_file));
     }
+    // The photos saved for offline may be at the other quality.
+    refreshSaveRoute();
   });
 }
 
@@ -405,4 +409,60 @@ function reflectQuality() {
   toggle.title = low ? 'Switch to full-quality photos' : 'Switch to low-data photos';
   const text = document.getElementById('speedToggleText');
   if (text) text.textContent = low ? 'Low data' : 'Fast';
+}
+
+/* -------------------------------------------------------- save for offline */
+
+/* Keeps this whole route on the phone: the page and the 360 viewer, the room
+   map, and every photo at the current quality, so it opens again without
+   signal (assets/js/offline.js, sw.js). Shown only where the phone supports it. */
+function setupSaveRoute() {
+  const button = document.getElementById('saveRoute');
+  const offline = window.EduTrackOffline;
+  if (!button || !offline || !offline.supported) return;
+  button.hidden = false;
+  refreshSaveRoute();
+
+  button.addEventListener('click', async () => {
+    if (button.getAttribute('aria-busy') === 'true') return;
+    button.setAttribute('aria-busy', 'true');
+    showSaveState('Saving…', false);
+    try {
+      const urls = [...await offline.walkthroughFiles(), ...routeData()];
+      const result = await offline.save(urls, p => showSaveState(`Saving ${p.done} of ${p.total}`, false));
+      if (result.failed) showSaveState('Some photos did not save. Tap to try again.', false);
+      else showSaveState('Saved offline', true);
+    } catch (err) {
+      showSaveState('Could not save. Tap to try again.', false);
+    } finally {
+      button.removeAttribute('aria-busy');
+    }
+  });
+}
+
+function showSaveState(text, saved) {
+  const button = document.getElementById('saveRoute');
+  button.classList.toggle('on', saved);
+  button.title = saved ? 'This route now works without signal' : 'Save this route to use without signal';
+  document.getElementById('saveRouteText').textContent = text;
+}
+
+/* This route's room map and its photos at the current quality. */
+function routeData() {
+  const photos = path
+    .map(id => graph.nodes.find(n => n.node_id === id))
+    .filter(Boolean)
+    .map(node => imageUrl(node.image_file));
+  return [GRAPH_URL + '?room=' + encodeURIComponent(targetRoomName), ...photos];
+}
+
+/* Says "Saved offline" when this route (at this quality) is already on the
+   phone from an earlier visit, and offers to save it otherwise. */
+function refreshSaveRoute() {
+  const button = document.getElementById('saveRoute');
+  if (!button || button.hidden) return;
+  showSaveState('Save offline', false);
+  window.EduTrackOffline.isSaved(routeData()).then(saved => {
+    if (saved) showSaveState('Saved offline', true);
+  });
 }

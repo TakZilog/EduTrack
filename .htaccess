@@ -30,6 +30,11 @@ Options -Indexes
     <FilesMatch "\.html$">
         Header set Cache-Control "no-cache"
     </FilesMatch>
+    # The offline worker (sw.js) too, so a new version reaches phones on their
+    # next visit rather than whenever a cached copy happens to expire.
+    <Files "sw.js">
+        Header set Cache-Control "no-cache"
+    </Files>
 </IfModule>
 
 # ---------------------------------------------------------------- page policy

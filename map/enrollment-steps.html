@@ -51,6 +51,24 @@
   }
   .gate-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--red); }
 
+  /* Keeps the guide and every walk it links to on the phone, for the gate,
+     where the signal is often weak (enrollment-steps.js). Shown only where the
+     phone supports it. */
+  .offline-save {
+    display: flex;
+    margin-top: var(--s3);
+    background: var(--surface);
+    font-family: var(--font);
+    font-size: var(--fs-body);
+    cursor: pointer;
+  }
+  .offline-save[hidden] { display: none; }
+  .offline-save svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--blue); }
+  .offline-save.is-saved { border-color: var(--blue); color: var(--blue); }
+  .offline-save[aria-busy="true"] { cursor: progress; }
+  .offline-note { margin: var(--s2) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
+  .offline-note:empty { display: none; }
+
   /* --------------------------------------------------------------- steps */
 
   .step-list {
@@ -322,12 +340,18 @@
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>
           Every route starts at the main gate.
         </p>
+        <button class="track-switch offline-save" id="saveGuide" type="button" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>
+          <span id="saveGuideText">Save the guide to use without signal</span>
+        </button>
+        <p class="offline-note" id="saveGuideNote" aria-live="polite"></p>
       </div>
     </div>
 
     <ol class="step-list" id="stepList" aria-live="polite"></ol>
   </main>
 
-  <script src="enrollment-steps.js?v=4"></script>
+  <script src="../assets/js/offline.js?v=2"></script>
+  <script src="enrollment-steps.js?v=6"></script>
 </body>
 </html>
