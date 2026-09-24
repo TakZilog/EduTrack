@@ -19,24 +19,24 @@ const String siteUrl = String.fromEnvironment(
   defaultValue: 'https://edutrack.art/EduTrack/',
 );
 
-/// Path segments that the mobile app must never load. The admin panel is a
-/// web-only tool; exposing it in the app risks leaking staff credentials on
-/// a device that may be shared, screen-recorded, or shoulder-surfed.
-///
-/// Matching is case-insensitive and checks every segment of the URL path, so
-/// `…/admin/login.html`, `…/api/admin/settings.php` and any future sub-path
-/// are all caught regardless of how the URL is cased.
-const Set<String> _blockedSegments = {'admin'};
+/// The only parts of the site the app opens: the student and visitor pages,
+/// named by the first folder or file under the site's address. Everything
+/// else is refused. A page has to be listed here to open, so the app never
+/// needs to know, or carry, the name of anything it must stay away from.
+const Set<String> _allowedSections = {'', 'index.html', 'guest-map.html', 'auth', 'map'};
 
-/// Returns `true` when [url] points at a path the mobile app is not allowed
-/// to open (currently: anything containing an `/admin/` segment).
-bool _isBlockedPath(String url) {
+/// True when [url] is one of the site's student or visitor pages.
+bool _isAllowedPage(Uri home, String url) {
   final uri = Uri.tryParse(url);
-  if (uri == null) return true; // un-parseable → block to be safe
+  if (uri == null) return false; // un-parseable: refuse to be safe
 
-  // Normalise: split, lower-case, drop empties.
-  final segments = uri.pathSegments.map((s) => s.toLowerCase());
-  return segments.any(_blockedSegments.contains);
+  final base = home.path.endsWith('/') ? home.path : '${home.path}/';
+  final path = uri.path;
+  if (path == base || '$path/' == base) return true; // the home page itself
+  if (!path.startsWith(base)) return false;
+
+  final first = path.substring(base.length).split('/').first.toLowerCase();
+  return _allowedSections.contains(first);
 }
 
 /// The whole app: one WebView on the site. Login, the room picker, the 360°
@@ -56,21 +56,6 @@ class _SiteScreenState extends State<SiteScreen> {
   int _progress = 0;
   bool _failed = false;
 
-  /// JavaScript injected after every page load to strip any element that
-  /// links to the admin panel. Belt-and-suspenders: even if a future page
-  /// accidentally includes an admin link, the mobile user never sees it.
-  static const String _stripAdminLinksJs = '''
-    (function() {
-      var links = document.querySelectorAll('a[href]');
-      for (var i = 0; i < links.length; i++) {
-        var href = links[i].getAttribute('href') || '';
-        if (/\\badmin\\b/i.test(href)) {
-          links[i].remove();
-        }
-      }
-    })();
-  ''';
-
   @override
   void initState() {
     super.initState();
@@ -81,22 +66,18 @@ class _SiteScreenState extends State<SiteScreen> {
       ..setNavigationDelegate(NavigationDelegate(
         onProgress: (p) => setState(() => _progress = p),
         onPageStarted: (_) => setState(() => _failed = false),
-        onPageFinished: (_) {
-          // Remove any admin-panel links from the rendered page.
-          _controller.runJavaScript(_stripAdminLinksJs);
-        },
         onWebResourceError: (error) {
           // Only a failed page counts; a missing font or image does not.
           if (error.isForMainFrame ?? true) setState(() => _failed = true);
         },
         // Two rules:
         // 1. Stay on the EduTrack site (same host + port).
-        // 2. Never open an admin path — it is web-only.
+        // 2. Open only the student and visitor pages (_allowedSections).
         onNavigationRequest: (request) {
           final uri = Uri.tryParse(request.url);
           final sameSite = uri != null && uri.host == _home.host && uri.port == _home.port;
           if (!sameSite) return NavigationDecision.prevent;
-          if (_isBlockedPath(request.url)) return NavigationDecision.prevent;
+          if (!_isAllowedPage(_home, request.url)) return NavigationDecision.prevent;
           return NavigationDecision.navigate;
         },
       ))
