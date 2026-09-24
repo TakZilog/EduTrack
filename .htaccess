@@ -35,6 +35,13 @@ Options -Indexes
     <Files "sw.js">
         Header set Cache-Control "no-cache"
     </Files>
+    # The app download too. Cloudflare caches .apk files by default and kept
+    # handing out an old build for hours after a new one was uploaded. With
+    # this, Cloudflare and browsers ask the server first (a quick "not
+    # modified" when nothing changed), so a new build reaches people at once.
+    <FilesMatch "\.apk$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
 </IfModule>
 
 # ---------------------------------------------------------------- page policy

@@ -506,7 +506,9 @@
       </section>
     </div>
 
-    <a class="app-cta" href="downloads/edutrack.apk" download>
+    <!-- Through api/app-download.php, which adds the build's timestamp to the
+         address so Cloudflare and phones never hand out an old build. -->
+    <a class="app-cta" href="api/app-download.php" download>
       <span class="app-cta-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
       </span>
