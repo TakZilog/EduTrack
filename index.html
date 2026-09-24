@@ -349,6 +349,53 @@
   @media (prefers-reduced-motion: reduce) {
     .floor-row:hover > svg, .enroll-split:hover .way-arrow, .login-bar:hover svg, .login-bar:active { transform: none; }
   }
+
+  /* --------------------------------------------------------- android app
+
+     A quiet row under the two panels: the same site, installable on a phone.
+     One tap downloads the APK straight from this site. */
+  .app-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    margin-top: var(--s5);
+    padding: var(--s4) var(--s5);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-panel);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color .15s var(--ease);
+  }
+  .app-cta-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 48px; height: 48px;
+    border-radius: var(--r-btn);
+    background: var(--blue);
+    color: var(--white);
+  }
+  .app-cta-icon svg { width: 26px; height: 26px; }
+  .app-cta-body { flex: 1; min-width: 0; }
+  .app-cta-title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--blue);
+    line-height: 1.1;
+  }
+  .app-cta-text { display: block; margin-top: 2px; color: var(--text-muted); font-size: var(--fs-sm); text-wrap: pretty; }
+  .app-cta-arrow { flex-shrink: 0; width: 22px; height: 22px; color: var(--blue); transition: transform .15s var(--ease); }
+
+  @media (hover: hover) and (pointer: fine) {
+    .app-cta:hover { background: var(--blue-wash); }
+    .app-cta:hover .app-cta-arrow { transform: translateY(3px); }
+  }
+  .app-cta:active { background: var(--blue-wash); }
+  .app-cta:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .app-cta:hover .app-cta-arrow { transform: none; } }
 </style>
 </head>
 <body>
@@ -452,6 +499,17 @@
         </ul>
       </section>
     </div>
+
+    <a class="app-cta" href="downloads/edutrack.apk" download>
+      <span class="app-cta-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      </span>
+      <span class="app-cta-body">
+        <span class="app-cta-title">Get the Android app</span>
+        <span class="app-cta-text">Install EduTrack on your phone. Android only. On first install, allow "install from unknown sources".</span>
+      </span>
+      <svg class="app-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </a>
   </main>
 
 

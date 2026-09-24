@@ -33,3 +33,7 @@ assets/nodes-new/
 # Per-machine Claude settings. Commands approved in a session are saved here,
 # and one can carry a password.
 .claude/settings.local.json
+
+# The built Android app, placed here to be downloaded from the site. Rebuilt
+# with `flutter build apk --release`; too large and too generated to track.
+downloads/*.apk
