@@ -113,3 +113,7 @@ refers to `N0001`-style ids that no longer exist. It is stale and unused.
 - `tools/reset-ip-allowlist.php` — clears an admin IP restriction that locked
   everyone out
 - `tools/setup-check.php` — diagnoses the environment, read-only
+- `.githooks/pre-commit` — stops a commit that holds a password, key,
+  database dump, log, or a risky call such as `eval` in a web page. The
+  repository is public. Turn it on once per copy with
+  `git config core.hooksPath .githooks`

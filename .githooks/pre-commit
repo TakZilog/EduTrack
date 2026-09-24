@@ -1,0 +1,90 @@
+#!/bin/sh
+# Stops a commit that would publish a secret or open a hole in the system.
+# The repository is public on GitHub, so anyone can read what is committed.
+#
+# Turn it on once in each copy of the repository:
+#     git config core.hooksPath .githooks
+# To commit past a false alarm, after checking it:
+#     git commit --no-verify
+
+problems=""
+note() {
+    problems="$problems
+  - $1"
+}
+
+# 1. Files that must never be committed, whatever is in them.
+files=$(git diff --cached --name-only --diff-filter=ACMR)
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    case "$f" in
+        .githooks/*|.gitattributes|.gitignore) continue ;;
+        api/config.php)
+            note "$f holds the database and email passwords." ;;
+        .env.example|*/.env.example) ;;
+        .env|.env.*|*/.env|*/.env.*)
+            note "$f is an environment file for secrets." ;;
+        sql/schema.sql|sql/migrations/*.sql) ;;
+        *.sql|*.sql.gz|*.dump|*.bak)
+            note "$f is a database dump or backup. It can hold student details and password hashes." ;;
+        *.db|*.sqlite|*.sqlite3|*.rvf)
+            note "$f is a database file." ;;
+        *.pem|*.key|*.p12|*.pfx|*.jks|*.keystore|*.ppk|*id_rsa*|*id_ed25519*)
+            note "$f is a private key or certificate." ;;
+        *key.properties|*google-services.json|*GoogleService-Info.plist|*local.properties)
+            note "$f holds keys or machine paths for the mobile app." ;;
+        .claude/settings.local.json)
+            note "$f is per-machine. Commands you approve are saved in it, passwords included." ;;
+        *.jsonl|*.log)
+            note "$f is a log or a chat transcript. It can hold prompts, passwords or personal details." ;;
+        storage/*)
+            note "$f is server storage, not source." ;;
+    esac
+    # A Cloudflare tunnel credentials file is named after the tunnel id.
+    if printf '%s' "${f##*/}" | grep -qiE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.json$'; then
+        note "$f looks like a Cloudflare tunnel credentials file."
+    fi
+done <<EOF
+$files
+EOF
+
+# Every added line, as "path: line". Only what this commit adds is read.
+added=$(git diff --cached -U0 --no-color --diff-filter=ACMR -- . ':(exclude).githooks' |
+    awk '/^\+\+\+ /{ f = substr($0, 7); next } /^\+/{ print f ": " substr($0, 2) }')
+
+# 2. Secrets typed into the code.
+keys='-----BEGIN ([A-Z]+ )*PRIVATE KEY-----|sk-ant-[A-Za-z0-9_-]{20,}|sk-(proj-)?[A-Za-z0-9]{32,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|TunnelSecret|AccountTag|[a-z][a-z0-9+.-]*://[^/ :@"'\'']+:[^/ @"'\'']+@'
+assigned='(pass(word|wd)?|pwd|secret|api_?key|token)["'\'']?[[:space:]]*(=>|=|:)[[:space:]]*["'\''][^"'\''[:space:]]{6,}["'\'']'
+placeholder='your[-_ ]|example|placeholder|change_?me|xxxx|dummy|<[a-z_-]+>'
+
+found=$( {
+    printf '%s\n' "$added" | grep -E -- "$keys"
+    printf '%s\n' "$added" | grep -iE -- "$assigned" | grep -viE -- "$placeholder"
+} | sort -u)
+if [ -n "$found" ]; then
+    while IFS= read -r line; do
+        note "Secret in ${line%%: *}. Move it to api/config.php and change it if it was ever pushed."
+    done <<EOF
+$found
+EOF
+fi
+
+# 3. Holes in pages the web server runs. tools/ only runs from the command line.
+web=$(printf '%s\n' "$added" | grep -E '^[^:]+\.php: ' | grep -vE '^(tools|vendor|\.claude)/')
+holes=$(printf '%s\n' "$web" | grep -E -- "phpinfo[[:space:]]*\(|var_dump[[:space:]]*\(|(^|[^>:\$A-Za-z_])(eval|shell_exec|system|passthru|proc_open|popen|exec)[[:space:]]*\(|display_errors[\"']?[[:space:]]*,[[:space:]]*[\"']?(1|on|true)")
+if [ -n "$holes" ]; then
+    while IFS= read -r line; do
+        note "Risky call in ${line%%: *}: debug output, eval, a shell command or visible errors. Remove it from web pages."
+    done <<EOF
+$holes
+EOF
+fi
+
+if [ -n "$problems" ]; then
+    echo "Commit stopped. It would publish something that can harm the system:$problems" >&2
+    echo "" >&2
+    echo "Take a file out with: git rm --cached <file>, then add it to .gitignore." >&2
+    echo "If this is a false alarm, check it and commit with --no-verify." >&2
+    exit 1
+fi
+exit 0
