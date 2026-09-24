@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   EduTrack launcher icon, front layer (adaptive icon, Android 8 and later).
-  A red map pin on a white disc, set in the school's blue: the seal's blue
-  ring and white centre, with EduTrack's own "you are here" pin in the seal's
-  red. The blue behind it is ic_launcher_background.
+  "ET" for EduTrack in bold white on the school's blue, with a white and red
+  rule underneath: the two-colour rule that sits under the site's page title,
+  in the school's colours. The blue behind it is ic_launcher_background.
 
-  Drawn in the 108-unit adaptive grid. Everything sits inside the 66-unit safe
-  circle, so no launcher shape (round, squircle, square) cuts into it. The
-  legacy PNGs in mipmap-*/ are the same drawing.
+  E and T are all straight strokes, so they are drawn as bars, sharp at any
+  size. Drawn in the 108-unit adaptive grid; everything sits inside the
+  66-unit safe circle, so no launcher shape cuts into it. The legacy PNGs in
+  the mipmap folders are the same drawing.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- the white disc -->
+    <!-- E: the upright and its three arms -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,27a27,27 0,1 1,0 54a27,27 0,1 1,0 -54z" />
-    <!-- the pin: its head, and the sides running down to the tip -->
+        android:pathData="M33,35h7v30h-7zM33,35h17v7h-17zM33,46.5h14v7h-14zM33,58h17v7h-17z" />
+    <!-- T: the crossbar and the stem -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,35h21v7h-21zM61,35h7v30h-7z" />
+    <!-- the rule: white, then red -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M33,69h21v4h-21z" />
     <path
         android:fillColor="#D3112A"
-        android:pathData="M43.68,54.63A12,12 0,1 1,64.32 54.63L54,72Z" />
-    <!-- the hole in the pin -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,44a4.5,4.5 0,1 1,0 9a4.5,4.5 0,1 1,0 -9z" />
+        android:pathData="M54,69h21v4h-21z" />
 </vector>
