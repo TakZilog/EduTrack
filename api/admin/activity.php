@@ -8,16 +8,9 @@ $input = admin_boot('audit.view');
 
 $page = paging($input, 20);
 
-$where  = [
-    "action IN ('admin.login', 'admin.logout', 'admin.create', 'admin.enable',
-                'admin.disable', 'settings.save', 'access.denied',
-                'room.register', 'room.update', 'room.remove',
-                'route.create', 'route.update', 'route.remove',
-                'walkthrough.add', 'walkthrough.update', 'walkthrough.photo.remove',
-                'map.issue.detected', 'map.issue.resolved', 'user.create',
-                'user.access.change', 'admin.failed_login')"
-];
-            $scope = $where[0];
+// Every row is shown. The log is the record of what staff did, so no action
+// is left out of it.
+$where  = [];
 $params = [];
 
 $who = trim((string) ($input['who'] ?? ''));
@@ -34,9 +27,22 @@ if ($action !== '') {
 
 $search = trim((string) ($input['search'] ?? ''));
 if ($search !== '') {
-    $where[] = '(admin_name LIKE ? OR action LIKE ? OR target_type LIKE ? OR target_id LIKE ? OR detail LIKE ?)';
+    $or   = ['admin_name LIKE ?', 'action LIKE ?', 'target_type LIKE ?', 'target_id LIKE ?', 'detail LIKE ?'];
     $term = '%' . $search . '%';
     array_push($params, $term, $term, $term, $term, $term);
+
+    // The words the panel shows for an action ("Signed in") are not stored,
+    // so the panel also sends the actions whose words match the search.
+    $named = array_values(array_filter(
+        explode(',', (string) ($input['search_actions'] ?? '')),
+        static fn ($a) => preg_match('/^[a-z_.-]{1,60}$/', $a) === 1
+    ));
+    if ($named !== []) {
+        $or[] = 'action IN (' . implode(', ', array_fill(0, count($named), '?')) . ')';
+        array_push($params, ...$named);
+    }
+
+    $where[] = '(' . implode(' OR ', $or) . ')';
 }
 
 $date = trim((string) ($input['date'] ?? ''));
@@ -50,7 +56,7 @@ if ($date === 'today') {
     $where[] = 'created_at >= NOW() - INTERVAL 7 DAY';
 } elseif ($date === '30d') {
     $where[] = 'created_at >= NOW() - INTERVAL 30 DAY';
-} else {
+} elseif ($date === 'custom') {
     if (preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $dateFrom)) {
         $where[] = 'created_at >= ?';
         $params[] = $dateFrom . ' 00:00:00';
@@ -68,6 +74,11 @@ $stmt = $pdo->prepare("SELECT COUNT(*) AS n FROM admin_audit{$clause}");
 $stmt->execute($params);
 $total = (int) $stmt->fetch()['n'];
 
+// An export takes every matching entry, not just the page on screen.
+if (($input['all'] ?? '') === '1') {
+    $page = ['page' => 1, 'perPage' => max(1, $total), 'offset' => 0];
+}
+
 $stmt = $pdo->prepare(
     "SELECT id, admin_name, role, action, target_type, target_id, detail, ip, created_at
        FROM admin_audit{$clause}
@@ -78,8 +89,8 @@ $stmt->execute($params);
 
 json_list($stmt->fetchAll(), $total, $page, [
     // Populates the filter menus without a second request.
-    'people'  => $pdo->query("SELECT DISTINCT admin_name FROM admin_audit WHERE {$scope} ORDER BY admin_name")
+    'people'  => $pdo->query('SELECT DISTINCT admin_name FROM admin_audit ORDER BY admin_name')
                      ->fetchAll(PDO::FETCH_COLUMN),
-    'actions' => $pdo->query("SELECT DISTINCT action FROM admin_audit WHERE {$scope} ORDER BY action")
+    'actions' => $pdo->query('SELECT DISTINCT action FROM admin_audit ORDER BY action')
                      ->fetchAll(PDO::FETCH_COLUMN),
 ]);

@@ -575,6 +575,7 @@ input, select, textarea { max-width: 100%; }
 }
 .activity-filters > label { display: block; min-width: 150px; flex: 0 0 150px; }
 .activity-filters > .activity-search { min-width: 240px; flex: 1 1 auto; }
+.activity-filters label { margin: 0; }
 .activity-filters input,
 .activity-filters select { min-height: 46px; margin: 0; border-color: var(--border); border-radius: 7px; font-size: .95rem; }
 .activity-filters input:focus,
@@ -651,16 +652,31 @@ input, select, textarea { max-width: 100%; }
   .activity-page .row-end { flex-direction: column; align-items: flex-end; gap: 5px; }
   .activity-page .panel-head { padding: 18px 16px; }
   .activity-page .facts > div { grid-template-columns: 1fr; gap: 3px; }
+  .activity-page .desk { grid-template-columns: 1fr; }
+  /* Below the list, an empty drawer is only a long scroll to nothing. */
+  .activity-page .drawer:has(.drawer-hint) { display: none; }
 }
+
+.print-log { display: none; }
 
 @media print {
   .activity-page .rail,
   .activity-page .activity-filters,
-  .activity-page .export-actions,
+  .activity-page .export-menu,
+  .activity-page .pager,
   .activity-page .drawer { display: none !important; }
   .activity-page .work-head,
   .activity-page .work-body { padding: 16px; }
   .activity-page .panel { box-shadow: none; }
+
+  /* Export PDF prints its own table of every matching entry instead. */
+  .print-export .work-body { display: none !important; }
+  .print-export .print-log { display: block; padding: 0 16px; }
+  .print-log p { margin: 0 0 12px; color: var(--text-muted); font-size: .85rem; }
+  .print-log table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  .print-log th,
+  .print-log td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .print-log tr { break-inside: avoid; }
 }
 .walk-step .n { color: var(--text-muted); font-size: var(--fs-sm); }
 .walk-step .t { margin: 2px 0; font-weight: 600; }

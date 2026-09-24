@@ -41,10 +41,17 @@ $admin = $stmt->fetch();
 if (!$admin || !verify_password($password, $admin['password_hash'], 'admins', (int) $admin['id'])) {
     rate_limit_record($username, 'admin_login', false);
     rate_limit_record($ip, 'admin_login_ip', false);
+    // The typed name is kept only when it is a real account: a name that
+    // matches nothing is often a password typed into the wrong box.
+    audit_log('admin.failed_login', 'admin', $admin ? $admin['username'] : null, $admin
+        ? "Wrong password for {$admin['username']}."
+        : 'Tried a username that does not exist.');
     json_fail(401, 'That username or password is not right.');
 }
 
 if (!$admin['active']) {
+    audit_log('admin.failed_login', 'admin', $admin['username'],
+        "Tried to sign in to {$admin['username']}, which is turned off.");
     json_fail(403, 'This account has been turned off. Ask a full-access admin to turn it back on.');
 }
 
