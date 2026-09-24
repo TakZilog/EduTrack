@@ -247,15 +247,16 @@
     grid-column: 1 / -1;
     grid-row: 2;
     height: 8px;
-    border-radius: 999px;
+    border-radius: var(--r-chip);   /* DESIGN.md: one 6px radius, no pills */
     background: var(--blue-wash);
     overflow: hidden;
   }
+  /* Set, not animated: renderProgress() rebuilds the bar on every tap, so a
+     width transition here never ran (and would animate a layout property). */
   .progress-fill {
     display: block;
     height: 100%;
     background: var(--blue);
-    transition: width .3s var(--ease);
   }
   .progress-reset {
     min-height: 36px;
