@@ -1,6 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_app/screens/site_screen.dart';
+import 'package:mobile_app/screens/unsupported_screen.dart';
+
+/// The WebView plugin has an implementation for Android and iOS only. Chrome
+/// and Windows, which Android Studio also offers as run targets, get a short
+/// note instead of a red error screen.
+bool get webViewSupported =>
+    !kIsWeb &&
+    (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +44,7 @@ class EduTrackApp extends StatelessWidget {
         scaffoldBackgroundColor: page,
         useMaterial3: true,
       ),
-      home: const SiteScreen(),
+      home: webViewSupported ? const SiteScreen() : const UnsupportedScreen(),
     );
   }
 }
