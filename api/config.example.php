@@ -1,5 +1,7 @@
 <?php
-// Copy this file to config.php (gitignored) and fill in real values.
+// Copy this file OUTSIDE the web folder and fill in real values: under XAMPP
+// to C:\xampp\edutrack-private\config.php, where Apache cannot serve it
+// (api/db.php, config_path()). api/config.php (gitignored) also works.
 // Gmail: use an App Password, not your normal password.
 // https://myaccount.google.com/apppasswords (requires 2-Step Verification on).
 

@@ -75,9 +75,18 @@ foreach (['pdo_mysql', 'mbstring', 'openssl', 'json'] as $ext) {
 
 section('files');
 
-is_file("{$root}/api/config.php")
-    ? report('ok', 'api/config.php present')
-    : report('fail', 'api/config.php missing', 'Copy api/config.example.php to api/config.php and fill in the values. It is gitignored on purpose.');
+require_once "{$root}/api/db.php";
+$configPath = config_path();
+$privateConfig = dirname($root, 2) . DIRECTORY_SEPARATOR . 'edutrack-private' . DIRECTORY_SEPARATOR . 'config.php';
+
+if ($configPath === null) {
+    report('fail', 'config file missing', "Copy api/config.example.php to {$privateConfig} and fill in the values.");
+} elseif (str_starts_with(realpath($configPath), realpath($root))) {
+    report('warn', 'config file is inside the web folder: ' . $configPath,
+        "Move it to {$privateConfig}, outside the web folder, where Apache cannot serve it. .htaccess refuses it over HTTP meanwhile.");
+} else {
+    report('ok', 'config file outside the web folder: ' . $configPath);
+}
 
 is_file("{$root}/vendor/autoload.php")
     ? report('ok', 'composer dependencies installed')
@@ -93,12 +102,10 @@ section('database');
 
 $pdo = null;
 
-if (!is_file("{$root}/api/config.php")) {
-    report('fail', 'skipped, no config.php');
+if ($configPath === null) {
+    report('fail', 'skipped, no config file');
 } else {
-    require_once "{$root}/api/db.php";
-
-    $config = require "{$root}/api/config.php";
+    $config = require $configPath;
     report('ok', sprintf(
         'target %s:%s/%s as %s',
         db_setting($config, 'db_host', '127.0.0.1'),

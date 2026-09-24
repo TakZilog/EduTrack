@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/db.php';   // config_path(): where the mail password is kept
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -8,7 +9,11 @@ use PHPMailer\PHPMailer\Exception;
  * Sends the OTP email. Returns true on success, or throws PHPMailer\Exception on failure.
  */
 function send_otp_email(string $toEmail, string $code): bool {
-    $config = require __DIR__ . '/config.php';
+    $configPath = config_path();
+    if ($configPath === null) {
+        throw new Exception('The config file with the mail settings is missing.');
+    }
+    $config = require $configPath;
 
     $mail = new PHPMailer(true);
     $mail->isSMTP();

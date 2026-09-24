@@ -34,6 +34,30 @@ function db_setting(array $config, string $key, string $default = ''): string
     return (string) ($config[$key] ?? $default);
 }
 
+/**
+ * Where the private settings (database and mail passwords) are kept.
+ *
+ * Outside the web folder first, so Apache cannot serve the file whatever its
+ * configuration: under XAMPP that is C:\xampp\edutrack-private\config.php,
+ * beside htdocs rather than in it. EDUTRACK_CONFIG names the file on a server
+ * laid out differently. api/config.php, the old place, still works; the
+ * .htaccess rule that refuses it over HTTP stays as a second guard.
+ */
+function config_path(): ?string
+{
+    $candidates = [
+        (string) getenv('EDUTRACK_CONFIG'),
+        dirname(__DIR__, 3) . '/edutrack-private/config.php',
+        __DIR__ . '/config.php',
+    ];
+    foreach ($candidates as $path) {
+        if ($path !== '' && is_file($path)) {
+            return $path;
+        }
+    }
+    return null;
+}
+
 function get_db(): PDO
 {
     static $pdo = null;
@@ -41,10 +65,11 @@ function get_db(): PDO
         return $pdo;
     }
 
-    $configPath = __DIR__ . '/config.php';
-    if (!is_file($configPath)) {
+    $configPath = config_path();
+    if ($configPath === null) {
         throw new DatabaseUnavailableException(
-            'api/config.php is missing. Copy api/config.example.php to api/config.php and fill in the values.'
+            'The config file is missing. Copy api/config.example.php to '
+            . dirname(__DIR__, 3) . '/edutrack-private/config.php and fill in the values.'
         );
     }
 
@@ -173,7 +198,7 @@ function db_failure_hint(PDOException $e, string $host, string $port, string $na
         // Bad credentials.
         $driverCode === 1045 || str_contains($message, 'Access denied') =>
             "MySQL refused the user '{$user}'. "
-            . 'Check db_user and db_pass in api/config.php. XAMPP defaults to root with an empty password.',
+            . 'Check db_user and db_pass in ' . (config_path() ?? 'the config file') . '. XAMPP defaults to root with an empty password.',
 
         default => 'Could not connect to MySQL. Run "php tools/setup-check.php" for a full diagnosis.',
     };
