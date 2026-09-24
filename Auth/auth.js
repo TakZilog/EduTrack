@@ -66,6 +66,23 @@ async function apiPost(endpoint, body) {
   return { status: res.status, data };
 }
 
+/* The Student No. printed on the study load, like C24-01-9477-MAN121.
+   Same rule as api/student-no.php. */
+const STUDENT_NO_RE = /^[A-Z]\d{2}-\d{2}-\d{4}-[A-Z]{3}\d{3}$/;
+const STUDENT_NO_MESSAGE = 'Use the Student No. on your study load, like C24-01-9477-MAN121.';
+
+function formatStudentNo(raw) {
+  const c = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+  return [c.slice(0, 3), c.slice(3, 5), c.slice(5, 9), c.slice(9)].filter(Boolean).join('-');
+}
+
+/* Capitals and dashes appear as the student types, so the format shows
+   itself instead of being explained. */
+function attachStudentNoFormat(input) {
+  if (!input) return;
+  input.addEventListener('input', () => { input.value = formatStudentNo(input.value); });
+}
+
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

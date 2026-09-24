@@ -12,11 +12,11 @@ document.getElementById('detailsForm').addEventListener('submit', function (e) {
   e.preventDefault();
   clearErrors();
 
-  const studentNo = document.getElementById('studentNo').value.trim();
+  const studentNo = formatStudentNo(document.getElementById('studentNo').value);
   const studyLoadNo = document.getElementById('studyLoadNo').value.trim();
 
   let valid = true;
-  if (!/^[A-Za-z0-9-]{4,20}$/.test(studentNo)) { showError('studentNo'); valid = false; }
+  if (!STUDENT_NO_RE.test(studentNo)) { showError('studentNo'); valid = false; }
   if (!/^[A-Za-z0-9-]{3,30}$/.test(studyLoadNo)) { showError('studyLoadNo'); valid = false; }
   if (!valid) return;
 
@@ -40,3 +40,5 @@ function setSubmitting(state) {
   btn.disabled = state;
   btn.textContent = state ? 'Saving…' : 'Open the room tour';
 }
+
+attachStudentNoFormat(document.getElementById('studentNo'));

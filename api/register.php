@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/db.php';
+require __DIR__ . '/student-no.php';
 require __DIR__ . '/mail.php';
 require __DIR__ . '/session.php';
 require __DIR__ . '/rate-limit.php';
@@ -36,10 +37,10 @@ if (strlen($password) < 8) {
 
 // Enrolment details. Formats vary by intake, so this accepts letters, digits
 // and dashes; checking them against the registrar's records is left to staff.
-$studentNo   = strtoupper(trim((string) ($input['studentNo'] ?? '')));
+$studentNo   = normalize_student_no((string) ($input['studentNo'] ?? ''));
 $studyLoadNo = strtoupper(trim((string) ($input['studyLoadNo'] ?? '')));
-if (!preg_match('/^[A-Z0-9-]{4,20}$/', $studentNo)) {
-    json_fail(400, 'Enter your student ID number exactly as it appears on your school ID.');
+if (!is_valid_student_no($studentNo)) {
+    json_fail(400, STUDENT_NO_MESSAGE);
 }
 if (!preg_match('/^[A-Z0-9-]{3,30}$/', $studyLoadNo)) {
     json_fail(400, 'Enter the number printed on your study load.');

@@ -16,6 +16,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/db.php';
+require __DIR__ . '/student-no.php';
 require __DIR__ . '/session.php';
 
 app_session_start();
@@ -46,15 +47,7 @@ if (!$user || $user['deactivated_at'] !== null) {
 json_ok([
     'signedIn' => true,
     'fullName' => $user['full_name'],
-    'studentId' => mask_student_id((string) $user['student_no']),
+    'studentId' => mask_student_no((string) $user['student_no']),
     'program' => 'BS Information Technology',
 ]);
 
-function mask_student_id(string $studentId): string
-{
-    $length = strlen($studentId);
-    if ($length <= 4) {
-        return str_repeat('•', $length);
-    }
-    return str_repeat('•', $length - 4) . substr($studentId, -4);
-}

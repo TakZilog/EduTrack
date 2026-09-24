@@ -46,6 +46,12 @@ function clearAlert(id) {
 document.getElementById('startForm').addEventListener('submit', async event => {
   event.preventDefault();
   clearAlert('startAlert');
+  const studentId = formatStudentNo(document.getElementById('studentId').value);
+  if (!STUDENT_NO_RE.test(studentId)) {
+    showAlert('startAlert', STUDENT_NO_MESSAGE);
+    document.getElementById('studentId').focus();
+    return;
+  }
   const button = document.getElementById('verifyStudentButton');
   button.disabled = true;
   button.textContent = 'Verifying…';
@@ -53,7 +59,7 @@ document.getElementById('startForm').addEventListener('submit', async event => {
   try {
     const { data } = await apiPost('student-verification.php', {
       action: 'lookup',
-      studentId: document.getElementById('studentId').value.trim(),
+      studentId,
       schoolYear: document.getElementById('schoolYear').value,
       semester: document.getElementById('semester').value
     });
@@ -104,3 +110,5 @@ document.getElementById('tryAgain').addEventListener('click', () => {
 document.getElementById('continueToEduTrack').addEventListener('click', () => {
   window.location.href = 'student-home.html';
 });
+
+attachStudentNoFormat(document.getElementById('studentId'));
