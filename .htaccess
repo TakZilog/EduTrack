@@ -14,7 +14,7 @@ Options -Indexes
 </If>
 <IfModule mod_headers.c>
     <If "-n req('CF-Connecting-IP') && req('X-Forwarded-Proto') == 'https'">
-        Header always set Strict-Transport-Security "max-age=31536000"
+        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
     </If>
     # Names the exact PHP version, which only helps someone pick an exploit.
     Header always unset X-Powered-By
