@@ -257,10 +257,6 @@
     [newPassword, newPassword2].forEach(i => { i.type = e.target.checked ? 'text' : 'password'; });
   });
 
-  document.getElementById('createUserTop').addEventListener('click', () => {
-    document.getElementById('createUserPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    document.getElementById('newName').focus({ preventScroll: true });
-  });
 
   document.getElementById('addForm').addEventListener('submit', async event => {
     event.preventDefault();
@@ -281,7 +277,7 @@
       password: newPassword.value
     });
     addBtn.disabled = false;
-    addBtn.textContent = 'Add this person';
+    addBtn.textContent = 'Add this staff';
     if (!data.ok) { error.textContent = data.error; error.classList.add('on'); return; }
 
     toast(data.message);
