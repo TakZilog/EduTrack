@@ -65,6 +65,12 @@ try {
 // itself; removing it frees the space straight away.
 @unlink(THUMBS_DIR . '/' . basename($nodeId) . '.webp');
 
+// The picture kept its file name, so only the map's timestamp tells the
+// walkthrough its photos moved on. Touch it to bump the cache version the page
+// appends to every image URL; browsers then fetch the new picture instead of a
+// cached old one. (Adding or re-shooting a room already rewrites the map.)
+@touch(GRAPH_PATH);
+
 audit_log('photo.replace', 'photo', $nodeId, 'Replaced the picture at ' . $nodeId . '. The old picture was deleted.');
 
 [$width, $height] = getimagesize($target);

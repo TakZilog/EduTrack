@@ -37,8 +37,37 @@ function readStoredQuality() {
 function saveQuality(q) {
   try { localStorage.setItem(QUALITY_KEY, q); } catch { /* private mode: this visit only */ }
 }
+// Set from the X-Map-Version header on the tour.php response: the map file's
+// timestamp. Appended to every image URL so a replaced photo gets a fresh URL
+// and node-image.php can otherwise cache photos for a year.
+let mapVersion = '';
+
 function imageUrl(file) {
-  return IMAGE_BASE + file + (quality === 'low' ? '&q=low' : '');
+  let url = IMAGE_BASE + file;
+  if (quality === 'low') url += '&q=low';
+  if (mapVersion) url += '&v=' + encodeURIComponent(mapVersion);
+  return url;
+}
+
+// Quietly pull the next and previous photos while this one is on screen, so
+// stepping the walk is instant instead of a wait on every tap. Low priority
+// (rel=prefetch), so it never competes with the photo being viewed.
+const prefetched = new Set();
+function prefetchPhoto(file) {
+  const url = imageUrl(file);
+  if (prefetched.has(url)) return;
+  prefetched.add(url);
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.href = url;
+  document.head.appendChild(link);
+}
+function prefetchAround(index) {
+  for (const i of [index + 1, index - 1]) {
+    if (i < 0 || i >= path.length) continue;
+    const node = graph.nodes.find(n => n.node_id === path[i]);
+    if (node) prefetchPhoto(node.image_file);
+  }
 }
 
 const params = new URLSearchParams(window.location.search);
@@ -82,6 +111,7 @@ async function init() {
     // ?room= lets a guest walk to an enrollment room; students get the full map.
     const res = await fetch(GRAPH_URL + '?room=' + encodeURIComponent(targetRoomName), { credentials: 'same-origin' });
     graph = await res.json();
+    mapVersion = res.headers.get('X-Map-Version') || '';
     if (res.status === 401) {
       // No enrolment numbers yet: add them, then come straight back to this room.
       window.location.href = graph.code === 'details_missing'
@@ -194,6 +224,8 @@ function showStep(index) {
   } catch (err) {
     console.error('Failed to load panorama viewer:', err);
   }
+
+  prefetchAround(index);
 }
 
 function scheduleArrivedBannerHide(arrivedBanner) {

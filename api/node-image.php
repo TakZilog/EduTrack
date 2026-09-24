@@ -44,15 +44,39 @@ if (!is_file($path)) { http_response_code(404); exit; }
 // phone signal that is the difference between a room that loads and one that
 // stalls. If the smaller copy cannot be made (GD off, an odd source), the full
 // photo is served instead, so the walk never breaks.
+// A versioned URL (?v=map timestamp) means this exact photo can never change
+// under this URL: a replaced photo bumps the map and so gets a new URL. The
+// browser may then keep it for a year and the walk costs no network on the way
+// back. Kept private, so only the visitor's own browser caches it and never a
+// shared proxy that would hand it out without the tour gate.
+$immutable = ($_GET["v"] ?? "") !== "";
+
 if (($_GET["q"] ?? "") === "low") {
     $low = low_res_panorama($path, $f);
     if ($low !== null) {
-        send_revalidated_file($low, "image/webp");
+        serve_photo($low, "image/webp", $immutable);
     }
 }
 
 $types = ["webp" => "image/webp", "jpg" => "image/jpeg", "jpeg" => "image/jpeg", "png" => "image/png"];
-send_revalidated_file($path, $types[strtolower(pathinfo($f, PATHINFO_EXTENSION))]);
+serve_photo($path, $types[strtolower(pathinfo($f, PATHINFO_EXTENSION))], $immutable);
+
+/**
+ * Sends one photo. With a versioned URL the copy is immutable and cached for a
+ * year; without one it falls back to the revalidated response, which asks the
+ * server whether the file changed on every view.
+ */
+function serve_photo(string $path, string $type, bool $immutable): never
+{
+    if ($immutable) {
+        header("Cache-Control: private, max-age=31536000, immutable");
+        header("Content-Type: {$type}");
+        header("Content-Length: " . filesize($path));
+        readfile($path);
+        exit;
+    }
+    send_revalidated_file($path, $type);
+}
 
 /**
  * A cached half-width, lower-quality WebP copy of one panorama for the

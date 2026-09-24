@@ -10,6 +10,11 @@ require __DIR__ . "/tour-gate.php";
 
 $room = isset($_GET["room"]) ? (string) $_GET["room"] : null;
 
+// A version for the photos: the map file's timestamp. The walkthrough page
+// appends it to every image URL, so a replaced photo (which keeps its file
+// name) gets a fresh URL and the browser can otherwise cache photos for good.
+header("X-Map-Version: " . (int) @filemtime(TOUR_GRAPH_PATH));
+
 if ($room !== null && tour_access_refusal() !== null) {
     $route = enrollment_route($room);
     if ($route !== null) {
