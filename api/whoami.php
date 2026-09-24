@@ -47,7 +47,7 @@ if (!$user || $user['deactivated_at'] !== null) {
 json_ok([
     'signedIn' => true,
     'fullName' => $user['full_name'],
-    'studentId' => mask_student_no((string) $user['student_no']),
+    'studentId' => mask_student_id((string) $user['student_no']),
     'program' => 'BS Information Technology',
 ]);
 

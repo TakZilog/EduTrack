@@ -35,15 +35,16 @@ if (strlen($password) < 8) {
     json_fail(400, 'Passwords need at least 8 characters.');
 }
 
-// Enrolment details. Formats vary by intake, so this accepts letters, digits
-// and dashes; checking them against the registrar's records is left to staff.
-$studentNo   = normalize_student_no((string) ($input['studentNo'] ?? ''));
-$studyLoadNo = strtoupper(trim((string) ($input['studyLoadNo'] ?? '')));
-if (!is_valid_student_no($studentNo)) {
-    json_fail(400, STUDENT_NO_MESSAGE);
+// Enrolment details: the Student ID from the school ID card and the number
+// on the study load (api/student-no.php). Checking them against the
+// registrar's records is left to staff.
+$studentNo   = normalize_student_id((string) ($input['studentNo'] ?? ''));
+$studyLoadNo = normalize_study_load_no((string) ($input['studyLoadNo'] ?? ''));
+if (!is_valid_student_id($studentNo)) {
+    json_fail(400, STUDENT_ID_MESSAGE);
 }
-if (!preg_match('/^[A-Z0-9-]{3,30}$/', $studyLoadNo)) {
-    json_fail(400, 'Enter the number printed on your study load.');
+if (!is_valid_study_load_no($studyLoadNo)) {
+    json_fail(400, STUDY_LOAD_MESSAGE);
 }
 
 // Registration is throttled per address so one machine cannot mass-create
@@ -66,9 +67,9 @@ try {
     $pdo->prepare(
         'DELETE FROM users
           WHERE email_verified = 0
-            AND (email = ? OR student_no = ?)
+            AND (email = ? OR student_no = ? OR study_load_no = ?)
             AND created_at < NOW() - INTERVAL 1 HOUR'
-    )->execute([$email, $studentNo]);
+    )->execute([$email, $studentNo, $studyLoadNo]);
 
     // Only the email is checked for collisions. Two students sharing a name is
     // normal and must not block the second one from registering.
@@ -85,6 +86,14 @@ try {
     if ($stmt->fetch()) {
         $pdo->rollBack();
         json_fail(400, 'That student ID number already has an account. Log in instead.');
+    }
+
+    // A study load belongs to one student, so it opens one account too.
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE study_load_no = ?');
+    $stmt->execute([$studyLoadNo]);
+    if ($stmt->fetch()) {
+        $pdo->rollBack();
+        json_fail(400, 'That study load number already has an account. Log in instead.');
     }
 
     $passwordHash = hash_password($password);

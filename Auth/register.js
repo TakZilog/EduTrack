@@ -7,15 +7,15 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
 
   const fullName = document.getElementById('fullName').value.trim().replace(/\s+/g, ' ');
   const email = document.getElementById('email').value.trim();
-  const studentNo = formatStudentNo(document.getElementById('studentNo').value);
-  const studyLoadNo = document.getElementById('studyLoadNo').value.trim();
+  const studentNo = formatStudentId(document.getElementById('studentNo').value);
+  const studyLoadNo = formatStudyLoadNo(document.getElementById('studyLoadNo').value);
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
 
   let valid = true;
   if (fullName.length < 2) { showError('fullName'); valid = false; }
-  if (!STUDENT_NO_RE.test(studentNo)) { showError('studentNo'); valid = false; }
-  if (!/^[A-Za-z0-9-]{3,30}$/.test(studyLoadNo)) { showError('studyLoadNo'); valid = false; }
+  if (!STUDENT_ID_RE.test(studentNo)) { showError('studentNo'); valid = false; }
+  if (!STUDY_LOAD_RE.test(studyLoadNo)) { showError('studyLoadNo'); valid = false; }
   if (!isValidEmail(email)) { showError('email'); valid = false; }
   if (password.length < 8) { showError('password'); valid = false; }
   if (password !== confirmPassword) { showError('confirmPassword'); valid = false; }
@@ -46,4 +46,4 @@ function setSubmitting(state) {
   btn.textContent = state ? 'Creating account…' : 'Create account';
 }
 
-attachStudentNoFormat(document.getElementById('studentNo'));
+attachStudyLoadFormat(document.getElementById('studyLoadNo'));

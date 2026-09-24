@@ -4,7 +4,7 @@
  *
  * For accounts created before migration 006, which have no student number or
  * study load number and so cannot open the full room tour. Same formats and
- * the same one-account-per-student-number rule as api/register.php. Only
+ * the same one-account-per-number rules as api/register.php. Only
  * fills empty fields: an account that already has its numbers is refused, so
  * this cannot be used to swap a student number onto someone else's account.
  */
@@ -33,14 +33,14 @@ rate_limit_action('user:' . (int) $userId, 'enrolment_details', 10, 15,
     'Too many attempts. Wait a few minutes and try again.');
 
 $input       = json_input();
-$studentNo   = normalize_student_no((string) ($input['studentNo'] ?? ''));
-$studyLoadNo = strtoupper(trim((string) ($input['studyLoadNo'] ?? '')));
+$studentNo   = normalize_student_id((string) ($input['studentNo'] ?? ''));
+$studyLoadNo = normalize_study_load_no((string) ($input['studyLoadNo'] ?? ''));
 
-if (!is_valid_student_no($studentNo)) {
-    json_fail(400, STUDENT_NO_MESSAGE);
+if (!is_valid_student_id($studentNo)) {
+    json_fail(400, STUDENT_ID_MESSAGE);
 }
-if (!preg_match('/^[A-Z0-9-]{3,30}$/', $studyLoadNo)) {
-    json_fail(400, 'Enter the number printed on your study load.');
+if (!is_valid_study_load_no($studyLoadNo)) {
+    json_fail(400, STUDY_LOAD_MESSAGE);
 }
 
 $pdo = get_db();
@@ -60,6 +60,12 @@ $stmt = $pdo->prepare('SELECT id FROM users WHERE student_no = ? AND id <> ?');
 $stmt->execute([$studentNo, $userId]);
 if ($stmt->fetch()) {
     json_fail(400, 'That student ID number already has an account. Ask the campus office if this is a mistake.');
+}
+
+$stmt = $pdo->prepare('SELECT id FROM users WHERE study_load_no = ? AND id <> ?');
+$stmt->execute([$studyLoadNo, $userId]);
+if ($stmt->fetch()) {
+    json_fail(400, 'That study load number already has an account. Ask the campus office if this is a mistake.');
 }
 
 try {

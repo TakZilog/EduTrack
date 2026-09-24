@@ -66,21 +66,29 @@ async function apiPost(endpoint, body) {
   return { status: res.status, data };
 }
 
-/* The Student No. printed on the study load, like C24-01-9477-MAN121.
-   Same rule as api/student-no.php. */
-const STUDENT_NO_RE = /^[A-Z]\d{2}-\d{2}-\d{4}-[A-Z]{3}\d{3}$/;
-const STUDENT_NO_MESSAGE = 'Use the Student No. on your study load, like C24-01-9477-MAN121.';
+/* The two numbers a student signs up with. Same rules as api/student-no.php.
+     Student ID number   on the school ID card, 11 digits:  24001177500
+     Study load number   printed on the study load:         C24-01-9477-MAN121 */
+const STUDENT_ID_RE = /^\d{11}$/;
+const STUDENT_ID_MESSAGE = 'Use the 11-digit number on your school ID, like 24001177500.';
+const STUDY_LOAD_RE = /^[A-Z]\d{2}-\d{2}-\d{4}-[A-Z]{3}\d{3}$/;
 
-function formatStudentNo(raw) {
+/* Spaces and dashes out. Letters stay, so a study load number typed into the
+   Student ID box fails instead of being read as its digits. */
+function formatStudentId(raw) {
+  return raw.replace(/[\s-]/g, '');
+}
+
+function formatStudyLoadNo(raw) {
   const c = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
   return [c.slice(0, 3), c.slice(3, 5), c.slice(5, 9), c.slice(9)].filter(Boolean).join('-');
 }
 
 /* Capitals and dashes appear as the student types, so the format shows
    itself instead of being explained. */
-function attachStudentNoFormat(input) {
+function attachStudyLoadFormat(input) {
   if (!input) return;
-  input.addEventListener('input', () => { input.value = formatStudentNo(input.value); });
+  input.addEventListener('input', () => { input.value = formatStudyLoadNo(input.value); });
 }
 
 function isValidEmail(email) {

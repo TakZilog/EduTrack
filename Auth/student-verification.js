@@ -46,9 +46,9 @@ function clearAlert(id) {
 document.getElementById('startForm').addEventListener('submit', async event => {
   event.preventDefault();
   clearAlert('startAlert');
-  const studentId = formatStudentNo(document.getElementById('studentId').value);
-  if (!STUDENT_NO_RE.test(studentId)) {
-    showAlert('startAlert', STUDENT_NO_MESSAGE);
+  const studentId = formatStudentId(document.getElementById('studentId').value);
+  if (!STUDENT_ID_RE.test(studentId)) {
+    showAlert('startAlert', STUDENT_ID_MESSAGE);
     document.getElementById('studentId').focus();
     return;
   }
@@ -111,4 +111,3 @@ document.getElementById('continueToEduTrack').addEventListener('click', () => {
   window.location.href = 'student-home.html';
 });
 
-attachStudentNoFormat(document.getElementById('studentId'));

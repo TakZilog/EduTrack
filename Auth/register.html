@@ -49,12 +49,12 @@
         <div class="field-error" id="err-email">Enter a valid email address.</div>
 
         <label for="studentNo">Student ID number</label>
-        <input type="text" id="studentNo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="18" placeholder="e.g. C24-01-9477-MAN121">
-        <div class="field-error" id="err-studentNo">Use the Student No. on your study load, like C24-01-9477-MAN121.</div>
+        <input type="text" id="studentNo" autocomplete="off" inputmode="numeric" spellcheck="false" maxlength="13" placeholder="On your school ID, e.g. 24001177500">
+        <div class="field-error" id="err-studentNo">Use the 11-digit number on your school ID, like 24001177500.</div>
 
         <label for="studyLoadNo">Study load number</label>
-        <input type="text" id="studyLoadNo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" placeholder="As printed on your study load">
-        <div class="field-error" id="err-studyLoadNo">Enter your study load number.</div>
+        <input type="text" id="studyLoadNo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="18" placeholder="e.g. C24-01-9477-MAN121">
+        <div class="field-error" id="err-studyLoadNo">Use the number on your study load, like C24-01-9477-MAN121.</div>
 
         <label for="password">Password</label>
         <input type="password" id="password" autocomplete="new-password" placeholder="Create a password" aria-describedby="hint-password">
@@ -74,8 +74,8 @@
   </main>
 
 <script src="../assets/js/offline.js?v=4"></script>
-<script src="auth.js?v=2"></script>
+<script src="auth.js?v=3"></script>
 
-<script src="register.js?v=2"></script>
+<script src="register.js?v=3"></script>
 </body>
 </html>

@@ -25,7 +25,7 @@ if ($userId === 0) {
 
 $input = json_input();
 $action = (string) ($input['action'] ?? '');
-$studentNo = normalize_student_no((string) ($input['studentId'] ?? ''));
+$studentNo = normalize_student_id((string) ($input['studentId'] ?? ''));
 $schoolYear = trim((string) ($input['schoolYear'] ?? ''));
 $semester = trim((string) ($input['semester'] ?? ''));
 
@@ -38,8 +38,8 @@ $ip = client_ip();
 rate_limit_check($ip, 'student_verify', 8, 15, 'Too many verification attempts. Wait %d minutes and try again.');
 
 if ($action === 'lookup') {
-    if ($studentIdEnabled && !is_valid_student_no($studentNo)) {
-        json_fail(400, STUDENT_NO_MESSAGE);
+    if ($studentIdEnabled && !is_valid_student_id($studentNo)) {
+        json_fail(400, STUDENT_ID_MESSAGE);
     }
     if (($verifyCurrentSemesterEnabled && $semester !== '1') || ($verifyCurrentSchoolYearEnabled && $schoolYear !== '2026-2027')) {
         rate_limit_record($ip, 'student_verify', false);
@@ -71,7 +71,7 @@ if ($action === 'lookup') {
 
     json_ok([
         'studentName' => $user['full_name'],
-        'maskedStudentId' => mask_student_no($user['student_no']),
+        'maskedStudentId' => mask_student_id($user['student_no']),
         'program' => 'BS Information Technology',
     ]);
 }
@@ -110,7 +110,7 @@ if ($action === 'verify-study-load') {
 
     json_ok([
         'studentName' => $user['full_name'],
-        'maskedStudentId' => mask_student_no($user['student_no']),
+        'maskedStudentId' => mask_student_id($user['student_no']),
         'program' => 'BS Information Technology',
     ]);
 }
