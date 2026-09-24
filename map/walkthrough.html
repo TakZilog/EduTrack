@@ -383,20 +383,31 @@
       display: inline-flex;
       align-items: center;
       gap: var(--s2);
-      min-height: 40px;
-      padding: 0 var(--s3);
+      min-height: 44px;
+      padding: 0 var(--s2) 0 var(--s3);
       border: 1px solid var(--hairline);
       border-radius: var(--r-chip);
       background: transparent;
-      color: var(--on-bar-dim);
+      color: var(--on-bar);
       font-family: var(--font);
-      font-size: var(--fs-sm);
-      font-weight: 600;
+      text-align: left;
       cursor: pointer;
-      transition: color .15s var(--ease), border-color .15s var(--ease);
+      transition: border-color .15s var(--ease);
     }
-    #photosBtn > svg { width: 18px; height: 18px; flex-shrink: 0; }
     #photosBtn:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+
+    /* Signal bars say "this is about your connection" before any word is
+       read: two lit for Low, all four for Fast. */
+    #photosBtn .signal { width: 19px; height: 16px; flex-shrink: 0; }
+    #photosBtn .signal rect { fill: rgba(255, 255, 255, .28); transition: fill .2s var(--ease); }
+    #photosBtn[data-level="low"] .signal rect:nth-child(-n+2),
+    #photosBtn[data-level="fast"] .signal rect { fill: var(--on-bar); }
+
+    /* The setting and its value, like a label over a field: "Internet / Low". */
+    #photosBtn .photos-text { display: grid; line-height: 1.05; }
+    #photosBtn .photos-cap { color: var(--on-bar-dim); font-size: var(--fs-sm); font-weight: 500; }
+    #photosBtnText { font-family: var(--font-display); font-size: var(--fs-body); font-weight: 700; }
+    #photosBtn .chev { width: 14px; height: 14px; flex-shrink: 0; color: var(--on-bar-dim); }
     /* A small tick on the button once every photo is on the phone. */
     #photosBtn .saved-mark {
       position: absolute;
@@ -413,15 +424,12 @@
     #photosBtn.all-saved .saved-mark { display: grid; }
 
     @media (hover: hover) and (pointer: fine) {
-      #photosBtn:hover { color: var(--on-bar); border-color: var(--on-bar); }
+      #photosBtn:hover { border-color: var(--on-bar); }
     }
-    /* Phones: the icon only, matching the back link and crest. */
+    /* Phones keep the words: an unlabelled box said nothing about data. The
+       bar's gaps tighten so the place name keeps its room. */
     @media (max-width: 599px) {
-      #photosBtnText {
-        position: absolute; width: 1px; height: 1px; overflow: hidden;
-        clip: rect(0 0 0 0); white-space: nowrap;
-      }
-      #photosBtn { padding: 0; width: 44px; min-height: 44px; justify-content: center; }
+      #topBar { gap: var(--s3); }
     }
 
     /* The sheet rises from the bottom edge on a phone, within thumb reach, and
@@ -624,8 +632,12 @@
       <span id="stepCount"></span>
     </div>
     <button id="photosBtn" type="button" aria-haspopup="dialog" aria-controls="photoSheet">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
-      <span id="photosBtnText">Photos</span>
+      <svg class="signal" viewBox="0 0 19 16" aria-hidden="true"><rect x="0" y="11" width="3" height="5" rx="1"/><rect x="5" y="7" width="3" height="9" rx="1"/><rect x="10" y="3.5" width="3" height="12.5" rx="1"/><rect x="15" y="0" width="3" height="16" rx="1"/></svg>
+      <span class="photos-text">
+        <span class="photos-cap">Internet</span>
+        <span id="photosBtnText">Low</span>
+      </span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
       <span class="saved-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
     </button>
     <a id="wtCrest" href="../index.html" aria-label="EduTrack home">
@@ -723,7 +735,7 @@
 
   <script src="../assets/js/offline.js?v=4"></script>
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-  <script src="walkthrough.js?v=17"></script>
+  <script src="walkthrough.js?v=18"></script>
 </body>
 
 </html>

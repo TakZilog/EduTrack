@@ -443,13 +443,16 @@ function setQuality(q) {
   if (downloads) downloads.refresh();
 }
 
-/* The Photos button names the quality in use, and wears a tick once every
-   photo is on the phone. */
+/* The top-bar button reads "Internet / Low" or "Internet / Fast", the same
+   words as the choice in the sheet, lights its signal bars to match, and
+   wears a tick once every photo is on the phone. */
 function reflectQuality() {
   const button = document.getElementById('photosBtn');
   if (!button) return;
-  const name = quality === 'low' ? 'Low data' : quality === 'fast' ? 'Full quality' : 'Photos';
-  document.getElementById('photosBtnText').textContent = name;
+  const value = quality === 'low' ? 'Low' : quality === 'fast' ? 'Fast' : 'Choose';
+  document.getElementById('photosBtnText').textContent = value;
+  button.dataset.level = quality || '';
   button.classList.toggle('all-saved', allSaved);
-  button.setAttribute('aria-label', 'Photos: ' + name.toLowerCase() + (allSaved ? ', all on this phone' : ''));
+  button.setAttribute('aria-label',
+    `Internet: ${value}. Photo quality and downloads` + (allSaved ? ', all photos on this phone' : ''));
 }
