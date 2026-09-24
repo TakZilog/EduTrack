@@ -22,6 +22,25 @@ let currentStep = 0;
 let viewer = null;
 let arrivedHideTimer = null;
 
+/* Photo quality for low-internet mode. 'low' asks node-image.php for a lighter
+   copy of each panorama; 'fast' loads the full one. Remembered per browser,
+   changeable from the top-bar pill. */
+const QUALITY_KEY = 'edutrack.walkQuality';
+let quality = readStoredQuality();
+
+function readStoredQuality() {
+  try {
+    const v = localStorage.getItem(QUALITY_KEY);
+    return v === 'low' || v === 'fast' ? v : null;
+  } catch { return null; }
+}
+function saveQuality(q) {
+  try { localStorage.setItem(QUALITY_KEY, q); } catch { /* private mode: this visit only */ }
+}
+function imageUrl(file) {
+  return IMAGE_BASE + file + (quality === 'low' ? '&q=low' : '');
+}
+
 const params = new URLSearchParams(window.location.search);
 const targetRoomName = params.get('room');
 
@@ -54,6 +73,11 @@ async function init() {
     return;
   }
 
+  // Shown at once so the visitor can pick Low before the first photo loads;
+  // the map JSON downloads behind it. Resolves immediately if they chose before.
+  setupSpeedToggle();
+  const qualityChosen = chooseQualityIfNeeded();
+
   try {
     // ?room= lets a guest walk to an enrollment room; students get the full map.
     const res = await fetch(GRAPH_URL + '?room=' + encodeURIComponent(targetRoomName), { credentials: 'same-origin' });
@@ -66,6 +90,7 @@ async function init() {
       return;
     }
   } catch (err) {
+    hideChoice();
     setLabel('Could not load map data.');
     console.error(err);
     return;
@@ -73,6 +98,7 @@ async function init() {
 
   const targetRoom = graph.rooms.find(r => r.room_name === targetRoomName);
   if (!targetRoom) {
+    hideChoice();
     setLabel(`Room "${targetRoomName}" not found.`);
     return;
   }
@@ -81,9 +107,13 @@ async function init() {
 
   path = findPath(gateNode.node_id, targetRoom.node_id);
   if (!path || path.length === 0) {
+    hideChoice();
     setLabel(`No route found to ${targetRoomName}.`);
     return;
   }
+
+  // Wait for the quality choice so the first photo loads at the right size.
+  await qualityChosen;
 
   currentStep = 0;
   showStep(currentStep);
@@ -160,7 +190,7 @@ function showStep(index) {
   }
 
   try {
-    loadPanorama(IMAGE_BASE + node.image_file);
+    loadPanorama(imageUrl(node.image_file));
   } catch (err) {
     console.error('Failed to load panorama viewer:', err);
   }
@@ -263,4 +293,71 @@ function updateRouteProgress(index) {
 function setLabel(main, sub) {
   document.getElementById('stepLabel').textContent = main;
   document.getElementById('stepCount').textContent = sub || '';
+}
+
+/* -------------------------------------------------------- data speed choice */
+
+/* Resolves once a quality is known. A visitor who chose before never sees the
+   overlay; otherwise it is shown and the promise waits for a button. */
+function chooseQualityIfNeeded() {
+  const overlay = document.getElementById('speedChoice');
+  if (quality) {
+    reflectQuality();
+    return Promise.resolve();
+  }
+
+  // A hint, not a default: recommend Low when the browser reports a slow or
+  // data-saving connection, but still let the visitor decide.
+  const conn = navigator.connection || navigator.webkitConnection;
+  if (conn && (conn.saveData || /(^|-)(slow-2g|2g|3g)$/.test(conn.effectiveType || ''))) {
+    const rec = overlay.querySelector('.speed-rec');
+    if (rec) rec.hidden = false;
+  }
+
+  overlay.hidden = false;
+  return new Promise(resolve => {
+    overlay.querySelectorAll('.speed-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        quality = btn.dataset.quality === 'low' ? 'low' : 'fast';
+        saveQuality(quality);
+        reflectQuality();
+        overlay.hidden = true;
+        resolve();
+      }, { once: true });
+    });
+    const first = overlay.querySelector('.speed-opt');
+    if (first) first.focus();
+  });
+}
+
+function hideChoice() {
+  const overlay = document.getElementById('speedChoice');
+  if (overlay) overlay.hidden = true;
+}
+
+/* The top-bar pill: flips quality and reloads the photo on screen. */
+function setupSpeedToggle() {
+  const toggle = document.getElementById('speedToggle');
+  if (!toggle) return;
+  reflectQuality();
+  toggle.addEventListener('click', () => {
+    quality = quality === 'low' ? 'fast' : 'low';
+    saveQuality(quality);
+    reflectQuality();
+    if (path.length) {
+      const node = graph.nodes.find(n => n.node_id === path[currentStep]);
+      if (node) loadPanorama(imageUrl(node.image_file));
+    }
+  });
+}
+
+function reflectQuality() {
+  const toggle = document.getElementById('speedToggle');
+  if (!toggle) return;
+  const low = quality === 'low';
+  toggle.classList.toggle('on', low);
+  toggle.setAttribute('aria-pressed', low ? 'true' : 'false');
+  toggle.title = low ? 'Switch to full-quality photos' : 'Switch to low-data photos';
+  const text = document.getElementById('speedToggleText');
+  if (text) text.textContent = low ? 'Low data' : 'Fast';
 }

@@ -369,6 +369,111 @@
       /* Keep the arrow lying on the floor; only the press and hover scale go. */
       .hotspot-arrow:active, .hotspot-arrow:hover { transform: perspective(260px) rotateX(55deg); }
     }
+
+    /* ---------------------------------------------- data speed: toggle + choice
+
+       A weak phone signal can take a long time to pull a full 4096px panorama.
+       The choice below lets the visitor ask for lighter photos (served by
+       node-image.php?q=low), and the pill in the top bar switches at any time. */
+
+    #speedToggle {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s2);
+      min-height: 36px;
+      padding: 0 var(--s3);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-chip);
+      background: transparent;
+      color: var(--on-bar-dim);
+      font-family: var(--font);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: color .15s var(--ease), border-color .15s var(--ease), background-color .15s var(--ease);
+    }
+    #speedToggle svg { width: 16px; height: 16px; flex-shrink: 0; }
+    #speedToggle.on { background: var(--blue); border-color: var(--blue); color: var(--white); }
+    #speedToggle:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+
+    @media (hover: hover) and (pointer: fine) {
+      #speedToggle:hover { color: var(--on-bar); border-color: var(--on-bar); }
+      #speedToggle.on:hover { color: var(--white); }
+    }
+    /* Phones: icon only, matching the back link and crest. */
+    @media (max-width: 599px) {
+      #speedToggleText {
+        position: absolute; width: 1px; height: 1px; overflow: hidden;
+        clip: rect(0 0 0 0); white-space: nowrap;
+      }
+      #speedToggle { padding: 0; width: 36px; justify-content: center; }
+    }
+
+    /* The choice shown on arrival, over the whole screen until one is picked. */
+    #speedChoice {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--s4);
+      background: rgba(10, 10, 10, .92);
+    }
+    #speedChoice[hidden] { display: none; }
+
+    .speed-card {
+      width: 100%;
+      max-width: 520px;
+      padding: var(--s7) var(--s5);
+      border-radius: var(--r-panel);
+      background: #1F1F1F;
+      color: var(--on-bar);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+      text-align: center;
+    }
+    .speed-card h1 {
+      margin: 0 0 var(--s2);
+      font-family: var(--font-display);
+      font-size: var(--fs-h2);
+      font-weight: 700;
+    }
+    .speed-sub { margin: 0 0 var(--s5); color: var(--on-bar-dim); font-size: var(--fs-body); }
+
+    .speed-options { display: grid; gap: var(--s3); }
+    @media (min-width: 480px) { .speed-options { grid-template-columns: 1fr 1fr; } }
+
+    .speed-opt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--s2);
+      padding: var(--s5) var(--s4);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-btn);
+      background: rgba(255, 255, 255, .04);
+      color: var(--on-bar);
+      font-family: var(--font);
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s var(--ease), background-color .15s var(--ease), transform .12s var(--ease);
+    }
+    .speed-opt svg { width: 30px; height: 30px; color: var(--blue-wash); }
+    .speed-opt-name { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; }
+    .speed-opt-desc { font-size: var(--fs-sm); color: var(--on-bar-dim); line-height: 1.4; }
+    .speed-rec { display: block; margin-top: var(--s1); color: var(--blue-wash); font-weight: 600; }
+    .speed-rec[hidden] { display: none; }
+    .speed-opt:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .speed-opt:hover { border-color: var(--on-bar); background: rgba(255, 255, 255, .08); }
+    }
+    .speed-opt:active { transform: scale(.98); }
+
+    .speed-foot { margin: var(--s5) 0 0; color: var(--on-bar-dim); font-size: var(--fs-sm); }
+
+    @media (prefers-reduced-motion: reduce) { .speed-opt:active { transform: none; } }
   </style>
 </head>
 
@@ -383,6 +488,10 @@
       <span id="stepLabel">Loading…</span>
       <span id="stepCount"></span>
     </div>
+    <button id="speedToggle" type="button" aria-pressed="false" title="Switch to low-data photos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+      <span id="speedToggleText">Fast</span>
+    </button>
     <a id="wtCrest" href="../index.html" aria-label="EduTrack home">
       <img src="../assets/img/aclc-logo.jpg" width="30" height="30" alt="">
       <span>EduTrack</span>
@@ -390,6 +499,29 @@
     <div id="routeProgress" aria-hidden="true"><span></span></div>
   </div>
 
+
+  <!-- Shown on arrival until the visitor picks a photo quality. walkthrough.js
+       keeps it hidden when a choice was made on an earlier visit. -->
+  <div id="speedChoice" hidden role="dialog" aria-modal="true" aria-labelledby="speedTitle">
+    <div class="speed-card">
+      <h1 id="speedTitle">Before you walk</h1>
+      <p class="speed-sub">Choose how the 360° photos load.</p>
+      <div class="speed-options">
+        <button class="speed-opt" type="button" data-quality="fast">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+          <span class="speed-opt-name">Fast Internet</span>
+          <span class="speed-opt-desc">Full-quality photos. Best on wifi or a strong signal.</span>
+        </button>
+        <button class="speed-opt" type="button" data-quality="low">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20a8 8 0 1 0-8-8"/><path d="M4 12H2m4.3-5.7L4.9 4.9M12 6V4"/><path d="m12 12 3 2"/></svg>
+          <span class="speed-opt-name">Low Internet</span>
+          <span class="speed-opt-desc">Lighter photos that load faster and use less data.
+            <span class="speed-rec" hidden>Recommended for your connection</span></span>
+        </button>
+      </div>
+      <p class="speed-foot">You can switch anytime from the top bar.</p>
+    </div>
+  </div>
 
   <div id="panorama"></div>
 
@@ -415,7 +547,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-  <script src="walkthrough.js?v=10"></script>
+  <script src="walkthrough.js?v=11"></script>
 </body>
 
 </html>
