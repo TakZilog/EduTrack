@@ -38,7 +38,13 @@ $stmt = $pdo->prepare('SELECT id, username, full_name, password_hash, role, acti
 $stmt->execute([$username]);
 $admin = $stmt->fetch();
 
-if (!$admin || !verify_password($password, $admin['password_hash'], 'admins', (int) $admin['id'])) {
+// A username that matches nothing still costs one bcrypt check, so response
+// time cannot be used to find out which staff usernames exist.
+$authenticated = $admin
+    ? verify_password($password, $admin['password_hash'], 'admins', (int) $admin['id'])
+    : burn_password_check($password);
+
+if (!$authenticated) {
     rate_limit_record($username, 'admin_login', false);
     rate_limit_record($ip, 'admin_login_ip', false);
     // The typed name is kept only when it is a real account: a name that

@@ -88,6 +88,20 @@ function hash_password(string $password): string
     return password_hash($password, PASSWORD_BCRYPT, PASSWORD_OPTIONS);
 }
 
+/** A bcrypt hash of nothing anyone knows, at the same cost as real ones. */
+const PASSWORD_TIMING_GUARD_HASH = '$2y$12$l2xtwhFmNB9ulF4CqKUWJeDC.A3dpEpz9XSiZ3jzw1DSlyZj8akwG';
+
+/**
+ * For a sign-in that matched no account: spends the same one bcrypt check a
+ * real account would, then fails. Without it the check is skipped on a miss,
+ * and the faster reply tells an attacker which emails or usernames exist.
+ */
+function burn_password_check(string $password): bool
+{
+    password_verify($password, PASSWORD_TIMING_GUARD_HASH);
+    return false;
+}
+
 /**
  * Checks a password and, when it is right but stored at an older cost,
  * re-stores it at the current one. Accounts made before the cost went up are

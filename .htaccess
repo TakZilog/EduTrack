@@ -88,7 +88,10 @@ RedirectMatch 404 ^/EduTrack/(storage|sql|tools|vendor)/
     RewriteEngine On
     RewriteCond %{HTTP:CF-Connecting-IP} . [OR]
     RewriteCond %{REMOTE_ADDR} !^(127\.0\.0\.1|::1)$
-    RewriteRule ^(\.|mobile_app/|node_modules/|EduTrack$|START-ONLINE\.bat$|package(-lock)?\.json$) - [R=404,L]
+    # ruvector.db / agentdb.rvf / skills-lock.json: coding-tool data stores and
+    # metadata that live in this folder. Never meant for visitors; ruvector.db
+    # was downloadable before this line.
+    RewriteRule ^(\.|mobile_app/|node_modules/|EduTrack$|START-ONLINE\.bat$|package(-lock)?\.json$|ruvector\.db|agentdb\.rvf|skills-lock\.json$) - [R=404,L]
 </IfModule>
 
 # The Android app download. Served from downloads/ (mobile_app/ itself is

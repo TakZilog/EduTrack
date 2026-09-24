@@ -29,15 +29,11 @@ $stmt = $pdo->prepare('SELECT id, full_name, email, password_hash, email_verifie
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
-// A missing account still spends one bcrypt verify against a fixed dummy hash,
-// so a wrong email cannot be told apart from a wrong password by how long the
-// answer takes. Without this the password check is skipped when no row matched,
-// and the faster reply leaks which emails are registered.
-const LOGIN_ENUMERATION_GUARD_HASH = '$2y$12$l2xtwhFmNB9ulF4CqKUWJeDC.A3dpEpz9XSiZ3jzw1DSlyZj8akwG';
-
+// A missing account still costs one bcrypt check (burn_password_check), so a
+// wrong email takes as long as a wrong password and cannot be told apart.
 $authenticated = $user
     ? verify_password($password, $user['password_hash'], 'users', (int) $user['id'])
-    : password_verify($password, LOGIN_ENUMERATION_GUARD_HASH);
+    : burn_password_check($password);
 
 if (!$authenticated) {
     rate_limit_record($email, 'student_login', false);
