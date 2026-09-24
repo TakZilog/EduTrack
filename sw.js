@@ -67,7 +67,7 @@ async function fromStudentPage(event) {
   return !!client && classify(new URL(client.url)) === 'page';
 }
 
-// A page asks for a list of addresses to be kept (the "Save for offline"
+// A page asks for a list of addresses to be kept (the "Download all photos"
 // buttons). Each one goes through the same rules as a normal visit, and the
 // page hears back after every file so it can show progress.
 self.addEventListener('message', event => {
@@ -195,10 +195,18 @@ async function keepRoomMap(cache, url, response) {
   await cache.put(url, response);
 }
 
+/* Four files at a time: the phone's connection stays busy, and one slow
+   photo does not hold up the rest. */
 async function saveAll(urls, port) {
   let done = 0;
   let failed = 0;
-  for (const raw of urls) {
+  let next = 0;
+  const lanes = Array.from({ length: Math.min(4, urls.length) }, async () => {
+    while (next < urls.length) await saveOne(urls[next++]);
+  });
+  await Promise.all(lanes);
+
+  async function saveOne(raw) {
     try {
       const url  = new URL(raw, self.location.href);
       const kind = classify(url);

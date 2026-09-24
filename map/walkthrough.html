@@ -370,20 +370,20 @@
       .hotspot-arrow:active, .hotspot-arrow:hover { transform: perspective(260px) rotateX(55deg); }
     }
 
-    /* ---------------------------------------------- data speed: toggle + choice
+    /* ------------------------------------------ photos: quality and download
 
        A weak phone signal can take a long time to pull a full 4096px panorama.
-       The choice below lets the visitor ask for lighter photos (served by
-       node-image.php?q=low), and the pill in the top bar switches at any time. */
-
-    /* The quality pill and, beside it, "Save offline", which keeps this whole
-       route on the phone for use without signal (walkthrough.js). */
-    #speedToggle, #saveRoute {
+       node-image.php?q=low serves a lighter copy. One "Photos" button in the
+       top bar opens a sheet with the quality choice and, in the app, a button
+       that puts every photo on the phone in one go (assets/js/offline.js), so
+       no step waits for its photo. */
+    #photosBtn {
+      position: relative;
       flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       gap: var(--s2);
-      min-height: 36px;
+      min-height: 40px;
       padding: 0 var(--s3);
       border: 1px solid var(--hairline);
       border-radius: var(--r-chip);
@@ -393,28 +393,157 @@
       font-size: var(--fs-sm);
       font-weight: 600;
       cursor: pointer;
-      transition: color .15s var(--ease), border-color .15s var(--ease), background-color .15s var(--ease);
+      transition: color .15s var(--ease), border-color .15s var(--ease);
     }
-    #saveRoute[hidden] { display: none; }
-    #speedToggle svg, #saveRoute svg { width: 16px; height: 16px; flex-shrink: 0; }
-    #speedToggle.on, #saveRoute.on { background: var(--blue); border-color: var(--blue); color: var(--white); }
-    #speedToggle:focus-visible, #saveRoute:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
-    #saveRoute[aria-busy="true"] { cursor: progress; }
-    #saveRoute .icon-done, #saveRoute.on .icon-save { display: none; }
-    #saveRoute.on .icon-done { display: block; }
+    #photosBtn > svg { width: 18px; height: 18px; flex-shrink: 0; }
+    #photosBtn:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+    /* A small tick on the button once every photo is on the phone. */
+    #photosBtn .saved-mark {
+      position: absolute;
+      top: -6px; right: -6px;
+      display: none;
+      place-items: center;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 2px #1A1A1A;
+      color: var(--white);
+    }
+    #photosBtn .saved-mark svg { width: 11px; height: 11px; }
+    #photosBtn.all-saved .saved-mark { display: grid; }
 
     @media (hover: hover) and (pointer: fine) {
-      #speedToggle:hover, #saveRoute:hover { color: var(--on-bar); border-color: var(--on-bar); }
-      #speedToggle.on:hover, #saveRoute.on:hover { color: var(--white); }
+      #photosBtn:hover { color: var(--on-bar); border-color: var(--on-bar); }
     }
-    /* Phones: icons only, matching the back link and crest. */
+    /* Phones: the icon only, matching the back link and crest. */
     @media (max-width: 599px) {
-      #speedToggleText, #saveRouteText {
+      #photosBtnText {
         position: absolute; width: 1px; height: 1px; overflow: hidden;
         clip: rect(0 0 0 0); white-space: nowrap;
       }
-      #speedToggle, #saveRoute { padding: 0; width: 36px; justify-content: center; }
+      #photosBtn { padding: 0; width: 44px; min-height: 44px; justify-content: center; }
     }
+
+    /* The sheet rises from the bottom edge on a phone, within thumb reach, and
+       sits centred on a wide screen. Same dark as the bars. */
+    #photoSheet {
+      width: 100%;
+      max-width: 480px;
+      max-height: calc(100% - 32px);
+      margin: auto auto 0;
+      padding: var(--s4) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom, 0px));
+      border: none;
+      border-radius: var(--r-panel) var(--r-panel) 0 0;
+      background: #1F1F1F;
+      color: var(--on-bar);
+      box-shadow: 0 -12px 40px rgba(0, 0, 0, .45);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    #photoSheet::backdrop { background: rgba(0, 0, 0, .6); }
+    #photoSheet[open] { animation: sheet-rise .3s cubic-bezier(.16, 1, .3, 1) both; }
+    @keyframes sheet-rise {
+      from { transform: translateY(32px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    @media (min-width: 600px) {
+      #photoSheet { margin: auto; padding: var(--s5); border-radius: var(--r-panel); }
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s3);
+      margin-bottom: var(--s3);
+    }
+    .sheet-head h2 { margin: 0; font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 700; }
+    .sheet-close {
+      display: grid;
+      place-items: center;
+      width: 44px; height: 44px;
+      margin-right: calc(var(--s2) * -1);
+      border: none;
+      border-radius: var(--r-btn);
+      background: transparent;
+      color: var(--on-bar-dim);
+      cursor: pointer;
+    }
+    .sheet-close svg { width: 22px; height: 22px; }
+    .sheet-close:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+    @media (hover: hover) and (pointer: fine) { .sheet-close:hover { color: var(--on-bar); } }
+
+    /* Quality: two cards that work as radio buttons. The chosen one gets a
+       white edge and a filled dot, both clear on the dark sheet. */
+    .quality-pick { display: grid; gap: var(--s2); margin: 0; padding: 0; border: none; min-width: 0; }
+    .sheet-label { margin: 0 0 var(--s2); padding: 0; color: var(--on-bar-dim); font-size: var(--fs-sm); font-weight: 600; }
+    /* Resets the form label style from style.css, which is for light pages. */
+    .quality-opt { position: relative; display: block; margin: 0; color: var(--on-bar); font-size: inherit; font-weight: 400; cursor: pointer; }
+    .quality-opt input { position: absolute; opacity: 0; pointer-events: none; }
+    .quality-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 2px var(--s3);
+      padding: var(--s3) var(--s4);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-btn);
+      background: rgba(255, 255, 255, .03);
+      transition: border-color .15s var(--ease), background-color .15s var(--ease);
+    }
+    .quality-dot {
+      grid-row: span 2;
+      width: 20px; height: 20px;
+      border: 2px solid var(--hairline);
+      border-radius: 50%;
+      transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+    }
+    .quality-name { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; }
+    .quality-desc { color: var(--on-bar-dim); font-size: var(--fs-sm); line-height: 1.4; }
+    .quality-opt input:checked + .quality-card { border-color: var(--on-bar); background: rgba(255, 255, 255, .08); }
+    .quality-opt input:checked + .quality-card .quality-dot { border-color: var(--on-bar); box-shadow: inset 0 0 0 3px #1F1F1F, inset 0 0 0 10px var(--on-bar); }
+    .quality-opt input:focus-visible + .quality-card { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+    @media (hover: hover) and (pointer: fine) {
+      .quality-opt:hover .quality-card { border-color: var(--on-bar); }
+    }
+
+    /* Download all photos: the app only (walkthrough.js unhides it). */
+    .sheet-download { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid rgba(255, 255, 255, .12); }
+    .sheet-download[hidden] { display: none; }
+    .sheet-download h3 { margin: 0 0 var(--s1); font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; }
+    .sheet-note { margin: 0 0 var(--s4); color: var(--on-bar-dim); font-size: var(--fs-sm); line-height: 1.45; }
+    #downloadAll { margin-top: 0; }
+    #downloadAll[hidden] { display: none; }
+    #downloadAll:focus-visible { outline-color: var(--on-bar); }
+    .download-bar {
+      height: 8px;
+      margin-top: var(--s3);
+      border-radius: var(--r-chip);   /* DESIGN.md: one 6px radius, no pills */
+      background: rgba(255, 255, 255, .16);
+      overflow: hidden;
+    }
+    .download-bar[hidden] { display: none; }
+    .download-bar span { display: block; width: 0; height: 100%; background: var(--blue-wash); }
+    #downloadStatus { margin: var(--s3) 0 0; color: var(--on-bar-dim); font-size: var(--fs-sm); line-height: 1.45; }
+    #downloadStatus:empty { display: none; }
+    #downloadRemove {
+      min-height: 44px;
+      margin-top: var(--s1);
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--on-bar-dim);
+      font-family: var(--font);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+    #downloadRemove[hidden] { display: none; }
+    #downloadRemove:focus-visible { outline: 2px solid var(--on-bar); outline-offset: 2px; }
+
+    @media (prefers-reduced-motion: reduce) { #photoSheet[open] { animation: none; } }
 
     /* The choice shown on arrival, over the whole screen until one is picked. */
     #speedChoice {
@@ -494,14 +623,10 @@
       <span id="stepLabel">Loading…</span>
       <span id="stepCount"></span>
     </div>
-    <button id="saveRoute" type="button" hidden title="Save this route to use without signal">
-      <svg class="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>
-      <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>
-      <span id="saveRouteText" aria-live="polite">Save offline</span>
-    </button>
-    <button id="speedToggle" type="button" aria-pressed="false" title="Switch to low-data photos">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
-      <span id="speedToggleText">Fast</span>
+    <button id="photosBtn" type="button" aria-haspopup="dialog" aria-controls="photoSheet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+      <span id="photosBtnText">Photos</span>
+      <span class="saved-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
     </button>
     <a id="wtCrest" href="../index.html" aria-label="EduTrack home">
       <img src="../assets/img/aclc-logo.jpg" width="30" height="30" alt="">
@@ -534,6 +659,45 @@
     </div>
   </div>
 
+  <!-- Opened by the Photos button in the top bar (walkthrough.js). -->
+  <dialog id="photoSheet" aria-labelledby="photoSheetTitle">
+    <div class="sheet-head">
+      <h2 id="photoSheetTitle">Photos</h2>
+      <button class="sheet-close" id="photoSheetClose" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <fieldset class="quality-pick">
+      <legend class="sheet-label">Photo quality</legend>
+      <label class="quality-opt">
+        <input type="radio" name="quality" value="low">
+        <span class="quality-card">
+          <span class="quality-dot" aria-hidden="true"></span>
+          <span class="quality-name">Low internet</span>
+          <span class="quality-desc">Lighter photos. They load fast and use less data.</span>
+        </span>
+      </label>
+      <label class="quality-opt">
+        <input type="radio" name="quality" value="fast">
+        <span class="quality-card">
+          <span class="quality-dot" aria-hidden="true"></span>
+          <span class="quality-name">Fast internet</span>
+          <span class="quality-desc">The sharpest photos. Best on wifi or a strong signal.</span>
+        </span>
+      </label>
+    </fieldset>
+
+    <section class="sheet-download" id="downloadSection" hidden aria-labelledby="downloadTitle">
+      <h3 id="downloadTitle">No waiting between steps</h3>
+      <p class="sheet-note">Download every photo once. Each step then opens at once, even without signal.</p>
+      <button class="btn" id="downloadAll" type="button">Download all photos</button>
+      <div class="download-bar" id="downloadBar" hidden><span></span></div>
+      <p id="downloadStatus" aria-live="polite"></p>
+      <button id="downloadRemove" type="button" hidden>Remove downloaded photos</button>
+    </section>
+  </dialog>
+
   <div id="panorama"></div>
 
   <div id="controls">
@@ -557,9 +721,9 @@
   </div>
 
 
-  <script src="../assets/js/offline.js?v=3"></script>
+  <script src="../assets/js/offline.js?v=4"></script>
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-  <script src="walkthrough.js?v=15"></script>
+  <script src="walkthrough.js?v=17"></script>
 </body>
 
 </html>

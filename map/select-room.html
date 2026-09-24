@@ -274,6 +274,34 @@
     .session-action { padding: 0 var(--s3); }
   }
 
+  /* ---------------------------------------------------- download all photos */
+
+  /* The app only (select-room.js unhides it): every photo on the phone in one
+     tap, before the walk starts, so no step waits for its photo. One row, so
+     the room list keeps its room; once done, one line. */
+  .dl-strip {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+    padding: var(--s2) var(--s4);
+    border-bottom: 1px solid var(--border);
+  }
+  .dl-strip[hidden] { display: none; }
+  .dl-strip > svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--blue); }
+  .dl-strip .icon-done, .dl-strip.is-done .icon-download { display: none; }
+  .dl-strip.is-done .icon-done { display: block; }
+  .dl-text { flex: 1; min-width: 0; margin: 0; line-height: 1.3; }
+  .dl-title { display: block; font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; }
+  .dl-strip.is-done .dl-title { display: none; }
+  #dlStatus { display: block; color: var(--text-muted); font-size: var(--fs-sm); }
+  #dlButton { border-color: var(--blue); color: var(--blue); }
+  #dlButton[hidden] { display: none; }
+  .dl-bar { flex-basis: 100%; height: 6px; border-radius: var(--r-chip); background: var(--border); overflow: hidden; }
+  .dl-bar[hidden] { display: none; }
+  .dl-bar span { display: block; width: 0; height: 100%; background: var(--blue); }
+
   @media (prefers-reduced-motion: reduce) {
     .session-action:active { transform: none; }
     .session-action:hover svg, .room:hover svg { transform: none; }
@@ -321,6 +349,17 @@
       </nav>
 
       <div class="panel">
+        <!-- The app only: select-room.js unhides it (assets/js/offline.js). -->
+        <section class="dl-strip" id="dlStrip" hidden aria-labelledby="dlTitle">
+          <svg class="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>
+          <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>
+          <p class="dl-text">
+            <span class="dl-title" id="dlTitle">Faster walks</span>
+            <span id="dlStatus" aria-live="polite">Checking the photos…</span>
+          </p>
+          <button class="session-action" id="dlButton" type="button" aria-label="Download all photos">Download</button>
+          <div class="dl-bar" id="dlBar" hidden><span></span></div>
+        </section>
         <div id="roomList" aria-live="polite" aria-busy="true">
           <p class="list-note">Loading rooms...</p>
         </div>
@@ -331,8 +370,8 @@
   </main>
 
   <!-- apiPost() attaches the CSRF token api/logout.php requires. -->
-  <script src="../assets/js/offline.js?v=3"></script>
+  <script src="../assets/js/offline.js?v=4"></script>
   <script src="../Auth/auth.js"></script>
-  <script src="select-room.js?v=3"></script>
+  <script src="select-room.js?v=4"></script>
 </body>
 </html>

@@ -24,9 +24,14 @@ let arrivedHideTimer = null;
 
 /* Photo quality for low-internet mode. 'low' asks node-image.php for a lighter
    copy of each panorama; 'fast' loads the full one. Remembered per browser,
-   changeable from the top-bar pill. */
+   changeable from the Photos sheet in the top bar. */
 const QUALITY_KEY = 'edutrack.walkQuality';
 let quality = readStoredQuality();
+
+// "Download all photos" in the Photos sheet (setupPhotos). Declared up here:
+// init() runs before the rest of this file is read.
+let downloads = null;    // the download control; the app only
+let allSaved = false;    // every photo, at this quality, is on the phone
 
 function readStoredQuality() {
   try {
@@ -104,7 +109,7 @@ async function init() {
 
   // Shown at once so the visitor can pick Low before the first photo loads;
   // the map JSON downloads behind it. Resolves immediately if they chose before.
-  setupSpeedToggle();
+  setupPhotos();
   const qualityChosen = chooseQualityIfNeeded();
 
   try {
@@ -160,8 +165,6 @@ async function init() {
       showStep(currentStep);
     }
   });
-
-  setupSaveRoute();
 }
 
 /* Breadth-first search over the edges list, treated as bidirectional
@@ -342,7 +345,7 @@ function chooseQualityIfNeeded() {
 
   // A phone screen shows a fraction of a 4096px panorama, so the light 2048px
   // copy looks the same there and loads about eight times faster. Phones and
-  // the app start with it at once instead of asking; the top-bar pill still
+  // the app start with it at once instead of asking; the Photos sheet still
   // switches to full quality. Not saved, so a later desktop visit still asks.
   const smallScreen = window.matchMedia('(max-width: 768px)').matches
     || /EduTrackMobile/i.test(navigator.userAgent);
@@ -382,87 +385,71 @@ function hideChoice() {
   if (overlay) overlay.hidden = true;
 }
 
-/* The top-bar pill: flips quality and reloads the photo on screen. */
-function setupSpeedToggle() {
-  const toggle = document.getElementById('speedToggle');
-  if (!toggle) return;
-  reflectQuality();
-  toggle.addEventListener('click', () => {
-    quality = quality === 'low' ? 'fast' : 'low';
-    saveQuality(quality);
-    reflectQuality();
-    if (path.length) {
-      const node = graph.nodes.find(n => n.node_id === path[currentStep]);
-      if (node) loadPanorama(imageUrl(node.image_file));
-    }
-    // The photos saved for offline may be at the other quality.
-    refreshSaveRoute();
+/* ------------------------------------------------------------ photos sheet */
+
+/* The top-bar Photos button opens a sheet with the photo quality and, in the
+   app, "Download all photos" (assets/js/offline.js): every photo goes on the
+   phone in one tap, instead of one route at a time, so no step waits. */
+function setupPhotos() {
+  const button = document.getElementById('photosBtn');
+  const sheet = document.getElementById('photoSheet');
+
+  button.addEventListener('click', () => {
+    sheet.querySelectorAll('input[name="quality"]').forEach(input => {
+      input.checked = input.value === (quality || 'low');
+    });
+    sheet.showModal();
+    if (downloads) downloads.refresh();
   });
-}
+  document.getElementById('photoSheetClose').addEventListener('click', () => sheet.close());
+  // A tap on the dimmed photo around the sheet closes it.
+  sheet.addEventListener('click', e => {
+    if (e.target !== sheet) return;
+    const r = sheet.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    if (!inside) sheet.close();
+  });
 
-function reflectQuality() {
-  const toggle = document.getElementById('speedToggle');
-  if (!toggle) return;
-  const low = quality === 'low';
-  toggle.classList.toggle('on', low);
-  toggle.setAttribute('aria-pressed', low ? 'true' : 'false');
-  toggle.title = low ? 'Switch to full-quality photos' : 'Switch to low-data photos';
-  const text = document.getElementById('speedToggleText');
-  if (text) text.textContent = low ? 'Low data' : 'Fast';
-}
+  sheet.querySelectorAll('input[name="quality"]').forEach(input => {
+    input.addEventListener('change', () => setQuality(input.value));
+  });
 
-/* -------------------------------------------------------- save for offline */
-
-/* Keeps this whole route on the phone: the page and the 360 viewer, the room
-   map, and every photo at the current quality, so it opens again without
-   signal (assets/js/offline.js, sw.js). Shown only in the app. */
-function setupSaveRoute() {
-  const button = document.getElementById('saveRoute');
   const offline = window.EduTrackOffline;
-  if (!button || !offline || !offline.supported) return;
-  button.hidden = false;
-  refreshSaveRoute();
-
-  button.addEventListener('click', async () => {
-    if (button.getAttribute('aria-busy') === 'true') return;
-    button.setAttribute('aria-busy', 'true');
-    showSaveState('Saving…', false);
-    try {
-      const urls = [...await offline.walkthroughFiles(), ...routeData()];
-      const result = await offline.save(urls, p => showSaveState(`Saving ${p.done} of ${p.total}`, false));
-      if (result.failed) showSaveState('Some photos did not save. Tap to try again.', false);
-      else showSaveState('Saved offline', true);
-    } catch (err) {
-      showSaveState('Could not save. Tap to try again.', false);
-    } finally {
-      button.removeAttribute('aria-busy');
-    }
-  });
+  if (offline && offline.supported) {
+    document.getElementById('downloadSection').hidden = false;
+    downloads = offline.downloadControl({
+      button: document.getElementById('downloadAll'),
+      bar: document.getElementById('downloadBar'),
+      status: document.getElementById('downloadStatus'),
+      remove: document.getElementById('downloadRemove'),
+      getQuality: () => quality || 'low',
+      onChange: all => { allSaved = all; reflectQuality(); },
+    });
+  }
+  reflectQuality();
 }
 
-function showSaveState(text, saved) {
-  const button = document.getElementById('saveRoute');
-  button.classList.toggle('on', saved);
-  button.title = saved ? 'This route now works without signal' : 'Save this route to use without signal';
-  document.getElementById('saveRouteText').textContent = text;
+/* A new quality from the sheet: kept for next time, and the photo on screen
+   reloads at it. */
+function setQuality(q) {
+  quality = q === 'low' ? 'low' : 'fast';
+  saveQuality(quality);
+  reflectQuality();
+  if (path.length) {
+    const node = graph.nodes.find(n => n.node_id === path[currentStep]);
+    if (node) loadPanorama(imageUrl(node.image_file));
+  }
+  // The photos on the phone may be at the other quality.
+  if (downloads) downloads.refresh();
 }
 
-/* This route's room map and its photos at the current quality. */
-function routeData() {
-  const photos = path
-    .map(id => graph.nodes.find(n => n.node_id === id))
-    .filter(Boolean)
-    .map(node => imageUrl(node.image_file));
-  return [GRAPH_URL + '?room=' + encodeURIComponent(targetRoomName), ...photos];
-}
-
-/* Says "Saved offline" when this route (at this quality) is already on the
-   phone from an earlier visit, and offers to save it otherwise. */
-function refreshSaveRoute() {
-  const button = document.getElementById('saveRoute');
-  if (!button || button.hidden) return;
-  showSaveState('Save offline', false);
-  window.EduTrackOffline.isSaved(routeData()).then(saved => {
-    if (saved) showSaveState('Saved offline', true);
-  });
+/* The Photos button names the quality in use, and wears a tick once every
+   photo is on the phone. */
+function reflectQuality() {
+  const button = document.getElementById('photosBtn');
+  if (!button) return;
+  const name = quality === 'low' ? 'Low data' : quality === 'fast' ? 'Full quality' : 'Photos';
+  document.getElementById('photosBtnText').textContent = name;
+  button.classList.toggle('all-saved', allSaved);
+  button.setAttribute('aria-label', 'Photos: ' + name.toLowerCase() + (allSaved ? ', all on this phone' : ''));
 }

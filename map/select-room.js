@@ -171,6 +171,7 @@ fetch('../api/tour.php', { credentials: 'same-origin' })
     // Arriving from a floor on the home page: open at that floor.
     const m = /^#floor-(\d+)$/.exec(location.hash);
     if (m) goToFloor(m[1], false);
+    setupDownload();
   })
   .catch(err => {
     list.setAttribute('aria-busy', 'false');
@@ -192,6 +193,25 @@ search.addEventListener('keydown', e => {
     window.location.href = 'walkthrough.html?room=' + encodeURIComponent(rooms[0].room_name);
   }
 });
+
+/* ---------------------------------------------- download all photos */
+
+/* In the app, every photo can go on the phone before the walk starts, so no
+   step waits for its photo (assets/js/offline.js). Downloads at the quality
+   the walkthrough last used. */
+function setupDownload() {
+  const offline = window.EduTrackOffline;
+  if (!offline || !offline.supported) return;
+  const strip = document.getElementById('dlStrip');
+  strip.hidden = false;
+  offline.downloadControl({
+    button: document.getElementById('dlButton'),
+    bar: document.getElementById('dlBar'),
+    status: document.getElementById('dlStatus'),
+    getQuality: offline.preferredQuality,
+    onChange: all => strip.classList.toggle('is-done', all),
+  });
+}
 
 /* ---------------------------------------------------------- session */
 
