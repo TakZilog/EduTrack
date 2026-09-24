@@ -338,6 +338,19 @@ function chooseQualityIfNeeded() {
     return Promise.resolve();
   }
 
+  // A phone screen shows a fraction of a 4096px panorama, so the light 2048px
+  // copy looks the same there and loads about eight times faster. Phones and
+  // the app start with it at once instead of asking; the top-bar pill still
+  // switches to full quality. Not saved, so a later desktop visit still asks.
+  const smallScreen = window.matchMedia('(max-width: 768px)').matches
+    || /EduTrackMobile/i.test(navigator.userAgent);
+  if (smallScreen) {
+    quality = 'low';
+    reflectQuality();
+    return Promise.resolve();
+  }
+
+  // Desktop: ask once, since a big screen can use the full photo.
   // A hint, not a default: recommend Low when the browser reports a slow or
   // data-saving connection, but still let the visitor decide.
   const conn = navigator.connection || navigator.webkitConnection;

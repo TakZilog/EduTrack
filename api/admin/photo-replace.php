@@ -21,6 +21,7 @@ declare(strict_types=1);
 require __DIR__ . '/_bootstrap.php';
 require __DIR__ . '/graph-lib.php';
 require __DIR__ . '/walk-lib.php';
+require __DIR__ . '/../lowres.php';
 
 admin_boot('room.edit', 'POST');
 
@@ -70,6 +71,11 @@ try {
 // appends to every image URL; browsers then fetch the new picture instead of a
 // cached old one. (Adding or re-shooting a room already rewrites the map.)
 @touch(GRAPH_PATH);
+
+// Build the low-internet copy now, so the first visitor to reach this step does
+// not wait for the server to shrink it. Best effort: node-image.php builds it on
+// demand if this could not.
+low_res_path($target, basename((string) $node['image_file']));
 
 audit_log('photo.replace', 'photo', $nodeId, 'Replaced the picture at ' . $nodeId . '. The old picture was deleted.');
 

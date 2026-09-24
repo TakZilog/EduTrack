@@ -26,6 +26,7 @@ require __DIR__ . '/_bootstrap.php';
 require __DIR__ . '/graph-lib.php';
 require __DIR__ . '/graph-write.php';
 require __DIR__ . '/walk-lib.php';
+require __DIR__ . '/../lowres.php';
 
 const UPLOAD_HOLD_DIR = __DIR__ . '/../../storage/walk-uploads';
 
@@ -203,6 +204,12 @@ $saved = true;
 
 // The map no longer points at the old photos, so they go. No copies are kept.
 delete_photo_files($photoDir, $oldNodes);
+
+// Build the low-internet copies of the new photos now, so nobody walking to
+// this room waits for them. Best effort: node-image.php builds any it misses.
+foreach ($placed as $file) {
+    low_res_path($file, basename($file));
+}
 
 $count = count($shrunk);
 audit_log($mode === 'add' ? 'room.add' : 'room.photos', 'room', $name, $mode === 'add'
