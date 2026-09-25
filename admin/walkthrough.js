@@ -134,14 +134,11 @@
     render();
   }
 
-  /* Whether visitors can walk to every room, above whatever floor is open:
-     this is what the dashboard's "Navigation Issues" count links to. */
+  /* Problems visitors would hit, above whatever floor is open: this is what
+     the dashboard's "Navigation Issues" count links to. Nothing when all is well. */
   function drawHealth() {
-    if (!checks) { health.replaceChildren(); return; }
-    health.replaceChildren(...(checks.problems.length
-      ? checks.problems.map(p => notice(p.severity === 'error' ? 'error' : 'warning', p.title, p.detail))
-      : [notice('good', 'Every room can be reached from the gate',
-        'Visitors can walk to all ' + checks.rooms.length + ' rooms on the list.')]));
+    health.replaceChildren(...(checks ? checks.problems : [])
+      .map(p => notice(p.severity === 'error' ? 'error' : 'warning', p.title, p.detail)));
   }
 
   function statusPill(name) {
