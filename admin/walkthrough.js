@@ -10,6 +10,9 @@
   photo being the room. Staff change a room by choosing its photos again, or
   swap, rename or remove it. Nobody sees a photo id.
 
+  It is also where staff check the map: whether every room can be reached
+  from the gate, and the walk to any room as pictures.
+
   Photos are prepared in the browser before anything is sent: put in the order
   they were taken, checked to be 360 photos, and shrunk, so a slow connection
   carries a fraction of what the camera wrote. Nothing reaches the server
@@ -31,7 +34,10 @@
 
   const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 
+  const health = document.getElementById('health');
+
   let data = null;     // what walkthrough.php sent
+  let checks = null;   // what rooms.php sent: can each room be reached from the gate
   let editor = null;   // the open photo editor, or null
 
   /* ------------------------------------------------------------- helpers */
@@ -63,7 +69,20 @@
     try { return sessionStorage.getItem(WHERE_KEY) || ''; } catch { return ''; }
   }
 
+  /* "2ND FLOOR SECOND BUILDING" -> "Second Building – 2nd Floor". The older
+     single-building map says "1ST FLOOR ADMIN BUILDING" -> "1st Floor". */
+  function floorLabel(value) {
+    const m = /^(\d+)(st|nd|rd|th)\s+floor\s*(.*)$/i.exec(String(value || '').trim());
+    if (!m) return String(value || '');
+    const floor = m[1] + m[2].toLowerCase() + ' Floor';
+    const building = m[3].toLowerCase().replace(/\b[a-z]/g, letter => letter.toUpperCase());
+    return building && !/^admin building$/i.test(building) ? building + ' – ' + floor : floor;
+  }
+
+  /* The building map is chosen a building and floor at a time. The older
+     single-building map is one list, narrowed by floor. */
   function current() {
+    if (!data.structured) return null;
     const [code, n] = whereSelect.value.split('|');
     const building = data.buildings.find(b => b.code === code);
     const floor = building && building.floors.find(f => String(f.n) === n);
@@ -77,31 +96,60 @@
   /* ---------------------------------------------------------------- load */
 
   async function load(keepRoom) {
-    const { data: answer } = await apiGet('walkthrough.php');
+    const [{ data: answer }, { data: check }] = await Promise.all([apiGet('walkthrough.php'), apiGet('rooms.php')]);
     if (!answer.ok) {
       view.replaceChildren(notice('error', 'The walkthrough could not be loaded', answer.error || 'Please reload the page.'));
       return;
     }
     data = answer;
+    checks = check.ok ? {
+      rooms: check.rooms,
+      unlisted: check.unlisted || [],
+      floors: check.floors.filter(Boolean),
+      problems: check.problems || [],
+      byName: new Map(check.rooms.map(r => [r.name, r])),
+      attention: new Set((check.problems || []).flatMap(p => p.items || []))
+    } : null;
+    drawHealth();
 
-    if (!data.structured) {
-      whereSelect.replaceChildren(new Option('Not set up yet', ''));
-      view.replaceChildren(notice('info', 'Nothing to change here yet',
-        'The walkthrough has not been set up by building and floor. Once the school\'s photos are imported, '
-        + 'every floor and room appears on this page.'));
+    if (!data.structured && !checks) {
+      view.replaceChildren(notice('error', 'The rooms could not be loaded', check.error || 'Please reload the page.'));
       return;
     }
 
     const chosen = whereSelect.value || remembered();
     whereSelect.replaceChildren();
-    data.buildings.forEach(b => b.floors.forEach(f => {
-      whereSelect.appendChild(new Option(b.name + ' – ' + f.label, b.code + '|' + f.n));
-    }));
+    if (data.structured) {
+      data.buildings.forEach(b => b.floors.forEach(f => {
+        whereSelect.appendChild(new Option(b.name + ' – ' + f.label, b.code + '|' + f.n));
+      }));
+    } else {
+      whereSelect.appendChild(new Option('Every floor', ''));
+      checks.floors.forEach(f => whereSelect.appendChild(new Option(floorLabel(f), f)));
+    }
     if ([...whereSelect.options].some(o => o.value === chosen)) whereSelect.value = chosen;
     whereSelect.disabled = false;
 
     fillRooms(keepRoom);
     render();
+  }
+
+  /* Whether visitors can walk to every room, above whatever floor is open:
+     this is what the dashboard's "Navigation Issues" count links to. */
+  function drawHealth() {
+    if (!checks) { health.replaceChildren(); return; }
+    health.replaceChildren(...(checks.problems.length
+      ? checks.problems.map(p => notice(p.severity === 'error' ? 'error' : 'warning', p.title, p.detail))
+      : [notice('good', 'Every room can be reached from the gate',
+        'Visitors can walk to all ' + checks.rooms.length + ' rooms on the list.')]));
+  }
+
+  function statusPill(name) {
+    const room = checks && checks.byName.get(name);
+    if (!room) return null;
+    if (!room.reachable) return pill('Cannot be reached from the gate', 'revoked');
+    if (checks.attention.has(name)) return pill('Needs attention', 'warning');
+    return pill('Reachable', 'verified');
   }
 
   function notice(kind, title, detail) {
@@ -110,13 +158,19 @@
     return box;
   }
 
-  function fillRooms(keep) {
+  function roomsHere() {
+    if (!data.structured) return checks.rooms.filter(r => !whereSelect.value || r.floor === whereSelect.value);
     const here = current();
+    return here ? here.floor.rooms : [];
+  }
+
+  function fillRooms(keep) {
+    const rooms = roomsHere();
     const want = keep !== undefined ? keep : roomSelect.value;
-    roomSelect.replaceChildren(new Option('All rooms on this floor', ''));
-    (here ? here.floor.rooms : []).forEach(r => roomSelect.appendChild(new Option(roomLabel(r.name), r.name)));
+    roomSelect.replaceChildren(new Option(data.structured || whereSelect.value ? 'All rooms on this floor' : 'All rooms', ''));
+    rooms.forEach(r => roomSelect.appendChild(new Option(roomLabel(r.name), r.name)));
     roomSelect.value = [...roomSelect.options].some(o => o.value === want) ? want : '';
-    roomSelect.disabled = !here || here.floor.rooms.length === 0;
+    roomSelect.disabled = rooms.length === 0;
   }
 
   whereSelect.addEventListener('change', () => {
@@ -129,9 +183,75 @@
   /* -------------------------------------------------------------- a floor */
 
   function render() {
+    if (!data.structured) { renderOlderMap(); return; }
     const here = current();
     if (!here) { view.replaceChildren(); return; }
     view.replaceChildren(floorHead(here), ...(editor ? [editorPanel()] : [pathPanel(here), roomsPanel(here)]));
+  }
+
+  /* The older single-building map has no fixed paths or per-room walks, so
+     its rooms can be renamed, moved to another floor or taken off the list,
+     and nothing else. */
+  function renderOlderMap() {
+    const panel = el('section', 'panel wt-rooms');
+    panel.setAttribute('aria-labelledby', 'roomsTitle');
+    const head = el('div', 'panel-head');
+    const title = el('h2', null, whereSelect.value ? 'Rooms on the ' + floorLabel(whereSelect.value) : 'Every room');
+    title.id = 'roomsTitle';
+    head.appendChild(title);
+    panel.appendChild(head);
+
+    const rooms = roomsHere().filter(r => !roomSelect.value || r.name === roomSelect.value);
+    if (rooms.length === 0) {
+      const empty = el('div', 'empty');
+      empty.append(el('h3', null, 'No rooms here'), el('p', null, 'No room on the list is on this floor.'));
+      panel.appendChild(empty);
+    } else {
+      const list = el('ul', 'wt-room-list');
+      rooms.forEach(room => list.appendChild(roomRow(room)));
+      panel.appendChild(list);
+    }
+
+    view.replaceChildren(
+      notice('info', 'This map is not set up by building and floor yet',
+        'Rooms can be renamed, moved to another floor or taken off the list here. '
+        + 'Their photos can be changed once the school\'s photos are imported by building and floor.'),
+      panel,
+      ...(checks.unlisted.length && !whereSelect.value ? [unlistedPanel()] : [])
+    );
+  }
+
+  /* Room photos on the map that visitors are not offered, because a room was
+     taken off the list. Without this they could never be found again. */
+  function unlistedPanel() {
+    const panel = el('section', 'panel wt-rooms');
+    panel.setAttribute('aria-labelledby', 'unlistedTitle');
+    const head = el('div', 'panel-head');
+    const title = el('h2', null, 'Not shown to visitors');
+    title.id = 'unlistedTitle';
+    head.appendChild(title);
+
+    const list = el('ul', 'wt-room-list');
+    checks.unlisted.forEach(item => {
+      const row = el('li', 'wt-room');
+      const img = el('img');
+      img.src = thumbUrl(item.nodeId);
+      img.loading = 'lazy';
+      img.alt = (item.label || 'This room') + ', a room photo visitors are not offered';
+
+      const text = el('div', 'wt-room-text');
+      text.append(el('h3', null, item.label ? roomLabel(item.label) : 'Unnamed room'),
+        el('p', 'wt-room-meta', item.reachable ? 'Can be reached from the gate' : 'Cannot be reached from the gate'));
+
+      const actions = el('div', 'wt-room-actions');
+      if (canEdit) actions.appendChild(button('Put back on the list', 'btn btn-small', () => relist(item)));
+
+      row.append(img, text, actions);
+      list.appendChild(row);
+    });
+
+    panel.append(head, list);
+    return panel;
   }
 
   function floorHead({ building, floor }) {
@@ -228,7 +348,13 @@
 
     const text = el('div', 'wt-room-text');
     text.append(el('h3', null, roomLabel(room.name)),
-      el('p', 'wt-room-meta', photos(room.photos) + ' from the floor point'));
+      el('p', 'wt-room-meta', data.structured ? photos(room.photos) + ' from the floor point' : floorLabel(room.floor)));
+    const state = statusPill(room.name);
+    if (state) {
+      const line = el('p', 'wt-room-state');
+      line.appendChild(state);
+      text.appendChild(line);
+    }
     const guide = inGuide(room.name);
     if (guide) text.appendChild(el('p', 'wt-tag', 'In the enrollment guide'));
 
@@ -239,11 +365,13 @@
     visit.rel = 'noopener';
 
     if (canEdit) {
-      actions.append(
-        button('Update photos', 'btn btn-small', () => openEditor('update', room)),
-        button('Swap with…', 'btn-quiet btn-small', () => swapRoom(room)),
-        button('Rename', 'btn-quiet btn-small', () => renameRoom(room))
-      );
+      if (data.structured) {
+        actions.append(
+          button('Update photos', 'btn btn-small', () => openEditor('update', room)),
+          button('Swap with…', 'btn-quiet btn-small', () => swapRoom(room))
+        );
+      }
+      actions.appendChild(button('Rename', 'btn-quiet btn-small', () => renameRoom(room)));
       const remove = button('Remove', 'btn-danger btn-small', () => removeRoom(room));
       if (guide) {
         // Removing it would break the enrollment guide; the server refuses too.
@@ -255,10 +383,70 @@
       }
       actions.appendChild(remove);
     }
-    actions.appendChild(visit);
+    actions.append(button('View route', 'btn-quiet btn-small', () => showRoute(room)), visit);
 
     row.append(img, text, actions);
     return row;
+  }
+
+  /*
+    The walk from the gate to the door, as pictures, in order. This is the
+    answer to "which photo is which part of the building": nobody reads a
+    photo id, they look at the corridor and see where it leads.
+  */
+  async function showRoute(room) {
+    const dialog = el('dialog', 'wt-route');
+    const body = el('div', 'dialog-body');
+    const loading = el('p', null, 'Loading the walk…');
+    body.append(el('h2', null, 'The walk to ' + roomLabel(room.name)), loading);
+    const foot = el('div', 'dialog-foot');
+    foot.appendChild(button('Close', 'btn-quiet', () => dialog.close()));
+    dialog.append(body, foot);
+    dialog.addEventListener('close', () => dialog.remove());
+    document.body.appendChild(dialog);
+    dialog.showModal();
+
+    const { data: answer } = await apiGet('room-route.php', { name: room.name });
+    if (!dialog.open) return;
+
+    if (!answer.ok || !answer.reachable) {
+      loading.replaceWith(notice('error', 'No walk to show',
+        answer.ok ? answer.why : (answer.error || 'Could not load the walk.')));
+      return;
+    }
+
+    const strip = el('ol', 'walk');
+    answer.steps.forEach(step => {
+      const li = el('li', 'walk-step');
+      li.dataset.last = String(step.isLast);
+
+      const img = el('img');
+      img.src = thumbUrl(step.nodeId);
+      img.loading = 'lazy';
+      img.alt = 'Photo at step ' + step.position + ': ' + step.title;
+
+      let where;
+      if (step.isLast) {
+        where = 'The door. This is where the walk ends.';
+      } else if (step.shared > 6) {
+        // Naming forty rooms helps nobody; the count is the useful fact.
+        where = 'A main corridor. ' + step.shared + ' rooms are reached through here.';
+      } else if (step.shared > 0) {
+        where = 'On the way to ' + step.leadsTo.map(roomLabel).join(', ') + '.';
+      } else {
+        where = 'Leads only to this room.';
+      }
+
+      const text = el('div');
+      text.append(el('div', 'n', 'Step ' + step.position + ' of ' + answer.total),
+        el('div', 't', step.isLast ? roomLabel(step.title) : step.title), el('p', 'd', where));
+
+      li.append(img, text);
+      strip.appendChild(li);
+    });
+
+    loading.replaceWith(el('p', null, 'From the gate to the door, ' + photos(answer.total)
+      + '. This is exactly what a visitor sees, in order.'), strip);
   }
 
   /* ------------------------------------------------------ preparing photos */
@@ -730,13 +918,46 @@
     input.autocomplete = 'off';
     input.value = roomLabel(room.name);
 
+    const fields = [field('renameField', 'New name', input,
+      inGuide(room.name) ? 'The enrollment guide sends visitors here, and it will use the new name too.' : null)];
+    // On the building map a room's floor comes from its photos: it moves by swapping.
+    const floor = data.structured ? null : floorChoice(room.floor);
+    if (floor) fields.push(field('renameFloor', 'Floor', floor));
+
     ask({
       title: 'Rename ' + roomLabel(room.name),
       message: 'The photos stay the same. Visitors see the new name in the room list and when they arrive.',
-      fields: [field('renameField', 'New name', input,
-        inGuide(room.name) ? 'The enrollment guide sends visitors here, and it will use the new name too.' : null)],
+      fields,
       confirmLabel: 'Rename',
-      onSave: async () => (await apiPost('room-action.php', { action: 'rename', name: room.name, newName: input.value })).data
+      onSave: async () => (await apiPost('room-action.php', {
+        action: 'rename', name: room.name, newName: input.value, floor: floor ? floor.value : ''
+      })).data
+    });
+  }
+
+  function floorChoice(selected) {
+    const select = el('select');
+    checks.floors.forEach(f => select.appendChild(new Option(floorLabel(f), f, false, f === selected)));
+    return select;
+  }
+
+  /* Older map only: a room photo taken off the list goes back on it. */
+  function relist(item) {
+    const input = el('input');
+    input.type = 'text';
+    input.maxLength = 100;
+    input.autocomplete = 'off';
+    input.value = item.label ? roomLabel(item.label) : '';
+    const floor = floorChoice(checks.floors[0]);
+
+    ask({
+      title: 'Put this room back on the list',
+      message: 'Visitors will be able to choose it again. Give it the name and floor they should see.',
+      fields: [field('relistName', 'Room name', input), field('relistFloor', 'Floor', floor)],
+      confirmLabel: 'Put it back',
+      onSave: async () => (await apiPost('room-action.php', {
+        action: 'relist', nodeId: item.nodeId, newName: input.value, floor: floor.value
+      })).data
     });
   }
 
@@ -768,8 +989,11 @@
   async function removeRoom(room) {
     const yes = await confirmAction({
       title: 'Remove ' + roomLabel(room.name) + '?',
-      message: 'Visitors will no longer be able to choose it, and its ' + photos(room.photos)
-        + ' are deleted for good. The fixed path is not affected.',
+      // On the older map hallway photos are shared, so the server keeps them.
+      message: data.structured
+        ? 'Visitors will no longer be able to choose it, and its ' + photos(room.photos)
+          + ' are deleted for good. The fixed path is not affected.'
+        : 'Visitors will no longer be able to choose it. Its photos are kept, and it can be put back on the list from this page.',
       confirmLabel: 'Remove the room',
       danger: true
     });

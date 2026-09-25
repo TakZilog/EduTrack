@@ -14,10 +14,10 @@
   /* Each figure links to the list it summarises, with the filter already
      applied, so a number is something you can act on rather than just read. */
   const counts = [
-    { n: data.rooms.total,      l: 'Mapped Locations',     href: 'rooms.html', tone: '' },
-    { n: data.rooms.photos,     l: 'Walkthrough Photos',   href: 'rooms.html', tone: '' },
-    { n: data.rooms.reachable,  l: 'Reachable Locations',  href: 'rooms.html', tone: '' },
-    { n: data.rooms.problems,   l: 'Navigation Issues',    href: 'rooms.html', tone: data.rooms.problems > 0 ? 'is-bad' : '' }
+    { n: data.rooms.total,      l: 'Mapped Locations',     href: 'walkthrough.html', tone: '' },
+    { n: data.rooms.photos,     l: 'Walkthrough Photos',   href: 'walkthrough.html', tone: '' },
+    { n: data.rooms.reachable,  l: 'Reachable Locations',  href: 'walkthrough.html', tone: '' },
+    { n: data.rooms.problems,   l: 'Navigation Issues',    href: 'walkthrough.html', tone: data.rooms.problems > 0 ? 'is-bad' : '' }
   ];
 
   const host = document.getElementById('counts');
