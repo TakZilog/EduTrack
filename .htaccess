@@ -88,7 +88,15 @@ Options -Indexes
 
 # Map snapshots and the photos staff replaced are kept here. PHP reads them
 # from disk; they were never meant to be browsable.
-RedirectMatch 404 ^/EduTrack/(storage|sql|tools|vendor)/
+# A rewrite rule, not RedirectMatch: RedirectMatch compared the address as
+# typed, and Windows ignores case, trailing dots and trailing spaces in folder
+# names, so /EduTrack/Storage/, /storage./ and /storage%20/ all got past it and
+# served the photos. A rule in this file is matched against the real folder
+# name on disk, whichever way the address spells it.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(storage|sql|tools|vendor)(/|$) - [R=404,L,NC]
+</IfModule>
 
 # Repository and tooling files. The public site is served straight out of this
 # checkout, so without this /.git/ hands out the full source and history.
