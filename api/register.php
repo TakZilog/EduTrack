@@ -53,8 +53,9 @@ if (!is_valid_study_load_no($studyLoadNo)) {
 // has none to record, so it never tripped.
 rate_limit_action(client_ip(), 'register', 10, 15, 'Too many registration attempts. Wait a few minutes and try again.');
 
-$pdo  = get_db();
-$code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+$pdo     = get_db();
+$code    = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+$minutes = otp_minutes();
 
 try {
     $pdo->beginTransaction();
@@ -106,7 +107,7 @@ try {
     // afterwards meant a mail failure left the student stranded with an account
     // they could never verify. Holding the transaction open across the SMTP
     // round trip costs a little concurrency, which at this volume is worth it.
-    send_otp_email($email, $code);
+    send_otp_email($email, $code, $minutes);
 
     $pdo->commit();
 } catch (Throwable $e) {
@@ -119,7 +120,7 @@ try {
 $_SESSION['otp'] = [
     'email'      => $email,
     'code'       => $code,
-    'expires_at' => time() + 600,
+    'expires_at' => time() + $minutes * 60,
     'attempts'   => 0,
 ];
 

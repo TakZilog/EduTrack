@@ -173,6 +173,14 @@ function setting(string $key, string $default = ''): string
     return $cache[$key] ?? $default;
 }
 
+/** A whole-number setting, kept inside the range the Settings page allows. */
+function setting_int(string $key, int $default, int $min, int $max): int
+{
+    $value = setting($key, (string) $default);
+
+    return is_numeric($value) ? max($min, min($max, (int) $value)) : $default;
+}
+
 /**
  * Turns a driver-level failure into something the person running the machine
  * can act on. Never includes the password.

@@ -5,10 +5,17 @@ require_once __DIR__ . '/db.php';   // config_path(): where the mail password is
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+/** How long an email code lasts, as set on the Settings page. */
+function otp_minutes(): int
+{
+    return setting_int('otp_lifetime_minutes', 10, 5, 60);
+}
+
 /**
  * Sends the OTP email. Returns true on success, or throws PHPMailer\Exception on failure.
+ * $minutes is the code's lifetime, told to the student in the email.
  */
-function send_otp_email(string $toEmail, string $code): bool {
+function send_otp_email(string $toEmail, string $code, int $minutes): bool {
     $configPath = config_path();
     if ($configPath === null) {
         throw new Exception('The config file with the mail settings is missing.');
@@ -29,8 +36,8 @@ function send_otp_email(string $toEmail, string $code): bool {
 
     $mail->isHTML(true);
     $mail->Subject = 'Your EduTrack verification code';
-    $mail->Body    = "<p>Your verification code is:</p><h2 style=\"letter-spacing:4px;\">{$code}</h2><p>This code expires in 10 minutes.</p>";
-    $mail->AltBody  = "Your verification code is: {$code} (expires in 10 minutes)";
+    $mail->Body    = "<p>Your verification code is:</p><h2 style=\"letter-spacing:4px;\">{$code}</h2><p>This code expires in {$minutes} minutes.</p>";
+    $mail->AltBody  = "Your verification code is: {$code} (expires in {$minutes} minutes)";
 
     return $mail->send();
 }

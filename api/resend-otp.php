@@ -26,10 +26,11 @@ rate_limit_action(
     'You have requested three codes recently. Wait a few minutes before asking for another.'
 );
 
-$code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+$code    = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+$minutes = otp_minutes();
 
 try {
-    send_otp_email($otp['email'], $code);
+    send_otp_email($otp['email'], $code, $minutes);
 } catch (Throwable $e) {
     json_fail(500, 'Could not send the email. Try again in a moment.');
 }
@@ -37,7 +38,7 @@ try {
 $_SESSION['otp'] = [
     'email'      => $otp['email'],
     'code'       => $code,
-    'expires_at' => time() + 600,
+    'expires_at' => time() + $minutes * 60,
     'attempts'   => 0,
 ];
 

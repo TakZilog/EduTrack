@@ -21,7 +21,8 @@ if ($email === '' || $password === '') {
 
 // Email is the login identifier. Full names are not unique, so they cannot be.
 $ip = client_ip();
-rate_limit_check($email, 'student_login');
+[$tries, $lockMinutes] = login_lockout();
+rate_limit_check($email, 'student_login', $tries, $lockMinutes);
 rate_limit_check($ip, 'student_login_ip', 20);
 
 $pdo  = get_db();

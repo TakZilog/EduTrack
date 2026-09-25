@@ -30,7 +30,8 @@ if ($username === '' || $password === '') {
 }
 
 $ip = client_ip();
-rate_limit_check($username, 'admin_login', 5, 15, 'Too many tries. Please wait %d minutes and try again.');
+[$tries, $lockMinutes] = login_lockout();
+rate_limit_check($username, 'admin_login', $tries, $lockMinutes, 'Too many tries. Please wait %d minutes and try again.');
 rate_limit_check($ip, 'admin_login_ip', 20, 15, 'Too many tries from this computer. Please wait %d minutes.');
 
 $pdo  = get_db();

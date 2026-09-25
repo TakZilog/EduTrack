@@ -54,6 +54,20 @@ function rate_limit_check(
     json_fail(429, sprintf($message, $waitMins));
 }
 
+/**
+ * The wrong-password rule set on the Settings page, for students and staff
+ * alike: how many tries an account gets, and how long it is then locked out.
+ *
+ * @return array{0: int, 1: int} [tries, minutes]
+ */
+function login_lockout(): array
+{
+    return [
+        setting_int('login_max_attempts', 5, 3, 20),
+        setting_int('login_lockout_minutes', 15, 5, 120),
+    ];
+}
+
 /** Records one attempt. A success clears prior failures for that identifier. */
 function rate_limit_record(string $identifier, string $scope, bool $successful): void
 {
